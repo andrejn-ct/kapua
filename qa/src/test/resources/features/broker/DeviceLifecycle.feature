@@ -26,7 +26,7 @@ Scenario: Starting and stopping the simulator should create a device entry and p
     And My credentials are username "kapua-sys" and password "kapua-password"
 
   When I start the simulator
-  Then Device sim-1 for account kapua-sys is registered after 30 seconds
+  Then Device sim-1 for account kapua-sys is registered after 120 seconds
   And The device should report simulator device information
   And I expect the device to report the applications
     | DEPLOY-V2 |
@@ -46,7 +46,7 @@ Scenario: Starting and stopping the simulator should create a device entry and p
   Then The bundle org.eclipse.kura.api with version 2.1.0 is present and ACTIVE
   
   When I stop the simulator
-  Then Device sim-1 for account kapua-sys is not registered after 30 seconds
+  Then Device sim-1 for account kapua-sys is not registered after 120 seconds
 
 Scenario: Installing a package
   Given The account name is kapua-sys and the client ID is sim-1
@@ -54,15 +54,15 @@ Scenario: Installing a package
     And My credentials are username "kapua-sys" and password "kapua-password"
   
   When I start the simulator
-  Then Device sim-1 for account kapua-sys is registered after 30 seconds
+  Then Device sim-1 for account kapua-sys is registered after 120 seconds
   
   When I fetch the package states
   Then There must be no installed packages
   
   When I start to download package "foo.bar" with version 1.2.3 from http://127.0.0.1/foo.dp
   
-  Then The download state changes to IN_PROGRESS in the next 30 seconds
-   And The download state changes to COMPLETED in the next 60 seconds
+  Then The download state changes to IN_PROGRESS in the next 120 seconds
+   And The download state changes to COMPLETED in the next 240 seconds
   
   When I fetch the package states
   Then Package "foo.bar" with version 1.2.3 is installed and has 10 mock bundles

@@ -782,6 +782,7 @@ public class DataStoreServiceSteps extends AbstractKapuaSteps {
     public void getEmptyMessageListResult() {
 
         MessageListResult result = (MessageListResult) stepData.get("messageListResult");
+        assertEquals(0, result.getSize());
         assertTrue(result.isEmpty());
     }
 
