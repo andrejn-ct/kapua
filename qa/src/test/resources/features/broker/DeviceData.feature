@@ -26,7 +26,7 @@ Scenario: Connect to the system and publish some data
   
   When I start the simulator 
   
-  Then Device sim-1 for account kapua-sys is registered after 5 seconds
+  Then Device sim-1 for account kapua-sys is registered after 30 seconds
    And I expect the device to report the applications
     | DEPLOY-V2 |
     | CMD-V1 |
@@ -50,7 +50,7 @@ Scenario: Connect to the system and publish some data
     | key | type | value |
     | foo.boolean| BOOLEAN | true |
   
-  And  I wait 5 seconds for the broker to process its data
+  And  I wait 30 seconds for the broker to process its data
   And  I refresh all indices
   
   Then I expect the number of messages for this device to be 5
@@ -59,7 +59,7 @@ Scenario: Connect to the system and publish some data
     | foo.boolean | BOOLEAN | true |
   
   When I stop the simulator
-  Then Device sim-1 for account kapua-sys is not registered after 5 seconds
+  Then Device sim-1 for account kapua-sys is not registered after 30 seconds
 
   @StopBroker
   Scenario: Stop broker after all scenarios
