@@ -49,6 +49,7 @@ Scenario: Birth message handling from a new device
     Then I find 1 event
     And The type of the last event is "BIRTH"
     And I logout
+    Then All indices are deleted
 
 Scenario: Birth message handling from an existing device
     A BIRTH message is received from an already existing device. A new BIRTH event must be
@@ -81,6 +82,7 @@ Scenario: Birth message handling from an existing device
     Then I find 1 event
     And The type of the last event is "BIRTH"
     And I logout
+    Then All indices are deleted
 
 Scenario: Handling of 2 birth messages
     Two BIRTH messages are received from a device. No exception should be thrown and there should be
@@ -111,6 +113,7 @@ Scenario: Handling of 2 birth messages
     Then I find 2 events
     And The type of the last event is "BIRTH"
     And I logout
+    Then All indices are deleted
 
 Scenario: Handling of a disconnect message from a non existing device
     Reception of a DISCONNECT message with a nonexistent client ID should result in an exception.
@@ -137,6 +140,7 @@ Scenario: Handling of a disconnect message from a non existing device
     When A disconnect message from device "device_1"
     Then An exception was thrown
     And I logout
+    Then All indices are deleted
 
 Scenario: Birth and death message handling
     Reception of a BIRTH-DISCONNECT pair. The first message (BIRTH) should cause a device to be
@@ -169,6 +173,7 @@ Scenario: Birth and death message handling
     Then I find 2 events
     And The type of the last event is "DEATH"
     And I logout
+    Then All indices are deleted
 
 Scenario: Birth and missing event handling
     Reception of a BIRTH-MISSING pair. The first message (BIRTH) should cause a device to be
@@ -201,6 +206,7 @@ Scenario: Birth and missing event handling
     Then I find 2 events
     And The type of the last event is "MISSING"
     And I logout
+    Then All indices are deleted
 
 Scenario: Birth and applications event handling
     Reception of a BIRTH-APPLICATION pair. The first message (BIRTH) should cause a device to be
@@ -233,6 +239,7 @@ Scenario: Birth and applications event handling
     Then I find 2 events
     And The type of the last event is "APPLICATION"
     And I logout
+    Then All indices are deleted
 
 Scenario: Creating new device and tagging it with specific Tag
   Procedure of registering a device is executed and device BIRTH message is sent.
@@ -263,6 +270,7 @@ Scenario: Creating new device and tagging it with specific Tag
     When I search for device with tag "KuraDevice"
     Then I find device "device_1"
     And I logout
+    Then All indices are deleted
 
   @StopBroker
   Scenario: Stop broker after all scenarios

@@ -60,6 +60,7 @@ Feature: Broker ACL tests
     Then Broker receives string "Hello broker" on topic "$EDC/acme/client-1/CONF-V1/REPLY"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM2 Data manage create sub-topic on CTRL_ACC_REPLY
   Normal user with data manage profile publishes to topic $EDC.{0}.*.*.REPLY.foo
@@ -73,6 +74,7 @@ Feature: Broker ACL tests
     Then Broker receives string "Hello broker" on topic "$EDC/acme/client-1/CONF-V1/REPLY/foo"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM3 Data manage subscribe on personal CTRL_ACC_REPLY
   Normal user with data manage profile subscribes to $EDC.{0}.*.*.REPLY
@@ -85,6 +87,7 @@ Feature: Broker ACL tests
     Then client "client-1" receives string "Hello broker" on topic "$EDC/acme/client-1/CONF-V1/REPLY"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM4 Data manage subscribe on CTRL_ACC_REPLY of another account
   Normal user with data manage profile subscribes to $EDC.{0}.*.*.REPLY of other account
@@ -96,6 +99,7 @@ Feature: Broker ACL tests
     Then exception is thrown
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM5 Data manage publish to CTRL_ACC is not allowed
   Normal user with data manage profile publishes to topic $EDC.{0}.>
@@ -107,6 +111,7 @@ Feature: Broker ACL tests
     Then Broker doesn't receive string "Hello broker" on topic "$EDC/acme"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM6 Data manage create sub-topic on CTRL_ACC is not allowed
   Normal user with data manage profile publishes to topic $EDC.{0}.foo
@@ -119,6 +124,7 @@ Feature: Broker ACL tests
     Then Broker doesn't receive string "Hello broker" on topic "$EDC/acme/foo"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM7 Data manage subscribe on CTRL_ACC is not allowed
   Normal user with data manage profile subscribes to $EDC.{0}.>
@@ -129,6 +135,7 @@ Feature: Broker ACL tests
     Then exception is thrown
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM8 Data manage subscribe - publish - admin on CTRL_ACC_CLI
   Normal user with data manage profile subscribes to $EDC.{0}.{1}.> and at the same time
@@ -141,6 +148,7 @@ Feature: Broker ACL tests
     Then client "client-1" receives string "Hello broker" on topic "$EDC/acme/client-1/foo"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM9 Data manage subscribe - publish - admin on ACL_DATA_ACC
   Normal user with data manage profile subscribes to {0}.> and at the same time
@@ -153,6 +161,7 @@ Feature: Broker ACL tests
     Then client "client-1" receives string "Hello broker" on topic "acme/foo"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM10 Data manage subscribe - publish - admin on ACL_DATA_ACC_CLI
   Normal user with data manage profile subscribes to {0}.{1}.> and at the same time
@@ -165,6 +174,7 @@ Feature: Broker ACL tests
     Then client "client-1" receives string "Hello broker" on topic "acme/client-1/foo"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   Scenario: DM11 Data manage publish to ACL_CTRL_ACC_NOTIFY is allowed
   Normal user with data manage profile publishes to topic $EDC.{0}.*.*.NOTIFY.{1}.>
@@ -177,6 +187,7 @@ Feature: Broker ACL tests
     Then Broker receives string "Hello broker" on topic "$EDC/acme/foo/bar/NOTIFY/client-1"
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
 #  Scenario: DM12 Data manage create sub-topic on ACL_CTRL_ACC_NOTIFY is not allowed
 #    Normal user with data manage profile publishes to topic $EDC.{0}.*.*.NOTIFY.{1}.foo
@@ -199,6 +210,7 @@ Feature: Broker ACL tests
     Then exception is thrown
     And clients are disconnected
     And Mqtt Device is stoped
+    Then All indices are deleted
 
   @StopBroker
   Scenario: Stop broker after all scenarios

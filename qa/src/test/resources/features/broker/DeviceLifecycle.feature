@@ -47,6 +47,7 @@ Scenario: Starting and stopping the simulator should create a device entry and p
   
   When I stop the simulator
   Then Device sim-1 for account kapua-sys is not registered after 120 seconds
+  And All indices are deleted
 
 Scenario: Installing a package
   Given The account name is kapua-sys and the client ID is sim-1
@@ -66,6 +67,7 @@ Scenario: Installing a package
   
   When I fetch the package states
   Then Package "foo.bar" with version 1.2.3 is installed and has 10 mock bundles
+  And All indices are deleted
 
   @StopBroker
   Scenario: Stop broker after all scenarios

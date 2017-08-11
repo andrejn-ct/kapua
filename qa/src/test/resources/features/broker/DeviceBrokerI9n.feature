@@ -38,6 +38,7 @@ Feature: Device Broker Integration
     Then Exit code 0 is received
     And I logout
     And Device death message is sent
+    Then All indices are deleted
 
   @StopBroker
   Scenario: Stop broker after all scenarios
