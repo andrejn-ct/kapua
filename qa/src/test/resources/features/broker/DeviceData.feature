@@ -60,6 +60,7 @@ Scenario: Connect to the system and publish some data
   
   When I stop the simulator
   Then Device sim-1 for account kapua-sys is not registered after 120 seconds
+  And All indices are deleted
 
   @StopBroker
   Scenario: Stop broker after all scenarios
