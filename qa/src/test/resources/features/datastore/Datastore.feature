@@ -28,6 +28,7 @@ Feature: Datastore tests
     doesn't exist it is not deleted.
 
     Given I login as user with name "kapua-sys" and password "kapua-password"
+    Then All indices are deleted
     Given Account for "kapua-sys"
       When I search for data message with id "fake-id"
         Then I don't find message
