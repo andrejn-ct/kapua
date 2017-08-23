@@ -163,6 +163,8 @@ public class DataStoreServiceSteps extends AbstractKapuaSteps {
 
         // JAXB Context
         XmlUtil.setContextProvider(new DatastoreJAXBContextProvider());
+
+        deleteAllIndices();
     }
 
     @After
