@@ -174,6 +174,7 @@ public class DataStoreServiceSteps extends AbstractKapuaSteps {
             logger.info("Logging out in cleanup");
             SecurityUtils.getSubject().logout();
             KapuaSecurityUtils.clearSession();
+            deleteAllIndices();
         } catch (Exception e) {
             logger.error("Failed to log out in @After", e);
         }
