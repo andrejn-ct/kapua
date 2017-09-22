@@ -11,8 +11,8 @@
         Eurotech - initial API and implementation
         Red Hat Inc
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -60,7 +60,7 @@
 
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-rest-api</artifactId>
+            <artifactId>kapua-rest-api-web</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
@@ -180,6 +180,10 @@
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-transport-mqtt</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-foreignkeys</artifactId>
         </dependency>
         <dependency>
             <!-- Google protobuf for message encoding -->
@@ -326,7 +330,7 @@
 
     <profiles>
         <profile>
-            <id>deploy</id>
+            <id>deployVagrant</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -382,21 +386,21 @@
         <profile>
             <id>docker</id>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <name>${docker.account}/kapua-api</name>
-                                    <build>
-                                        <from>${docker.account}/jetty-base</from>
-                                        <assembly>
-                                            <descriptor>${basedir}/src/main/descriptors/kapua-api-jetty.xml</descriptor>
-                                            <basedir>/var/lib/jetty</basedir>
-                                        </assembly>
-                                        <env>
+                    <plugins>
+                        <plugin>
+                            <groupId>io.fabric8</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <configuration>
+                                <images>
+                                    <image>
+                                        <name>${docker.account}/kapua-api</name>
+                                        <build>
+                                            <from>${docker.account}/jetty-base</from>
+                                            <assembly>
+                                                <descriptor>${basedir}/src/main/descriptors/kapua-api-jetty.xml</descriptor>
+                                                <basedir>/var/lib/jetty</basedir>
+                                            </assembly>
+                                            <env>
                                             <SQL_DB_PORT>\${DB_PORT_3306_TCP_PORT}</SQL_DB_PORT>
                                             <SQL_DB_ADDR>\${DB_PORT_3306_TCP_ADDR}</SQL_DB_ADDR>
                                             <DATASTORE_PORT>\${ES_PORT_9200_TCP_PORT}</DATASTORE_PORT>
@@ -407,15 +411,16 @@
                                                 -Dbroker.host=\${BROKER_PORT_1883_TCP_ADDR} \
                                                 -Ddatastore.elasticsearch.nodes=\${DATASTORE_ADDR} \
                                                 -Ddatastore.elasticsearch.port=\${DATASTORE_PORT} \
-                                                -Ddatastore.client.class=\${DATASTORE_CLIENT}</JAVA_OPTS>
-                                        </env>
-                                        <user>kapua</user>
-                                    </build>
-                                </image>
-                            </images>
-                        </configuration>
-                    </plugin>
-                </plugins>
+                                                -Ddatastore.client.class=\${DATASTORE_CLIENT}
+                                            </JAVA_OPTS>
+                                            </env>
+                                            <user>kapua</user>
+                                        </build>
+                                    </image>
+                                </images>
+                            </configuration>
+                        </plugin>
+                    </plugins>
             </build>
         </profile>
     </profiles>

@@ -31,7 +31,8 @@
             <useProjectArtifact>false</useProjectArtifact>
 
             <includes>
-                <include>${pom.groupId}:kapua-rest-api:war</include>
+                <include>${pom.groupId}:kapua-rest-api-web:war</include>
+                <include>${pom.groupId}:kapua-foreignkeys</include>
             </includes>
 
         </dependencySet>

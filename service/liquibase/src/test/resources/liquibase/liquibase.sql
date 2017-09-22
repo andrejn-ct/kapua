@@ -17,6 +17,8 @@
 CREATE TABLE tst_liquibase (
   id                         BIGINT(21) 	  UNSIGNED NOT NULL,
 
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+
+  CHECK  id >= 0
   
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
