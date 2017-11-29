@@ -21,11 +21,11 @@ Feature: User Service Integration
     And I configure account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities | 50    |
+      | integer | maxNumberChildEntities | 500   |
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 5     |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
@@ -36,11 +36,11 @@ Feature: User Service Integration
     And I configure account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities | 5     |
+      | integer | maxNumberChildEntities | 500   |
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 5     |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
@@ -65,7 +65,7 @@ Feature: User Service Integration
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 5     |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
@@ -98,11 +98,11 @@ Feature: User Service Integration
     And I configure account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities | 50    |
+      | integer | maxNumberChildEntities | 500   |
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 50    |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
@@ -113,11 +113,11 @@ Feature: User Service Integration
     And I configure account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities | 10    |
+      | integer | maxNumberChildEntities | 500    |
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 5     |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
@@ -139,11 +139,11 @@ Feature: User Service Integration
     And I configure account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities | 10    |
+      | integer | maxNumberChildEntities | 500   |
     And I configure user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
-      | integer | maxNumberChildEntities     | 5     |
+      | integer | maxNumberChildEntities     | 500   |
       | boolean | lockoutPolicy.enabled      | false |
       | integer | lockoutPolicy.maxFailures  | 3     |
       | integer | lockoutPolicy.resetAfter   | 300   |
