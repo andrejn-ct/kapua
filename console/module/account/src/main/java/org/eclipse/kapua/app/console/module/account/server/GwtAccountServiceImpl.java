@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sanselan.ImageFormat;
 import org.apache.sanselan.Sanselan;
 import org.eclipse.kapua.app.console.module.api.server.KapuaRemoteServiceServlet;
@@ -195,18 +194,29 @@ public class GwtAccountServiceImpl extends KapuaRemoteServiceServlet implements 
         KapuaId accountId = KapuaEid.parseCompactId(accountIdString);
 
         KapuaLocator locator = KapuaLocator.getInstance();
-        AccountService accountService = locator.getService(AccountService.class);
+        final AccountService accountService = locator.getService(AccountService.class);
         final UserService userService = locator.getService(UserService.class);
 
         List<GwtGroupedNVPair> accountPropertiesPairs = new ArrayList<GwtGroupedNVPair>();
         try {
             final Account account = accountService.find(scopeId, accountId);
-            String brokerUrl;
-            if (accountService.getConfigValues(account.getId()).get("deviceBrokerClusterUri") != null && StringUtils.isNotEmpty(accountService.getConfigValues(account.getId()).get("deviceBrokerClusterUri").toString())) {
-                brokerUrl = accountService.getConfigValues(account.getId()).get("deviceBrokerClusterUri").toString();
-            } else {
-                brokerUrl = SystemUtils.getBrokerURI().toString();
-            }
+            final KapuaId rootAccountId = GwtKapuaCommonsModelConverter.convertKapuaId(findRootAccount().getId());
+            String brokerUri = KapuaSecurityUtils.doPrivileged(new Callable<String>() {
+
+                @Override
+                public String call() throws Exception {
+                    String brokerUriInternal;
+                    Object brokerUriObj = accountService.getConfigValues(rootAccountId).get("brokerUri");
+                    if (brokerUriObj == null) {
+                        brokerUriInternal = SystemUtils.getBrokerURI().toString();
+                    } else {
+                        brokerUriInternal = brokerUriObj.toString().isEmpty() ? SystemUtils.getBrokerURI().toString() : brokerUriObj.toString();
+                    }
+
+                    return brokerUriInternal;
+                }
+            });
+
             User userCreatedBy = KapuaSecurityUtils.doPrivileged(new Callable<User>() {
 
                 @Override
@@ -229,7 +239,7 @@ public class GwtAccountServiceImpl extends KapuaRemoteServiceServlet implements 
             accountPropertiesPairs.add(new GwtGroupedNVPair("accountInfo", "accountCreatedOn", account.getCreatedOn().toString()));
             accountPropertiesPairs.add(new GwtGroupedNVPair("accountInfo", "accountCreatedBy", userCreatedBy.getName()));
 
-            accountPropertiesPairs.add(new GwtGroupedNVPair("deploymentInfo", "deploymentBrokerURL", brokerUrl));
+            accountPropertiesPairs.add(new GwtGroupedNVPair("deploymentInfo", "deploymentBrokerURL", brokerUri));
 
             accountPropertiesPairs.add(new GwtGroupedNVPair("organizationInfo", "organizationName", account.getOrganization().getName()));
             accountPropertiesPairs.add(new GwtGroupedNVPair("organizationInfo", "organizationPersonName", account.getOrganization().getPersonName()));
@@ -697,7 +707,19 @@ public class GwtAccountServiceImpl extends KapuaRemoteServiceServlet implements 
 
     @Override
     public GwtAccount findRootAccount() throws GwtKapuaException {
-        return findByAccountName(SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_ACCOUNT));
+        GwtAccount gwtAccount = null;
+        try {
+            gwtAccount = KapuaSecurityUtils.doPrivileged(new Callable<GwtAccount>() {
+
+                @Override
+                public GwtAccount call() throws Exception {
+                    return findByAccountName(SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_ACCOUNT));
+                }
+            });
+        } catch (Throwable t) {
+            KapuaExceptionHandler.handle(t);
+        }
+        return gwtAccount;
     }
 
 }
