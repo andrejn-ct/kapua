@@ -9,33 +9,22 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.datastore.client.model;
+package org.eclipse.kapua.service.certificate.exception;
 
-/**
- * Index find response
- * 
- * @since 1.0
- */
-public class IndexExistsResponse {
+import org.eclipse.kapua.KapuaErrorCode;
+import org.eclipse.kapua.KapuaException;
 
-    private boolean indexExists;
+public class KapuaCertificateException extends KapuaException {
 
-    /**
-     * Default constructor
-     * 
-     * @param indexExists
-     */
-    public IndexExistsResponse(boolean indexExists) {
-        this.indexExists = indexExists;
+    public KapuaCertificateException(KapuaErrorCode code) {
+        super(code);
     }
 
-    /**
-     * Get the index exists
-     * 
-     * @return
-     */
-    public boolean isIndexExists() {
-        return indexExists;
+    public KapuaCertificateException(KapuaErrorCode code, Object... arguments) {
+        super(code, arguments);
     }
 
+    public KapuaCertificateException(KapuaErrorCode code, Throwable cause, Object... arguments) {
+        super(code, cause, arguments);
+    }
 }

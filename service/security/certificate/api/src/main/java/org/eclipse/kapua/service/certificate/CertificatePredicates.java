@@ -9,33 +9,19 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.datastore.client.model;
+package org.eclipse.kapua.service.certificate;
 
-/**
- * Index find request
- * 
- * @since 1.0
- */
-public class IndexExistsRequest {
+import org.eclipse.kapua.model.KapuaUpdatableEntityPredicates;
 
-    private String index;
+public interface CertificatePredicates extends KapuaUpdatableEntityPredicates {
 
     /**
-     * Default constructor
-     * 
-     * @param index
+     * Certificate name
      */
-    public IndexExistsRequest(String index) {
-        this.index = index;
-    }
+    public static final String NAME = "name";
 
-    /**
-     * Get the index name
-     * 
-     * @return
-     */
-    public String getIndex() {
-        return index;
-    }
+    public static final String USAGE = "certificateUsages";
+
+    public static final String USAGE_NAME = USAGE + ".name";
 
 }
