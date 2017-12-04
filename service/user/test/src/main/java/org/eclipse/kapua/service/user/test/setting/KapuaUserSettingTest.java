@@ -9,10 +9,11 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.user.internal.setting;
+package org.eclipse.kapua.service.user.test.setting;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.kapua.service.user.internal.setting.KapuaUserSetting;
 import org.junit.Test;
 
 public class KapuaUserSettingTest {
