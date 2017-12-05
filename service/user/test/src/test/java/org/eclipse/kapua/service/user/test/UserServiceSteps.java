@@ -11,23 +11,17 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.user.test;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-
-import java.math.BigInteger;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import cucumber.api.Scenario;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import cucumber.runtime.java.guice.ScenarioScoped;
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.configuration.KapuaConfigurableServiceSchemaUtils;
 import org.eclipse.kapua.commons.configuration.metatype.KapuaMetatypeFactoryImpl;
 import org.eclipse.kapua.commons.jpa.AbstractEntityManagerFactory;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
@@ -38,32 +32,40 @@ import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.model.config.metatype.KapuaMetatypeFactory;
 import org.eclipse.kapua.model.config.metatype.KapuaTocd;
 import org.eclipse.kapua.model.query.KapuaQuery;
+import org.eclipse.kapua.qa.steps.DBHelper;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.Permission;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
-import org.eclipse.kapua.service.liquibase.KapuaLiquibaseClient;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserCreator;
 import org.eclipse.kapua.service.user.UserFactory;
 import org.eclipse.kapua.service.user.UserListResult;
 import org.eclipse.kapua.service.user.UserService;
+import org.eclipse.kapua.service.user.UserStatus;
+import org.eclipse.kapua.service.user.internal.UserEntityManagerFactory;
+import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
 import org.eclipse.kapua.service.user.internal.UserImpl;
 import org.eclipse.kapua.service.user.internal.UserServiceImpl;
-import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
-import org.eclipse.kapua.service.user.internal.UserEntityManagerFactory;
 import org.eclipse.kapua.service.user.internal.UsersJAXBContextProvider;
-import org.eclipse.kapua.service.user.UserStatus;
 import org.eclipse.kapua.test.MockedLocator;
 import org.eclipse.kapua.test.steps.AbstractKapuaSteps;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import cucumber.runtime.java.guice.ScenarioScoped;
+import javax.inject.Inject;
+import java.math.BigInteger;
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+//import static org.mockito.Matchers.any;
+//import static org.mockito.Mockito.mock;
 
 /**
  * Implementation of Gherkin steps used in UserService.feature scenarios.
@@ -73,6 +75,8 @@ import cucumber.runtime.java.guice.ScenarioScoped;
  */
 @ScenarioScoped
 public class UserServiceSteps extends AbstractKapuaSteps {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceSteps.class);
 
     static {
         setupDI();
@@ -90,6 +94,7 @@ public class UserServiceSteps extends AbstractKapuaSteps {
 
     private static final String DEFAULT_COMMONS_PATH = "../../../commons/";
     private static final String DROP_FILTER = "usr_*_drop.sql";
+    private static final String DELETE_FILTER = "usr_*_delete.sql";
 
     private static final int DEFAULT_SCOPE_ID = 42;
 
@@ -151,6 +156,8 @@ public class UserServiceSteps extends AbstractKapuaSteps {
     private String exceptionMessage;
     private boolean exceptionCaught;
 
+    private DBHelper database;
+
     /**
      * Setup DI with Google Guice DI.
      * Create mocked and non mocked service under test and bind them with Guice.
@@ -166,15 +173,15 @@ public class UserServiceSteps extends AbstractKapuaSteps {
             protected void configure() {
 
                 // Inject mocked Authorization Service method checkPermission
-                AuthorizationService mockedAuthorization = mock(AuthorizationService.class);
+                AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
                 try {
-                    Mockito.doNothing().when(mockedAuthorization).checkPermission(any(Permission.class));
+                    Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(Permission.class));
                 } catch (KapuaException e) {
                     // skip
                 }
                 bind(AuthorizationService.class).toInstance(mockedAuthorization);
                 // Inject mocked Permission Factory
-                PermissionFactory mockedPermissionFactory = mock(PermissionFactory.class);
+                PermissionFactory mockedPermissionFactory = Mockito.mock(PermissionFactory.class);
                 bind(PermissionFactory.class).toInstance(mockedPermissionFactory);
                 // Set KapuaMetatypeFactory for Metatype configuration
                 KapuaMetatypeFactory metaFactory = new KapuaMetatypeFactoryImpl();
@@ -194,6 +201,12 @@ public class UserServiceSteps extends AbstractKapuaSteps {
         mockedLocator.setInjector(injector);
     }
 
+    @Inject
+    public UserServiceSteps(DBHelper dbHelper) {
+
+        this.database = dbHelper;
+    }
+
     @Before
     public void beforeScenario(Scenario scenario) throws Exception {
 
@@ -203,14 +216,16 @@ public class UserServiceSteps extends AbstractKapuaSteps {
 
         this.scenario = scenario;
 
+        database.setup();
+
         exceptionExpected = false;
         exceptionName = "";
         exceptionMessage = "";
         exceptionCaught = false;
 
         // Create User Service tables
-        enableH2Connection();
-        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "kapua", "kapua").update();
+//        enableH2Connection();
+//        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "kapua", "kapua").update();
 
         // Create KapuaSession using KapuaSecurtiyUtils and kapua-sys user as logged in user.
         // All operations on database are performed using system user.
@@ -225,12 +240,13 @@ public class UserServiceSteps extends AbstractKapuaSteps {
     @After
     public void afterScenario() throws Exception {
 
-        // Drop User Service tables
-        scriptSession((AbstractEntityManagerFactory) UserEntityManagerFactory.getInstance(), DROP_FILTER);
+        // Delete User Service tables
+        scriptSession((AbstractEntityManagerFactory) UserEntityManagerFactory.getInstance(), DELETE_FILTER);
 
         // Drop system configuration tables
-        KapuaConfigurableServiceSchemaUtils.dropSchemaObjects(DEFAULT_COMMONS_PATH);
+//        KapuaConfigurableServiceSchemaUtils.dropSchemaObjects(DEFAULT_COMMONS_PATH);
 
+        // database.deleteAll();
         KapuaSecurityUtils.clearSession();
     }
 

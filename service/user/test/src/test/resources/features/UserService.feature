@@ -14,6 +14,12 @@ Feature: User Service
     User Service is responsible for CRUD operations on User objects in Kapua
     database.
 
+#@StartBroker
+#Scenario: Start broker for all scenarios
+
+@StartDatastore
+Scenario: Start datastore for all scenarios
+
 Scenario: Creating user 
     Create user with all User entity fields set and persist it in database. Then try to
     find it by name and check all the fields.
@@ -22,10 +28,10 @@ Scenario: Creating user
         | type    | name                       | value |
         | boolean | infiniteChildEntities      | true  |
         | integer | maxNumberChildEntities     | 5     |
-        | boolean | lockoutPolicy.enabled      | false |
-        | integer | lockoutPolicy.maxFailures  | 3     |
-        | integer | lockoutPolicy.resetAfter   | 300   |
-        | integer | lockoutPolicy.lockDuration | 3     |
+#        | boolean | lockoutPolicy.enabled      | false |
+#        | integer | lockoutPolicy.maxFailures  | 3     |
+#        | integer | lockoutPolicy.resetAfter   | 300   |
+#        | integer | lockoutPolicy.lockDuration | 3     |
     Given I have following user
         | name     | displayName        | email              | phoneNumber     | status  |
         | kapua-u1 |    Kapua User 1    | kapua_u1@kapua.com | +386 31 323 555 | ENABLED |
@@ -309,3 +315,9 @@ Scenario: Get metadata
 
     When I retrieve metadata
     Then I have metadata
+
+#@StopBroker
+#Scenario: Stop broker after all scenarios
+
+@StopDatastore
+Scenario: Stop datastore after all scenarios
