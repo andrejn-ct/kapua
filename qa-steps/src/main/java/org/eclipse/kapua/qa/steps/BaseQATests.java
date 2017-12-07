@@ -15,6 +15,8 @@ package org.eclipse.kapua.qa.steps;
 import cucumber.api.Scenario;
 import org.eclipse.kapua.service.StepData;
 
+import java.util.Random;
+
 public class BaseQATests {
 
     /**
@@ -26,6 +28,11 @@ public class BaseQATests {
      * Current scenario scope
      */
     public Scenario scenario;
+
+    /**
+     * Random number generator
+     */
+    public Random random = new Random();
 
     public BaseQATests() {
     }

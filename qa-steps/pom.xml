@@ -159,6 +159,10 @@
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-guice</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
 
         <!-- activemq -->
         <dependency>

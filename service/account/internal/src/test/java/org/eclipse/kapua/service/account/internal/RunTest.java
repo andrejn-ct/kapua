@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(CucumberWithProperties.class)
 @CucumberOptions(features = "classpath:features",
+                 glue = { "org.eclipse.kapua.service.account.internal" },
                  plugin = { "pretty", "html:target/cucumber",
                             "json:target/cucumber.json" },
                  monochrome = true)
