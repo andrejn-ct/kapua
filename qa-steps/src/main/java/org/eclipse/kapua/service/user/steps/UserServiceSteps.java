@@ -97,7 +97,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Implementation of Gherkin steps used in UserServiceI9n.feature scenarios.
+ * Implementation of Gherkin steps used in User Service feature scenarios.
  */
 @ScenarioScoped
 public class UserServiceSteps extends BaseQATests {
@@ -301,7 +301,7 @@ public class UserServiceSteps extends BaseQATests {
         stepData.put("LastUser", tmpUser.getUser());
     }
 
-    @Given("^The generic users?$")
+    @Given("^(?:The|A) generic users?$")
     public void givenGenericUser(List<TestUser> userList) throws Exception {
         // User is created within account that was last created in steps
         ComparableUser tmpUser = null;
