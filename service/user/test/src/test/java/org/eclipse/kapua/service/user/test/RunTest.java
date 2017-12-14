@@ -28,5 +28,6 @@ import org.junit.runner.RunWith;
                  },
         monochrome = true )
 @CucumberProperty(key="locator.class.impl", value="org.eclipse.kapua.test.MockedLocator")
+@CucumberProperty(key="test.type", value="unit")
 public class RunTest {
 }

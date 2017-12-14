@@ -14,9 +14,6 @@ Feature: User Service
     User Service is responsible for CRUD operations on User objects in Kapua
     database.
 
-Background:
-    Given The setup for unit testing the User service
-
 Scenario: Creating user
     Create user with all User entity fields set and persist it in database. Then try to
     find it by name and check all the fields.

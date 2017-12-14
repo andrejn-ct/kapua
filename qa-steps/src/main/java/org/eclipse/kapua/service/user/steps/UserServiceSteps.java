@@ -130,8 +130,6 @@ public class UserServiceSteps extends BaseQATests {
      */
     private AccessInfoService accessInfoService;
 
-    private DBHelper database;
-
     @Inject
     public UserServiceSteps(StepData stepData, DBHelper dbHelper) {
 
@@ -140,12 +138,12 @@ public class UserServiceSteps extends BaseQATests {
     }
 
     @Before
-    public void beforeScenario(Scenario scenario) throws KapuaException {
+    public void beforeScenario(Scenario scenario) {
 
         this.database.setup();
 
         // Services by default Locator
-        KapuaLocator locator = KapuaLocator.getInstance();
+        locator = KapuaLocator.getInstance();
         userService = locator.getService(UserService.class);
         userFactory = locator.getFactory(UserFactory.class);
         authenticationService = locator.getService(AuthenticationService.class);
@@ -157,73 +155,28 @@ public class UserServiceSteps extends BaseQATests {
 
         this.scenario = scenario;
         this.stepData.clear();
+
+        if (isUnitTest()) {
+            try {
+                setupMockLocatorForUser();
+            } catch (Exception ex) {
+                logger.error("Failed to set up mock locator in @Before", ex);
+            }
+        }
     }
 
     @After
-    public void afterScenario() throws KapuaException {
+    public void afterScenario() {
+
         try {
             logger.info("Logging out in cleanup");
-            SecurityUtils.getSubject().logout();
+            if (isIntegrationTest()) {
+                SecurityUtils.getSubject().logout();
+            }
             KapuaSecurityUtils.clearSession();
         } catch (Exception e) {
             logger.error("Failed to log out in @After", e);
         }
-    }
-
-    @Given("^The setup for unit testing the User service$")
-    public void setupMockLocatorForUser() throws Exception {
-        MockedLocator mockedLocator = (MockedLocator) KapuaLocator.getInstance();
-
-        AbstractModule module = new AbstractModule() {
-
-            @Override
-            protected void configure() {
-
-                // Inject mocked Authorization Service method checkPermission
-                AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
-                try {
-                    Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(Permission.class));
-                } catch (KapuaException e) {
-                    // skip
-                }
-                bind(AuthorizationService.class).toInstance(mockedAuthorization);
-                // Inject mocked Authentication Service method login and logout
-//                AuthenticationService mockedAuthentication = Mockito.mock(AuthenticationService.class);
-//                try {
-//                    Mockito.doNothing().when(mockedAuthentication).login(Matchers.any(LoginCredentials.class));
-//                    Mockito.doNothing().when(mockedAuthentication).logout();
-//                } catch (KapuaException e) {
-//                    // skip
-//                }
-//                bind(AuthenticationService.class).toInstance(mockedAuthentication);
-                // Inject mocked Permission Factory
-                PermissionFactory mockedPermissionFactory = Mockito.mock(PermissionFactory.class);
-                bind(PermissionFactory.class).toInstance(mockedPermissionFactory);
-                // Set KapuaMetatypeFactory for Metatype configuration
-                KapuaMetatypeFactory metaFactory = new KapuaMetatypeFactoryImpl();
-                bind(KapuaMetatypeFactory.class).toInstance(metaFactory);
-
-                // Inject actual implementation of UserService
-                UserEntityManagerFactory userEntityManagerFactory = (UserEntityManagerFactory) UserEntityManagerFactory.getInstance();
-                bind(UserEntityManagerFactory.class).toInstance(userEntityManagerFactory);
-                UserService userService = new UserServiceImpl();
-                bind(UserService.class).toInstance(userService);
-                UserFactory userFactory = new UserFactoryImpl();
-                bind(UserFactory.class).toInstance(userFactory);
-            }
-        };
-
-        Injector injector = Guice.createInjector(module);
-        mockedLocator.setInjector(injector);
-
-        userService = KapuaLocator.getInstance().getService(UserService.class);
-        userFactory = KapuaLocator.getInstance().getFactory(UserFactory.class);
-
-        // Create KapuaSession using KapuaSecurtiyUtils and kapua-sys user as logged in user.
-        // All operations on database are performed using system user.
-        User user = userService.findByName("kapua-sys");
-        KapuaSession kapuaSession = new KapuaSession(null, user.getScopeId(), user.getId());
-        KapuaSecurityUtils.setSession(kapuaSession);
     }
 
     @Given("^Account$")
@@ -809,7 +762,8 @@ public class UserServiceSteps extends BaseQATests {
             try {
                 User user = userService.findByName(testCredentials.getName());
 
-                Credential credential = credentialService.create(credentialCreatorCreator(user.getScopeId(),
+                Credential credential = credentialService.create(
+                        credentialCreatorCreator(user.getScopeId(),
                         user.getId(), testCredentials.getPassword(),
                         testCredentials.getStatus(), testCredentials.getExpirationDate()));
                 credentialList.add(credential);
@@ -981,5 +935,58 @@ public class UserServiceSteps extends BaseQATests {
         }
 
         return res;
+    }
+
+    /**
+     * Set up the preconditions for unit tests. This includes filling the mock locator with the correct
+     * mocked services and the actual service implementation under test.
+     * Also, all the unit tests will be run with the kapua-sys user.
+     *
+     * @throws Exception
+     */
+    private void setupMockLocatorForUser() throws Exception {
+        MockedLocator mockedLocator = (MockedLocator) KapuaLocator.getInstance();
+
+        AbstractModule module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+
+                // Inject mocked Authorization Service method checkPermission
+                AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
+                try {
+                    Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(Permission.class));
+                } catch (KapuaException e) {
+                    // skip
+                }
+                bind(AuthorizationService.class).toInstance(mockedAuthorization);
+                // Inject mocked Permission Factory
+                PermissionFactory mockedPermissionFactory = Mockito.mock(PermissionFactory.class);
+                bind(PermissionFactory.class).toInstance(mockedPermissionFactory);
+                // Set KapuaMetatypeFactory for Metatype configuration
+                KapuaMetatypeFactory metaFactory = new KapuaMetatypeFactoryImpl();
+                bind(KapuaMetatypeFactory.class).toInstance(metaFactory);
+
+                // Inject actual implementation of UserService
+                UserEntityManagerFactory userEntityManagerFactory = (UserEntityManagerFactory) UserEntityManagerFactory.getInstance();
+                bind(UserEntityManagerFactory.class).toInstance(userEntityManagerFactory);
+                UserService userService = new UserServiceImpl();
+                bind(UserService.class).toInstance(userService);
+                UserFactory userFactory = new UserFactoryImpl();
+                bind(UserFactory.class).toInstance(userFactory);
+            }
+        };
+
+        Injector injector = Guice.createInjector(module);
+        mockedLocator.setInjector(injector);
+
+        userService = KapuaLocator.getInstance().getService(UserService.class);
+        userFactory = KapuaLocator.getInstance().getFactory(UserFactory.class);
+
+        // Create KapuaSession using KapuaSecurtiyUtils and kapua-sys user as logged in user.
+        // All operations on database are performed using system user.
+        User user = userService.findByName("kapua-sys");
+        KapuaSession kapuaSession = new KapuaSession(null, user.getScopeId(), user.getId());
+        KapuaSecurityUtils.setSession(kapuaSession);
     }
 }
