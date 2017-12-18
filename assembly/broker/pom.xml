@@ -689,11 +689,11 @@
                                             <run><![CDATA[
                                     chown -R kapua:kapua /maven && \
                                     chmod -R a+rw /maven && \
+                                    chmod og+rwx /home/kapua \
+                                    find /maven/bin -type f ! -name "*.jar" -exec chmod a+x {} + && \
+                                    chmod a+x /maven/run-broker && \
                                     find /maven -type d -exec chmod a+x {} +
                                     ]]></run>
-                                            <runCmd>
-                                               chmod og+rwx /home/kapua
-                                            </runCmd>
                                         </runCmds>
                                         <volumes>
                                             <volume>/maven/data</volume>
