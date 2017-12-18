@@ -48,7 +48,7 @@
                                     <build>
                                         <from>${docker.account}/java-base</from>
                                         <assembly>
-                                            <descriptor>/src/main/descriptors/kapua-sql.xml</descriptor>
+                                            <descriptor>${basedir}/src/main/descriptors/kapua-sql.xml</descriptor>
                                             <basedir>/</basedir>
                                         </assembly>
                                         <runCmds>
@@ -57,6 +57,7 @@
                                     chown kapua:kapua /var/h2/data && \
                                     chmod a+rw /var/h2/data && \
                                     cd /home/kapua && \
+                                    chmod a+rx run-h2 && \
                                     mkdir tmp && chmod a+rwx tmp && \
                                     curl -s http://repo2.maven.org/maven2/com/h2database/h2/1.4.193/h2-1.4.193.jar -o h2.jar
                                     ]]></runCmd>

@@ -350,16 +350,17 @@
                                             </JAVA_OPTS>
                                         </env>
                                         <user>kapua</user>
+                                        <runCmds>
+                                            <runCmd><![CDATA[
+                                    chmod a+rwx /home/kapua/run-console && \
+                                    chown -R kapua:kapua /home/kapua
+                                    ]]>     </runCmd>
+                                        </runCmds>
                                         <entryPoint>
                                             <exec>
                                                 <arg>/home/kapua/run-console</arg>
                                             </exec>
                                         </entryPoint>
-                                        <runCmds>
-                                            <runCmd>
-                                                chown -R kapua:kapua /home/kapua
-                                            </runCmd>
-                                        </runCmds>
                                     </build>
                                 </image>
                             </images>

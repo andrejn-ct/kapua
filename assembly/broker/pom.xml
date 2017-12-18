@@ -648,6 +648,8 @@
                                             <run><![CDATA[
                                     chown -R kapua:kapua /maven && \
                                     chmod -R a+rw /maven && \
+                                    find /maven/bin -type f ! -name "*.jar" -exec chmod a+x {} + && \
+                                    chmod a+x /maven/run-broker && \
                                     find /maven -type d -exec chmod a+x {} +
                                     ]]></run>
                                         </runCmds>
