@@ -195,10 +195,10 @@ public class ConnectionSteps extends BaseQATests {
     }
 
     @Given("^The following device connections?$")
-    public void createConnectionForDevice(List<CucConnection> connections) throws KapuaException {
+    public void createConnectionForDevice(List<TestConnection> connections) throws KapuaException {
 
         KapuaSecurityUtils.doPrivileged(() -> {
-            for (CucConnection tmpConn : connections) {
+            for (TestConnection tmpConn : connections) {
                 DeviceConnectionCreator tmpCreator = deviceConnectionFactory.newCreator(tmpConn.getScopeId());
                 tmpCreator.setClientId(tmpConn.getClientId());
                 tmpCreator.setUserId(tmpConn.getUserId());

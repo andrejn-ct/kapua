@@ -39,9 +39,6 @@ import org.eclipse.kapua.qa.steps.BaseQATests;
 import org.eclipse.kapua.qa.steps.DBHelper;
 import org.eclipse.kapua.service.StepData;
 import org.eclipse.kapua.service.account.Account;
-import org.eclipse.kapua.service.account.AccountCreator;
-import org.eclipse.kapua.service.account.AccountService;
-import org.eclipse.kapua.service.account.internal.AccountFactoryImpl;
 import org.eclipse.kapua.service.authentication.AuthenticationService;
 import org.eclipse.kapua.service.authentication.LoginCredentials;
 import org.eclipse.kapua.service.authentication.credential.Credential;
@@ -60,6 +57,7 @@ import org.eclipse.kapua.service.authorization.permission.Actions;
 import org.eclipse.kapua.service.authorization.permission.Permission;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.authorization.permission.shiro.PermissionFactoryImpl;
+import org.eclipse.kapua.service.common.TestConfig;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserCreator;
 import org.eclipse.kapua.service.user.UserFactory;
@@ -111,11 +109,6 @@ public class UserServiceSteps extends BaseQATests {
     private UserFactory userFactory;
 
     /**
-     * Account service by locator.
-     */
-    private AccountService accountService;
-
-    /**
      * Authentication service by locator.
      */
     private AuthenticationService authenticationService;
@@ -147,7 +140,6 @@ public class UserServiceSteps extends BaseQATests {
         userService = locator.getService(UserService.class);
         userFactory = locator.getFactory(UserFactory.class);
         authenticationService = locator.getService(AuthenticationService.class);
-        accountService = locator.getService(AccountService.class);
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
 
@@ -177,17 +169,6 @@ public class UserServiceSteps extends BaseQATests {
         } catch (Exception e) {
             logger.error("Failed to log out in @After", e);
         }
-    }
-
-    @Given("^Account$")
-    public void givenAccount(List<TestAccount> accountList) throws Exception {
-        TestAccount testAccount = accountList.get(0);
-        // If accountId is not set in account list, use last created Account for scope id
-        if (testAccount.getScopeId() == null) {
-            testAccount.setScopeId(((Account) stepData.get("LastAccount")).getId().getId());
-        }
-
-        stepData.put("LastAccount", createAccount(testAccount));
     }
 
     @Given("^Credentials$")
@@ -522,49 +503,10 @@ public class UserServiceSteps extends BaseQATests {
         }
     }
 
-    @When("^I select account \"(.*)\"$")
-    public void selectAccount(String accountName) throws KapuaException{
-
-        Account tmpAccount;
-        tmpAccount = accountService.findByName(accountName);
-        if (tmpAccount != null) {
-            stepData.put("LastAccount", tmpAccount);
-        } else {
-            stepData.remove("LastAccount");
-        }
-    }
-
     @When("^I set the current scope id to (\\d+)$")
     public void setCurrentScopeId(int id) {
 
         stepData.put("CurrentScopeId", new KapuaEid(BigInteger.valueOf(id)));
-    }
-
-    @When("^I configure account service$")
-    public void setAccountServiceConfig(List<TestConfig> testConfigs)
-            throws Exception {
-        Map<String, Object> valueMap = new HashMap<>();
-        KapuaId accId;
-        KapuaId scopeId;
-
-        for (TestConfig config : testConfigs) {
-            config.addConfigToMap(valueMap);
-        }
-
-        primeException();
-        try {
-            Account tmpAccount = (Account) stepData.get("LastAccount");
-            if (tmpAccount != null) {
-                accId = tmpAccount.getId();
-                scopeId = new KapuaEid(BigInteger.ONE);
-            } else {
-                accId = new KapuaEid(BigInteger.ONE);
-                scopeId = new KapuaEid(BigInteger.ONE);
-            }
-            accountService.setConfigValues(accId, scopeId, valueMap);
-        } catch (KapuaException ex) {
-            verifyException(ex);
-        }
     }
 
     @When("^I configure user service$")
@@ -719,34 +661,6 @@ public class UserServiceSteps extends BaseQATests {
     }
 
     /**
-     * Create account in privileged mode as kapua-sys user.
-     * Account is created in scope specified by scopeId in testAccount parameter.
-     * This is not accountId, but account under which it is created. AccountId itself
-     * is created automatically.
-     *
-     * @param testAccount
-     *            basic data about account
-     * @return Kapua Account object
-     */
-    private Account createAccount(TestAccount testAccount) throws Exception {
-        List<Account> accountList = new ArrayList<>();
-        KapuaSecurityUtils.doPrivileged(() -> {
-            primeException();
-            try {
-                Account account = accountService.create(accountCreatorCreator(testAccount.getName(),
-                        testAccount.getScopeId()));
-                accountList.add(account);
-            } catch (KapuaException ke) {
-                verifyException(ke);
-            }
-
-            return null;
-        });
-
-        return accountList.size() == 1 ? accountList.get(0) : null;
-    }
-
-    /**
      * Create credentials for specific user, set users password.
      * It finds user by name and sets its password.
      *
@@ -804,25 +718,6 @@ public class UserServiceSteps extends BaseQATests {
         });
 
         return;
-    }
-
-    /**
-     * Create account creator.
-     *
-     * @param name
-     *            account name
-     * @param scopeId
-     *            acount scope id
-     * @return
-     */
-    private AccountCreator accountCreatorCreator(String name, BigInteger scopeId) {
-        AccountCreator accountCreator;
-
-        accountCreator = new AccountFactoryImpl().newCreator(new KapuaEid(scopeId), name);
-        accountCreator.setOrganizationName("ACME Inc.");
-        accountCreator.setOrganizationEmail("some@one.com");
-
-        return accountCreator;
     }
 
     /**

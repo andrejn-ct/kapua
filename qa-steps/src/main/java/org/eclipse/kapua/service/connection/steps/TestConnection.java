@@ -25,7 +25,7 @@ import org.eclipse.kapua.service.user.UserService;
  * The data setters intentionally use only cucumber-friendly data types and
  * generate the resulting Kapua types internally.
  */
-public class CucConnection {
+public class TestConnection {
 
     String scope;
     KapuaId scopeId;

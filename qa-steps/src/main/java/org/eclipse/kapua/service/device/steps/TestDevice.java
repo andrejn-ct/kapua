@@ -22,33 +22,33 @@ import org.eclipse.kapua.service.device.registry.DeviceStatus;
  * The data setters intentionally use only cucumber-friendly data types and
  * generate the resulting Kapua types internally.
  */
-public class CucDevice {
+public class TestDevice {
 
-    Integer scopeId;
-    KapuaId kScopeId;
-    Integer groupId;
-    KapuaId kGroupId;
-    Integer connectionId;
-    KapuaId kConnectionId;
-    Integer preferredUserId;
-    KapuaId kPreferredUserId;
-    String clientId;
-    String displayName;
-    String status;
-    DeviceStatus kStatus;
-    String modelId;
-    String serialNumber;
-    String imei;
-    String imsi;
-    String iccid;
-    String biosVersion;
-    String firmwareVersion;
-    String osVersion;
-    String jvmVersion;
-    String osgiFrameworkVersion;
-    String applicationFrameworkVersion;
-    String applicationIdentifiers;
-    String acceptEncoding;
+    public Integer scopeId;
+    public KapuaId kScopeId;
+    public Integer groupId;
+    public KapuaId kGroupId;
+    public Integer connectionId;
+    public KapuaId kConnectionId;
+    public Integer preferredUserId;
+    public KapuaId kPreferredUserId;
+    public String clientId;
+    public String displayName;
+    public String status;
+    public DeviceStatus kStatus;
+    public String modelId;
+    public String serialNumber;
+    public String imei;
+    public String imsi;
+    public String iccid;
+    public String biosVersion;
+    public String firmwareVersion;
+    public String osVersion;
+    public String jvmVersion;
+    public String osgiFrameworkVersion;
+    public String applicationFrameworkVersion;
+    public String applicationIdentifiers;
+    public String acceptEncoding;
 
     public void parse() {
         if (scopeId != null) {

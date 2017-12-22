@@ -33,7 +33,7 @@ import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
 import org.eclipse.kapua.service.tag.internal.TagPredicates;
-import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.eclipse.kapua.service.common.TestConfig;
 
 import javax.inject.Inject;
 import java.math.BigInteger;

@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.user.steps;
+package org.eclipse.kapua.service.common;
 
 import java.util.Map;
 

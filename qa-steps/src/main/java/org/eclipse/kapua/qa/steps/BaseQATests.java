@@ -13,9 +13,12 @@
 package org.eclipse.kapua.qa.steps;
 
 import cucumber.api.Scenario;
+import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.locator.KapuaLocator;
+import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.StepData;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 public class BaseQATests {
@@ -50,6 +53,11 @@ public class BaseQATests {
      * Random number generator
      */
     public Random random = new Random();
+
+    /**
+     * System account and user ID
+     */
+    public KapuaId kapuaSys = new KapuaEid(BigInteger.ONE);
 
     public BaseQATests() {
 

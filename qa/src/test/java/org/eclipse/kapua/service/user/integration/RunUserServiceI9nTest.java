@@ -22,7 +22,8 @@ import cucumber.api.CucumberOptions;
 @CucumberOptions(
         features = "classpath:features/user/UserServiceI9n.feature",
         glue = {"org.eclipse.kapua.qa.steps",
-                "org.eclipse.kapua.service.user.steps"
+                "org.eclipse.kapua.service.user.steps",
+                "org.eclipse.kapua.service.account.steps",
                },
         plugin = {"pretty", 
                   "html:target/cucumber/UserServiceI9n",

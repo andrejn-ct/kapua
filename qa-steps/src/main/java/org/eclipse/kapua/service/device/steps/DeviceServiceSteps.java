@@ -95,7 +95,7 @@ import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
 import org.eclipse.kapua.service.tag.internal.TagPredicates;
-import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.eclipse.kapua.service.common.TestConfig;
 //import org.eclipse.kapua.test.KapuaTest;
 
 import cucumber.api.Scenario;
@@ -352,14 +352,14 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     }
 
     @Given("^(?:A d|D)evices? such as$")
-    public void createADevicesAsSpecified(List<CucDevice> devLst)
+    public void createADevicesAsSpecified(List<TestDevice> devLst)
             throws KapuaException {
 
         KapuaSecurityUtils.doPrivileged(() -> {
             assertNotNull(devLst);
 
             Device tmpDevice = null;
-            for (CucDevice tmpCDev : devLst) {
+            for (TestDevice tmpCDev : devLst) {
                 tmpCDev.parse();
                 DeviceCreator devCr = prepareDeviceCreatorFromCucDevice(tmpCDev);
                 tmpDevice = deviceRegistryService.create(devCr);
@@ -612,7 +612,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         return tmpPayload;
     }
 
-    private DeviceCreator prepareDeviceCreatorFromCucDevice(CucDevice dev) {
+    private DeviceCreator prepareDeviceCreatorFromCucDevice(TestDevice dev) {
         Account tmpAccount = (Account) stepData.get("LastAccount");
         DeviceCreator tmpCr;
         KapuaId tmpScope;
