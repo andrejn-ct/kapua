@@ -62,7 +62,8 @@ public abstract class KapuaDialog extends Dialog {
         infoPanel.setBodyBorder(false);
         infoPanel.setHeaderVisible(false);
         infoPanel.setLayout(new TableLayout(2));
-        infoPanel.setBodyStyle("background-color:transparent");
+        infoPanel.setStyleAttribute("background-color", "#F0F0F0");
+        infoPanel.setBodyStyle("background-color: #F0F0F0");
         add(infoPanel);
 
         // Heading Message (if implementation needs one)
@@ -71,6 +72,9 @@ public abstract class KapuaDialog extends Dialog {
             headingMessage = "";
         }
         setHeading(headingMessage);
+        getHeader().setStyleAttribute("white-space", "nowrap");
+        getHeader().setStyleAttribute("text-overflow", "ellipsis");
+        getHeader().setStyleAttribute("overflow", "hidden");
 
         // Icon (if implementation needs one)
         KapuaIcon infoIcon = getInfoIcon();

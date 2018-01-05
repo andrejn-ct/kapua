@@ -88,6 +88,7 @@ public class AccountServiceSteps extends BaseQATests {
         // Services by default Locator
         locator = KapuaLocator.getInstance();
         accountService = locator.getService(AccountService.class);
+        accountFactory = locator.getFactory(AccountFactory.class);
 
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
 

@@ -13,6 +13,9 @@
 Feature: User Service Integration
   User Service integration scenarios
 
+  @StartEventBroker
+  Scenario: Start event broker for all scenarios
+
   Scenario: Deleting user in account that is lower in hierarchy
   Using user A in in different scope than user B, try to delete user B. Scope of user A is one
   level higher than scope of B. Scope of A is parent of scope B. This allows user A to delete
@@ -83,10 +86,10 @@ Feature: User Service Integration
       | user   | delete |
     And I logout
     When I login as user with name "kapua-a" and password "ToManySecrets123#"
-    When I try to delete user "kapua-g"
+    When I delete the user "kapua-g"
     Then No exception was thrown
     Given I expect the exception "SubjectUnauthorizedException" with the text "Error: user:read:"
-    When I try to delete user "kapua-b"
+    When I delete the user "kapua-b"
     Then An exception was thrown
     And I logout
 
@@ -163,6 +166,9 @@ Feature: User Service Integration
     When I login as user with name "kapua-b" and password "ToManySecrets123#"
     Then No exception was thrown
     Given I expect the exception "SubjectUnauthorizedException" with the text "Error: user:read:"
-    When I try to delete user "kapua-a"
+    When I delete the user "kapua-a"
     Then An exception was thrown
     And I logout
+
+  @StopEventBroker
+  Scenario: Stop event broker for all scenarios

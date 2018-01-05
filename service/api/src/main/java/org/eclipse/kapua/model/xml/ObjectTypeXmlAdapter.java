@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.eclipse.kapua.model.xml;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.eclipse.kapua.model.type.ObjectTypeConverter;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class ObjectTypeXmlAdapter extends XmlAdapter<String, Class<?>> {
 
@@ -26,5 +26,4 @@ public class ObjectTypeXmlAdapter extends XmlAdapter<String, Class<?>> {
     public Class<?> unmarshal(String value) throws ClassNotFoundException {
         return ObjectTypeConverter.fromString(value);
     }
-
 }

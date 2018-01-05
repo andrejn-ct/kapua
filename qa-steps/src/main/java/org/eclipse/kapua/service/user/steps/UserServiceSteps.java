@@ -94,6 +94,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Implementation of Gherkin steps used in User Service feature scenarios.
  */
@@ -397,19 +400,28 @@ public class UserServiceSteps extends BaseQATests {
         }
     }
 
-    @Then("^I try to delete user \"(.*)\"$")
-    public void thenDeleteUser(String userName) throws Exception {
+    // @When("^I try to delete account \"(.*)\"$")
+    // public void deleteAccount(String accountName) throws KapuaException{
+        // Account accountToDelete;
+        // accountToDelete = accountService.findByName(accountName);
+        // if (accountToDelete != null) {
+            // accountService.delete(accountToDelete.getScopeId(), accountToDelete.getId());
+        // }
+    // }
 
-        primeException();
-        try {
-            User userToDelete = userService.findByName(userName);
-            if (userToDelete != null) {
-                userService.delete(userToDelete);
-            }
-        } catch (KapuaException e) {
-            verifyException(e);
-        }
-    }
+    // @Then("^I try to delete user \"(.*)\"$")
+    // public void thenDeleteUser(String userName) throws Exception {
+
+        // primeException();
+        // try {
+            // User userToDelete = userService.findByName(userName);
+            // if (userToDelete != null) {
+                // userService.delete(userToDelete);
+            // }
+        // } catch (KapuaException e) {
+            // verifyException(e);
+        // }
+    // }
 
     @When("^I delete the user \"(.+)\"$")
     public void deleteNamedUser(String name) throws Exception {
@@ -420,6 +432,30 @@ public class UserServiceSteps extends BaseQATests {
             userService.delete(tmpUsr);
         } catch (Exception ex) {
             verifyException(ex);
+        }
+    }
+
+    @Then("^I find user \"(.*)\"$")
+    public void thenIFindUser(String userName) throws Exception {
+
+        primeException();
+        try {
+            User user = userService.findByName(userName);
+            assertNotNull("User doesn't exist.", user);
+        } catch (KapuaException e) {
+            verifyException(e);
+        }
+    }
+
+    @Then("^I don't find user \"(.*)\"$")
+    public void thenIdontFindUser(String userName) throws Exception {
+
+        primeException();
+        try {
+            User user = userService.findByName(userName);
+            assertNull("User still exists.", user);
+        } catch (KapuaException e) {
+            verifyException(e);
         }
     }
 
