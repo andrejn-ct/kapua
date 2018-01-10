@@ -38,6 +38,7 @@ import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.qa.steps.BaseQATests;
 import org.eclipse.kapua.qa.steps.DBHelper;
 import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountCreator;
 import org.eclipse.kapua.service.account.AccountService;
@@ -71,7 +72,6 @@ import org.eclipse.kapua.service.user.internal.UserEntityManagerFactory;
 import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
 import org.eclipse.kapua.service.user.internal.UserImpl;
 import org.eclipse.kapua.service.user.internal.UserServiceImpl;
-import org.eclipse.kapua.service.user.internal.UsersJAXBContextProvider;
 import org.eclipse.kapua.test.MockedLocator;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -151,7 +151,7 @@ public class UserServiceSteps extends BaseQATests {
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
 
-        XmlUtil.setContextProvider(new UsersJAXBContextProvider());
+        XmlUtil.setContextProvider(new TestJAXBContextProvider());
 
         this.scenario = scenario;
         this.stepData.clear();
@@ -529,8 +529,10 @@ public class UserServiceSteps extends BaseQATests {
         tmpAccount = accountService.findByName(accountName);
         if (tmpAccount != null) {
             stepData.put("LastAccount", tmpAccount);
+            stepData.put("CurrentScopeId", tmpAccount.getId());
         } else {
             stepData.remove("LastAccount");
+            stepData.remove("CurrentScopeId");
         }
     }
 
