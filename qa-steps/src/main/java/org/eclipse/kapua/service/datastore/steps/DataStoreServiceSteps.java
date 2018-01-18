@@ -49,8 +49,8 @@ import org.eclipse.kapua.message.internal.device.data.KapuaDataChannelImpl;
 import org.eclipse.kapua.message.internal.device.data.KapuaDataMessageImpl;
 import org.eclipse.kapua.message.internal.device.data.KapuaDataPayloadImpl;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.qa.steps.DBHelper;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.DBHelper;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.datastore.ChannelInfoRegistryService;
@@ -143,10 +143,10 @@ public class DataStoreServiceSteps extends AbstractKapuaSteps {
     private ClientInfoRegistryService clientInfoRegistryService;
     private ClientInfoRegistryServiceProxy clientInfoRegistryServiceProxy;
 
-    private StepData stepData;
+    private TestData stepData;
 
     @Inject
-    public DataStoreServiceSteps(StepData stepData, DBHelper dbHelper) {
+    public DataStoreServiceSteps(TestData stepData, DBHelper dbHelper) {
 
         this.stepData = stepData;
     }

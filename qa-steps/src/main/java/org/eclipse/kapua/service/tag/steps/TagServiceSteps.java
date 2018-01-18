@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -24,8 +24,8 @@ import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate;
-import org.eclipse.kapua.qa.steps.BaseQATests;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.tag.Tag;
 import org.eclipse.kapua.service.tag.TagCreator;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertEquals;
  * Implementation of Gherkin steps used in TagService.feature scenarios.
  */
 @ScenarioScoped
-public class TagServiceSteps extends BaseQATests {
+public class TagServiceSteps extends TestBase {
 
     private static final KapuaEid DEFAULT_SCOPE_ID = new KapuaEid(BigInteger.valueOf(1L));
 
@@ -62,7 +62,7 @@ public class TagServiceSteps extends BaseQATests {
 //    private StepData stepData;
 
     @Inject
-    public TagServiceSteps(StepData stepData) { 
+    public TagServiceSteps(TestData stepData) { 
 
         this.stepData = stepData;
     }

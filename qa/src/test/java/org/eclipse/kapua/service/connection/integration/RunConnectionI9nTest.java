@@ -20,7 +20,7 @@ import cucumber.api.junit.Cucumber;
 @CucumberOptions(
         features = {"classpath:features/connection/UserCouplingI9n.feature"
         },
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.device.steps",
                 "org.eclipse.kapua.service.connection.steps"

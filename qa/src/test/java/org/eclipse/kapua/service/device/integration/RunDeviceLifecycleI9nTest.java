@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = {"classpath:features/broker/DeviceLifecycle.feature"},
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.device.steps"
                },

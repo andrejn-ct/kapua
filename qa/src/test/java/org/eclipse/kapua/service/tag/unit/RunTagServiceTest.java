@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 @RunWith(CucumberWithProperties.class)
 @CucumberOptions(
         features = "classpath:features/tag/TagService.feature",
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.tag.steps"
         },

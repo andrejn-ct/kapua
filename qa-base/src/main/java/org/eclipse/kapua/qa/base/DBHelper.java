@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,10 +7,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Eurotech
+ *     Eurotech - initial API and implementation
  *     Red Hat Inc
  *******************************************************************************/
-package org.eclipse.kapua.qa.steps;
+package org.eclipse.kapua.qa.base;
 
 import static org.eclipse.kapua.commons.jpa.JdbcConnectionUrlResolvers.resolveJdbcUrl;
 import static org.eclipse.kapua.commons.setting.system.SystemSettingKey.DB_JDBC_CONNECTION_URL_RESOLVER;
@@ -27,7 +27,7 @@ import org.eclipse.kapua.service.liquibase.KapuaLiquibaseClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cucumber.api.java.After;
+//import cucumber.api.java.After;
 import cucumber.runtime.java.guice.ScenarioScoped;
 
 /**
@@ -47,6 +47,7 @@ public class DBHelper {
      * Filter for deleting all new DB data except base data.
      */
     public static final String DELETE_SCRIPT = "all_delete.sql";
+    public static final String DROP_SCRIPT = "all_drop.sql";
 
     private boolean setup;
 
@@ -84,12 +85,31 @@ public class DBHelper {
 
     }
 
-    @After(order = HookPriorities.DATABASE)
+//    @After(order = HookPriorities.DATABASE)
     public void deleteAll() throws SQLException {
 
         try {
             if (setup) {
                 KapuaConfigurableServiceSchemaUtilsWithResources.scriptSession(FULL_SCHEMA_PATH, DELETE_SCRIPT);
+            }
+        } finally {
+
+            // close the connection
+
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
+
+        }
+
+    }
+
+    public void dropAll() throws SQLException {
+
+        try {
+            if (setup) {
+                KapuaConfigurableServiceSchemaUtilsWithResources.scriptSession(FULL_SCHEMA_PATH, DROP_SCRIPT);
             }
         } finally {
 

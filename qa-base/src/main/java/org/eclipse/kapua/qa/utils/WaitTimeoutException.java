@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.qa.utils;
+package org.eclipse.kapua.qa.base.utils;
 
 import java.time.Duration;
 

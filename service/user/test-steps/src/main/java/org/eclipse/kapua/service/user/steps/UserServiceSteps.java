@@ -35,9 +35,9 @@ import org.eclipse.kapua.model.config.metatype.KapuaMetatypeFactory;
 import org.eclipse.kapua.model.config.metatype.KapuaTocd;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
-import org.eclipse.kapua.qa.steps.BaseQATests;
-import org.eclipse.kapua.qa.steps.DBHelper;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.DBHelper;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountCreator;
 import org.eclipse.kapua.service.account.AccountService;
@@ -103,7 +103,7 @@ import static org.junit.Assert.assertNull;
  * Implementation of Gherkin steps used in User Service feature scenarios.
  */
 @ScenarioScoped
-public class UserServiceSteps extends BaseQATests {
+public class UserServiceSteps extends TestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceSteps.class);
 
@@ -134,7 +134,7 @@ public class UserServiceSteps extends BaseQATests {
     private AccessInfoService accessInfoService;
 
     @Inject
-    public UserServiceSteps(StepData stepData, DBHelper dbHelper) {
+    public UserServiceSteps(TestData stepData, DBHelper dbHelper) {
 
         this.stepData = stepData;
         this.database = dbHelper;
@@ -174,7 +174,10 @@ public class UserServiceSteps extends BaseQATests {
         try {
             logger.info("Logging out in cleanup");
             if (isIntegrationTest()) {
+                database.deleteAll();
                 SecurityUtils.getSubject().logout();
+            } else {
+                database.dropAll();
             }
             KapuaSecurityUtils.clearSession();
         } catch (Exception e) {

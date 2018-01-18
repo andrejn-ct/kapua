@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = {"classpath:features/broker/acl/BrokerACLI9n.feature"
                    },
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.device.steps"
                },

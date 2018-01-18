@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Red Hat Inc and others.
+ * Copyright (c) 2018 Red Hat Inc and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,13 @@
  *
  * Contributors:
  *     Red Hat Inc - initial API and implementation
+ *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.qa.steps;
+package org.eclipse.kapua.qa.base;
 
 import static java.time.Duration.ofSeconds;
-import static org.eclipse.kapua.qa.utils.Ports.isPortOpen;
-import static org.eclipse.kapua.qa.utils.Suppressed.withRuntimeException;
+import static org.eclipse.kapua.qa.base.utils.Ports.isPortOpen;
+import static org.eclipse.kapua.qa.base.utils.Suppressed.withRuntimeException;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
 import org.apache.activemq.broker.BrokerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.eclipse.kapua.commons.event.ServiceEventBusManager;
-import org.eclipse.kapua.qa.utils.Suppressed;
+import org.eclipse.kapua.qa.base.utils.Suppressed;
 import org.eclipse.kapua.service.datastore.internal.mediator.DatastoreMediator;
 import org.elasticsearch.common.UUIDs;
 import org.slf4j.Logger;

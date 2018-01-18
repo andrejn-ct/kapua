@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = "classpath:features/user/LockoutExpirationI9n.feature",
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps"
                },
         plugin = {"pretty", 

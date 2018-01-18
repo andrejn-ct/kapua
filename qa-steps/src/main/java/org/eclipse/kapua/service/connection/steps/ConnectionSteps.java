@@ -23,9 +23,9 @@ import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.qa.steps.BaseQATests;
-import org.eclipse.kapua.qa.steps.DBHelper;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.DBHelper;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountFactory;
@@ -59,7 +59,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 @ScenarioScoped
-public class ConnectionSteps extends BaseQATests {
+public class ConnectionSteps extends TestBase {
 
     /**
      * Authentication service.
@@ -105,12 +105,9 @@ public class ConnectionSteps extends BaseQATests {
      */
     private static AclCreator aclCreator;
 
-    // Single point to database access.
-    private static DBHelper dbHelper;
-
     @Inject
-    public ConnectionSteps(StepData stepData, DBHelper dbHelper) {
-        this.dbHelper = dbHelper;
+    public ConnectionSteps(TestData stepData, DBHelper dbHelper) {
+        this.database = dbHelper;
         this.stepData = stepData;
     }
 
@@ -132,7 +129,7 @@ public class ConnectionSteps extends BaseQATests {
         aclCreator = new AclCreator(accountService, accountFactory, userService, accessInfoService, credentialService);
 
         // Initialize the database
-        dbHelper.setup();
+        database.setup();
 
         this.scenario = scenario;
 
@@ -143,7 +140,7 @@ public class ConnectionSteps extends BaseQATests {
     public void afterScenario() throws Exception {
 
         // Clean up the database
-        dbHelper.deleteAll();
+        database.deleteAll();
         KapuaSecurityUtils.clearSession();
     }
 

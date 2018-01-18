@@ -21,7 +21,7 @@ import cucumber.api.CucumberOptions;
 @RunWith(CucumberWithProperties.class)
 @CucumberOptions(
         features = "classpath:features/user/UserServiceI9n.feature",
-        glue = {"org.eclipse.kapua.qa.steps",
+        glue = {"org.eclipse.kapua.qa.base",
                 "org.eclipse.kapua.service.user.steps"
                },
         plugin = {"pretty", 

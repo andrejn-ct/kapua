@@ -24,8 +24,9 @@ import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.xml.JAXBContextProvider;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
-import org.eclipse.kapua.qa.steps.EmbeddedBroker;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.EmbeddedBroker;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.device.management.bundle.DeviceBundle;
 import org.eclipse.kapua.service.device.management.bundle.DeviceBundleManagementService;
@@ -54,7 +55,7 @@ import java.util.List;
  * commands on Mocked Kura.
  */
 @ScenarioScoped
-public class BrokerSteps extends Assert {
+public class BrokerSteps extends /*Assert*/ TestBase {
 
     /**
      * Embedded broker configuration file from classpath resources.
@@ -112,13 +113,8 @@ public class BrokerSteps extends Assert {
      */
     private KuraDevice kuraDevice;
 
-    /**
-     * Scenario scoped step data.
-     */
-    private StepData stepData;
-
     @Inject
-    public BrokerSteps(/* dependency */ EmbeddedBroker broker, StepData stepData) {
+    public BrokerSteps(/* dependency */ EmbeddedBroker broker, TestData stepData) {
         this.stepData = stepData;
     }
 

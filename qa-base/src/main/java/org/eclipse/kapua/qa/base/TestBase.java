@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,17 +8,16 @@
  *
  * Contributors:
  *     Eurotech - initial API and implementation
- *     Red Hat Inc
  *******************************************************************************/
-package org.eclipse.kapua.qa.steps;
+package org.eclipse.kapua.qa.base;
 
 import cucumber.api.Scenario;
 import org.eclipse.kapua.locator.KapuaLocator;
-import org.eclipse.kapua.service.StepData;
 
 import java.util.Random;
+import org.junit.Assert;
 
-public class BaseQATests {
+public class TestBase extends Assert {
 
     /**
      * Common locator instance
@@ -28,7 +27,7 @@ public class BaseQATests {
     /**
      * Inter step data scratchpad.
      */
-    public StepData stepData;
+    public TestData stepData;
 
     /**
      * Common database helper
@@ -51,7 +50,7 @@ public class BaseQATests {
      */
     public Random random = new Random();
 
-    public BaseQATests() {
+    public TestBase() {
 
         testType = System.getProperty("test.type");
         if (testType != null) {
@@ -82,8 +81,8 @@ public class BaseQATests {
             throws Exception {
 
         boolean exceptionExpected = stepData.contains("ExceptionExpected") ? (boolean)stepData.get("ExceptionExpected") : false;
-        String exceptionName = stepData.contains("ExceptionName") ? (String)stepData.get("ExceptionName") : "";
-        String exceptionMessage = stepData.contains("ExceptionMessage") ? (String)stepData.get("ExceptionMessage") : "";
+        String exceptionName = stepData.contains("ExceptionName") ? ((String)stepData.get("ExceptionName")).trim() : "";
+        String exceptionMessage = stepData.contains("ExceptionMessage") ? ((String)stepData.get("ExceptionMessage")).trim() : "";
 
         if (!exceptionExpected ||
                 (!exceptionName.isEmpty() && !ex.getClass().toGenericString().contains(exceptionName)) ||

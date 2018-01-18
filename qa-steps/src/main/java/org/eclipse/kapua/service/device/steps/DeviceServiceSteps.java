@@ -68,9 +68,9 @@ import org.eclipse.kapua.message.internal.device.lifecycle.KapuaMissingPayloadIm
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate;
-import org.eclipse.kapua.qa.steps.BaseQATests;
-import org.eclipse.kapua.qa.steps.DBHelper;
-import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.DBHelper;
+import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
@@ -96,7 +96,6 @@ import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
 import org.eclipse.kapua.service.tag.internal.TagPredicates;
 import org.eclipse.kapua.service.user.steps.TestConfig;
-//import org.eclipse.kapua.test.KapuaTest;
 
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
@@ -109,7 +108,7 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 
 // Implementation of Gherkin steps used in DeviceRegistryI9n.feature scenarios.
 @ScenarioScoped
-public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
+public class DeviceServiceSteps extends TestBase /*KapuaTest*/ {
 
     private static final KapuaEid DEFAULT_SCOPE_ID = new KapuaEid(BigInteger.valueOf(1L));
     protected static Random random = new Random();
@@ -120,12 +119,9 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     private DeviceLifeCycleService deviceLifeCycleService;
     private TagService tagService;
 
-    // Single point to database access.
-    private DBHelper dbHelper;
-
     @Inject
-    public DeviceServiceSteps(StepData stepData, DBHelper dbHelper) {
-        this.dbHelper = dbHelper;
+    public DeviceServiceSteps(TestData stepData, DBHelper dbHelper) {
+        this.database = dbHelper;
         this.stepData = stepData;
     }
 
@@ -143,7 +139,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         this.scenario = scenario;
 
         // Initialize the database
-        dbHelper.setup();
+        database.setup();
 
         stepData.clear();
 
@@ -154,7 +150,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     public void afterScenario() throws Exception {
 
         // Clean up the database
-        dbHelper.deleteAll();
+        database.deleteAll();
         KapuaSecurityUtils.clearSession();
     }
 

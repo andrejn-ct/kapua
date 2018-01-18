@@ -9,10 +9,10 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.qa.steps;
+package org.eclipse.kapua.qa.base;
 
 import static java.time.Duration.ofSeconds;
-import static org.eclipse.kapua.qa.utils.Suppressed.withRuntimeException;
+import static org.eclipse.kapua.qa.base.utils.Suppressed.withRuntimeException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +28,10 @@ import org.apache.activemq.artemis.jms.server.config.impl.JMSConfigurationImpl;
 import org.apache.activemq.artemis.jms.server.embedded.EmbeddedJMS;
 import org.eclipse.kapua.commons.event.ServiceEventBusManager;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
-import org.eclipse.kapua.qa.utils.Suppressed;
+import org.eclipse.kapua.qa.base.TestBase;
+import org.eclipse.kapua.qa.base.TestData;
+import org.eclipse.kapua.qa.base.DBHelper;
+import org.eclipse.kapua.qa.base.utils.Suppressed;
 import org.elasticsearch.common.UUIDs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +43,7 @@ import cucumber.api.java.Before;
 import cucumber.runtime.java.guice.ScenarioScoped;
 
 @ScenarioScoped
-public class EmbeddedEventBroker {
+public class EmbeddedEventBroker extends TestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(EmbeddedEventBroker.class);
 
@@ -51,13 +54,14 @@ public class EmbeddedEventBroker {
 
     private Map<String, List<AutoCloseable>> closables = new HashMap<>();
 
-    private DBHelper database;
+    // private DBHelper database;
 
     private EmbeddedJMS jmsServer;
 
     @Inject
-    public EmbeddedEventBroker(final DBHelper database) {
+    public EmbeddedEventBroker(final DBHelper database, final TestData stepData) {
         this.database = database;
+        this.stepData = stepData;
     }
 
     @Before(value = "@StartEventBroker")

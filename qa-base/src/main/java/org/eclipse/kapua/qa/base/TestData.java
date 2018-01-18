@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service;
+package org.eclipse.kapua.qa.base;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ import javax.inject.Singleton;
  * between step implementation classes.
  */
 @Singleton
-public class StepData {
+public class TestData {
 
     /**
      * Generic map that accepts string key that represents data and data
@@ -29,29 +29,29 @@ public class StepData {
      * Dev-user has to know type of data stored under specified key.
      * Key could be class name.
      */
-    Map<String, Object> stepDataMap;
+    Map<String, Object> testDataMap;
 
-    public StepData() {
-        stepDataMap = new HashMap<>();
+    public TestData() {
+        testDataMap = new HashMap<>();
     }
 
     public void clear() {
-        stepDataMap.clear();
+        testDataMap.clear();
     }
 
     public void put(String key, Object value) {
-        stepDataMap.put(key, value);
+        testDataMap.put(key, value);
     }
 
     public Object get(String key) {
-        return stepDataMap.get(key);
+        return testDataMap.get(key);
     }
 
     public boolean contains(String key) {
-        return stepDataMap.containsKey(key);
+        return testDataMap.containsKey(key);
     }
 
     public void remove(String key) {
-        stepDataMap.remove(key);
+        testDataMap.remove(key);
     }
 }
