@@ -50,6 +50,16 @@
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-qa-base</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-user-test-steps</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-tag-test-steps</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-qa-steps</artifactId>

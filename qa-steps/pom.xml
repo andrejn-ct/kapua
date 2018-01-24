@@ -74,12 +74,6 @@
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-device-registry-internal</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-user-test-steps</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-security-shiro</artifactId>
@@ -145,12 +139,6 @@
         </dependency>
 
         <!-- Test dependencies -->
-        <!--
-        <dependency>
-            <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-test</artifactId>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-qa-base</artifactId>

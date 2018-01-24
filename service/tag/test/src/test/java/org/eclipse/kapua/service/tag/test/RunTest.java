@@ -30,5 +30,6 @@ import org.junit.runner.RunWith;
         monochrome = true)
 @CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
 @CucumberProperty(key="org.eclipse.kapua.qa.datastore.extraStartupDelay", value="5")
-public class RunTagServiceTest {
+@CucumberProperty(key="test.type", value="unit")
+public class RunTest {
 }

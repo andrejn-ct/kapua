@@ -805,6 +805,16 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.kapua</groupId>
+                <artifactId>kapua-tag-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.kapua</groupId>
+                <artifactId>kapua-tag-test-steps</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.kapua</groupId>
                 <artifactId>kapua-translator-api</artifactId>
                 <version>${project.version}</version>
             </dependency>

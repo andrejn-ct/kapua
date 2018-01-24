@@ -48,7 +48,6 @@
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-junit</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>info.cukes</groupId>
@@ -72,7 +71,6 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
             <version>${activemq.version}</version>
-            <!-- <scope>test</scope> -->
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
@@ -84,25 +82,21 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-spring</artifactId>
             <version>${activemq.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-kahadb-store</artifactId>
             <version>${activemq.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-mqtt</artifactId>
             <version>${activemq.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-camel</artifactId>
             <version>${activemq.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.eclipse.paho</groupId>
@@ -113,24 +107,20 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-junit</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-amqp-protocol</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
 
         <!-- camel -->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jms</artifactId>
-            <!-- <scope>test</scope> -->
         </dependency>
 
         <!-- Embedded database -->

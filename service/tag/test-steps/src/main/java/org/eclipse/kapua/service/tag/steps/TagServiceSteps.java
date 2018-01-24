@@ -33,15 +33,13 @@ import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
 import org.eclipse.kapua.service.tag.internal.TagPredicates;
-import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.eclipse.kapua.qa.base.TestConfig;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Implementation of Gherkin steps used in TagService.feature scenarios.
@@ -55,11 +53,6 @@ public class TagServiceSteps extends TestBase {
      * Tag service.
      */
     private static TagService tagService;
-
-    /**
-     * Inter step data scratchpad.
-     */
-//    private StepData stepData;
 
     @Inject
     public TagServiceSteps(TestData stepData) { 
@@ -75,7 +68,6 @@ public class TagServiceSteps extends TestBase {
 
         this.scenario = scenario;
         stepData.clear();
-//        stepData.put("LastAccount", null);
     }
 
     @Given("^Tag Service configuration$")
@@ -95,12 +87,9 @@ public class TagServiceSteps extends TestBase {
             config.addConfigToMap(valueMap);
         }
         try {
-//            stepData.put("isException", false);
             primeException();
             tagService.setConfigValues(scopeId, parentId, valueMap);
         } catch (KapuaException ke) {
-//            stepData.put("isException", true);
-//            stepData.put("exception", ke);
             verifyException(ke);
         }
     }

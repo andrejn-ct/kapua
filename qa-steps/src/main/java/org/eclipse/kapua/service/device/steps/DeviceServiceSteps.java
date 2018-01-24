@@ -12,10 +12,6 @@
 package org.eclipse.kapua.service.device.steps;
 
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -95,7 +91,7 @@ import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
 import org.eclipse.kapua.service.tag.internal.TagPredicates;
-import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.eclipse.kapua.qa.base.TestConfig;
 
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
@@ -108,7 +104,7 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 
 // Implementation of Gherkin steps used in DeviceRegistryI9n.feature scenarios.
 @ScenarioScoped
-public class DeviceServiceSteps extends TestBase /*KapuaTest*/ {
+public class DeviceServiceSteps extends TestBase {
 
     private static final KapuaEid DEFAULT_SCOPE_ID = new KapuaEid(BigInteger.valueOf(1L));
     protected static Random random = new Random();

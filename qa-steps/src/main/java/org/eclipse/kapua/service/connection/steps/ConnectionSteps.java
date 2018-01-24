@@ -46,17 +46,13 @@ import org.eclipse.kapua.service.device.steps.AclCreator;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserFactory;
 import org.eclipse.kapua.service.user.UserService;
-import org.eclipse.kapua.service.user.steps.TestUser;
+import org.eclipse.kapua.qa.base.TestUser;
 
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 @ScenarioScoped
 public class ConnectionSteps extends TestBase {
