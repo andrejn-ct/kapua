@@ -21,7 +21,7 @@ import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
-import org.eclipse.kapua.commons.util.xml.JAXBContextProvider;
+//import org.eclipse.kapua.commons.util.xml.JAXBContextProvider;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.qa.base.EmbeddedBroker;
@@ -130,8 +130,9 @@ public class BrokerSteps extends /*Assert*/ TestBase {
         deviceCommandManagementService = locator.getService(DeviceCommandManagementService.class);
         deviceCommandFactory = locator.getFactory(DeviceCommandFactory.class);
 
-        JAXBContextProvider consoleProvider = new TestJAXBContextProvider();
-        XmlUtil.setContextProvider(consoleProvider);
+//        JAXBContextProvider consoleProvider = new TestJAXBContextProvider();
+        XmlUtil.setContextProvider(new TestJAXBContextProvider());
+//        XmlUtil.setContextProvider(consoleProvider);
     }
 
     @After

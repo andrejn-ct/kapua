@@ -26,7 +26,7 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.qa.base.TestBase;
 import org.eclipse.kapua.qa.base.DBHelper;
 import org.eclipse.kapua.qa.base.TestData;
-import org.eclipse.kapua.service.TestJAXBContextProvider;
+import org.eclipse.kapua.qa.base.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountFactory;
 import org.eclipse.kapua.service.account.AccountService;

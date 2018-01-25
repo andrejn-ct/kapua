@@ -118,8 +118,8 @@ public class SimulatorSteps {
 
     @Before
     public void beforeScenario(final Scenario scenario) throws Exception {
-        XmlUtil.setContextProvider(new TestJAXBContextProvider());
 
+        XmlUtil.setContextProvider(new TestJAXBContextProvider());
         downloadExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("DownloadSimulator"));
     }
 

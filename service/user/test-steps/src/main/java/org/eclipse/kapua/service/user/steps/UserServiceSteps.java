@@ -76,7 +76,8 @@ import org.eclipse.kapua.service.user.internal.UserEntityManagerFactory;
 import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
 import org.eclipse.kapua.service.user.internal.UserImpl;
 import org.eclipse.kapua.service.user.internal.UserServiceImpl;
-import org.eclipse.kapua.service.user.internal.UsersJAXBContextProvider;
+//import org.eclipse.kapua.service.user.internal.UsersJAXBContextProvider;
+import org.eclipse.kapua.qa.base.TestJAXBContextProvider;
 import org.eclipse.kapua.test.MockedLocator;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -94,15 +95,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Implementation of Gherkin steps used in User Service feature scenarios.
@@ -159,7 +151,8 @@ public class UserServiceSteps extends TestBase {
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
 
-        XmlUtil.setContextProvider(new UsersJAXBContextProvider());
+//        XmlUtil.setContextProvider(new UsersJAXBContextProvider());
+        XmlUtil.setContextProvider(new TestJAXBContextProvider());
 
         this.scenario = scenario;
         this.stepData.clear();
