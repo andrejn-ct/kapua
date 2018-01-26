@@ -12,9 +12,13 @@
 package org.eclipse.kapua.qa.base;
 
 import cucumber.api.Scenario;
+import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.locator.KapuaLocator;
 
+import java.math.BigInteger;
 import java.util.Random;
+
+import org.eclipse.kapua.model.id.KapuaId;
 import org.junit.Assert;
 
 public class TestBase extends Assert {
@@ -49,6 +53,12 @@ public class TestBase extends Assert {
      * Random number generator
      */
     public Random random = new Random();
+
+    /**
+     * Commonly used constants
+     */
+    public static final KapuaId SYS_SCOPE_ID = new KapuaEid(BigInteger.ONE);
+    public static final KapuaId SYS_USER_ID = new KapuaEid(BigInteger.ONE);
 
     public TestBase() {
 

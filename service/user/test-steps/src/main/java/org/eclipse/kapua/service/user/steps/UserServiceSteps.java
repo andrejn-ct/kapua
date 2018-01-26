@@ -151,7 +151,6 @@ public class UserServiceSteps extends TestBase {
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
 
-//        XmlUtil.setContextProvider(new UsersJAXBContextProvider());
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
 
         this.scenario = scenario;

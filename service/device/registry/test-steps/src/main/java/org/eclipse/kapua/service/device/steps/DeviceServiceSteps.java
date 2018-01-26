@@ -136,7 +136,6 @@ public class DeviceServiceSteps extends TestBase {
 
         // Initialize the database
         database.setup();
-
         stepData.clear();
 
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
