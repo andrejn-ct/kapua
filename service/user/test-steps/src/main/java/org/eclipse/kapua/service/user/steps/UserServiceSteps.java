@@ -140,6 +140,7 @@ public class UserServiceSteps extends TestBase {
     @Before
     public void beforeScenario(Scenario scenario) {
 
+        // Initialize the database
         this.database.setup();
 
         // Services by default Locator

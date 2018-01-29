@@ -17,11 +17,14 @@ import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
 import org.junit.runner.RunWith;
 
 @RunWith(CucumberWithProperties.class)
-@CucumberOptions(features = "classpath:features/DeviceRegistryValidation.feature",
+@CucumberOptions(
+        features = { "classpath:features/DeviceRegistryValidation.feature",
+                     "classpath:features/DeviceRegistry.feature",
+                   },
         glue = { "org.eclipse.kapua.qa.base",
                  "org.eclipse.kapua.service.device.steps",
                  "org.eclipse.kapua.service.device.registry.common",
-                 "org.eclipse.kapua.service.device.registry.internal",
+//                 "org.eclipse.kapua.service.device.registry.internal",
                  "org.eclipse.kapua.service.device.registry.shared",
                  "org.eclipse.kapua.service.device.registry.connection.internal",
                  "org.eclipse.kapua.service.device.registry.event.internal" },

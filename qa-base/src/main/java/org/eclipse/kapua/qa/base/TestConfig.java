@@ -27,6 +27,12 @@ public class TestConfig {
     /** String representation of parameter value. */
     private String value;
 
+    /** String presentation of scopeId. */
+    private String scopeId;
+
+    /** String presentation of parentScopeId. */
+    private String parentScopeId;
+
     public String getType() {
         return type;
     }
@@ -49,6 +55,22 @@ public class TestConfig {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
     }
 
     /**

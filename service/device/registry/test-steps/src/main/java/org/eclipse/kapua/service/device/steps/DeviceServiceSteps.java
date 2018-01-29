@@ -12,6 +12,7 @@
 package org.eclipse.kapua.service.device.steps;
 
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsEqualTo;
+import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsNotEqualTo;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,19 +21,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
 import javax.inject.Inject;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.apache.shiro.SecurityUtils;
+import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.commons.configuration.metatype.KapuaMetatypeFactoryImpl;
 import org.eclipse.kapua.commons.model.id.IdGenerator;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
+import org.eclipse.kapua.commons.model.id.KapuaIdFactoryImpl;
 import org.eclipse.kapua.commons.model.query.FieldSortCriteria;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicate;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.message.KapuaPosition;
@@ -61,7 +69,9 @@ import org.eclipse.kapua.message.internal.device.lifecycle.KapuaDisconnectPayloa
 import org.eclipse.kapua.message.internal.device.lifecycle.KapuaMissingChannelImpl;
 import org.eclipse.kapua.message.internal.device.lifecycle.KapuaMissingMessageImpl;
 import org.eclipse.kapua.message.internal.device.lifecycle.KapuaMissingPayloadImpl;
+import org.eclipse.kapua.model.config.metatype.KapuaMetatypeFactory;
 import org.eclipse.kapua.model.id.KapuaId;
+import org.eclipse.kapua.model.id.KapuaIdFactory;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate;
 import org.eclipse.kapua.qa.base.TestBase;
@@ -70,11 +80,15 @@ import org.eclipse.kapua.qa.base.TestData;
 import org.eclipse.kapua.qa.base.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
+import org.eclipse.kapua.service.authorization.AuthorizationService;
+import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
+import org.eclipse.kapua.service.authorization.permission.shiro.PermissionFactoryImpl;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DevicePredicates;
+import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventListResult;
@@ -82,8 +96,13 @@ import org.eclipse.kapua.service.device.registry.event.DeviceEventQuery;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventService;
 import org.eclipse.kapua.service.device.registry.event.internal.DeviceEventListResultImpl;
 import org.eclipse.kapua.service.device.registry.event.internal.DeviceEventQueryImpl;
+import org.eclipse.kapua.service.device.registry.internal.DeviceCreatorImpl;
+import org.eclipse.kapua.service.device.registry.internal.DeviceCreatorProxy;
+import org.eclipse.kapua.service.device.registry.internal.DeviceEntityManagerFactory;
+import org.eclipse.kapua.service.device.registry.internal.DeviceFactoryImpl;
 import org.eclipse.kapua.service.device.registry.internal.DeviceListResultImpl;
 import org.eclipse.kapua.service.device.registry.internal.DeviceQueryImpl;
+import org.eclipse.kapua.service.device.registry.internal.DeviceRegistryServiceImpl;
 import org.eclipse.kapua.service.device.registry.lifecycle.DeviceLifeCycleService;
 import org.eclipse.kapua.service.tag.Tag;
 import org.eclipse.kapua.service.tag.TagCreator;
@@ -101,16 +120,37 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
+import org.eclipse.kapua.test.MockedLocator;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Implementation of Gherkin steps used in DeviceRegistryI9n.feature scenarios.
 @ScenarioScoped
 public class DeviceServiceSteps extends TestBase {
 
-    private static final KapuaEid DEFAULT_SCOPE_ID = new KapuaEid(BigInteger.valueOf(1L));
-    protected static Random random = new Random();
+    public static final String DEFAULT_PATH = "src/main/sql/H2";
+    public static final String DEFAULT_COMMONS_PATH = "../../../../commons";
+    public static final String CREATE_DEVICE_TABLES = "dvc_*_create.sql";
+    public static final String DROP_DEVICE_TABLES = "dvc_*_drop.sql";
+
+    public static final String TEST_DEVICE_NAME = "test_name";
+    public static final String TEST_BIOS_VERSION_1 = "bios_version_1";
+    public static final String TEST_BIOS_VERSION_2 = "bios_version_2";
+    public static final String TEST_BIOS_VERSION_3 = "bios_version_3";
+
+    // Strings for client ID character set and length checks
+    public static String simpleClientId = "simpleClientIdWith64Chars_12345678901234567890123456789012345678";
+    public static String fullClientId = "fullClientIdWith64Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓";
+    public static String simpleClientIdTooLong = "simpleClientIdWith65Chars_123456789012345678901234567890123456789";
+    public static String fullClientIdTooLong = "fullClientIdWith65Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔";
+
+    private static final Logger logger = LoggerFactory.getLogger(DeviceServiceSteps.class);
 
     // Device registry services
     private DeviceRegistryService deviceRegistryService;
+    private DeviceFactory deviceFactory;
     private DeviceEventService deviceEventsService;
     private DeviceLifeCycleService deviceLifeCycleService;
     private TagService tagService;
@@ -125,28 +165,47 @@ public class DeviceServiceSteps extends TestBase {
     @Before
     public void beforeScenario(Scenario scenario) throws KapuaException {
 
+        // Initialize the database
+        this.database.setup();
+
         // Find all the required services with the default Locator
         KapuaLocator locator = KapuaLocator.getInstance();
         deviceRegistryService = locator.getService(DeviceRegistryService.class);
+        deviceFactory = locator.getFactory(DeviceFactory.class);
         deviceEventsService = locator.getService(DeviceEventService.class);
         deviceLifeCycleService = locator.getService(DeviceLifeCycleService.class);
         tagService = locator.getService(TagService.class);
 
-        this.scenario = scenario;
-
-        // Initialize the database
-        database.setup();
-        stepData.clear();
-
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
+
+        this.scenario = scenario;
+        this.stepData.clear();
+
+        if (isUnitTest()) {
+            try {
+                setupMockLocatorForDeviceService();
+            } catch (Exception ex) {
+                logger.error("Failed to set up mock locator in @Before", ex);
+            }
+        }
     }
 
     @After
-    public void afterScenario() throws Exception {
+    public void afterScenario() {
 
         // Clean up the database
-        database.deleteAll();
-        KapuaSecurityUtils.clearSession();
+        try {
+            logger.info("Logging out in cleanup");
+            if (isIntegrationTest()) {
+                database.deleteAll();
+                SecurityUtils.getSubject().logout();
+            } else {
+                database.dropAll();
+            }
+            KapuaSecurityUtils.clearSession();
+        } catch (Exception e) {
+            logger.error("Failed to log out in @After", e);
+        }
     }
 
     // Cucumber test steps
@@ -188,7 +247,7 @@ public class DeviceServiceSteps extends TestBase {
             tmpMsg.setDeviceId(null);
         }
 
-        deviceLifeCycleService.birth(generateRandomId(), tmpMsg);
+        deviceLifeCycleService.birth(getRandomId(), tmpMsg);
     }
 
     @Given("^A disconnect message from device \"(.+)\"$")
@@ -224,7 +283,7 @@ public class DeviceServiceSteps extends TestBase {
 
         try {
             primeException();
-            deviceLifeCycleService.death(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.death(getRandomId(), tmpMsg);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -262,7 +321,7 @@ public class DeviceServiceSteps extends TestBase {
 
         try {
             primeException();
-            deviceLifeCycleService.missing(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.missing(getRandomId(), tmpMsg);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -300,7 +359,7 @@ public class DeviceServiceSteps extends TestBase {
 
         try {
             primeException();
-            deviceLifeCycleService.applications(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.applications(getRandomId(), tmpMsg);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -381,12 +440,353 @@ public class DeviceServiceSteps extends TestBase {
         }
     }
 
+    @Then("^I find device \"([^\"]*)\"$")
+    public void iFindDeviceWithTag(String deviceName) throws Throwable {
+
+        DeviceListResult deviceList = (DeviceListResult) stepData.get("DeviceList");
+        Device device = deviceList.getFirstItem();
+
+        assertEquals(deviceName, device.getClientId());
+    }
+
+    @Then("^There is no such device$")
+    public void deviceMustBeNull() {
+        assertNull(stepData.get("Device"));
+    }
+
+    @Then("^The device has a non-null ID$")
+    public void checkCreatedDeviceId() {
+
+        Device origDevice = (Device) stepData.get("Device");
+        DeviceCreator devCr = (DeviceCreator) stepData.get("DeviceCreator");
+
+        assertNotNull(origDevice.getId());
+        assertEquals(devCr.getScopeId(), origDevice.getScopeId());
+        assertEquals(devCr.getClientId(), origDevice.getClientId());
+    }
+
+    @When("^I query for devices with BIOS version \"(.*)\"$")
+    public void queryForDevicesBasedOnBiosVersion(String version)
+            throws Exception {
+
+        DeviceListResult tmpList;
+        DeviceQuery tmpQuery = new DeviceQueryImpl(SYS_SCOPE_ID);
+        tmpQuery.setPredicate(attributeIsEqualTo("biosVersion", version));
+
+        // Search for the known bios version string
+        try {
+            primeException();
+            tmpList = deviceRegistryService.query(tmpQuery);
+            assertNotNull(tmpList);
+            stepData.put("DeviceList", tmpList);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I query for devices with BIOS different from \"(.*)\"$")
+    public void queryForDevicesWithDifferentBiosVersion(String version)
+            throws Exception {
+
+        DeviceListResult tmpList;
+        DeviceQuery tmpQuery = new DeviceQueryImpl(SYS_SCOPE_ID);
+        tmpQuery.setPredicate(attributeIsNotEqualTo("biosVersion", version));
+
+        // Search for the known bios version string
+        try {
+            primeException();
+            tmpList = deviceRegistryService.query(tmpQuery);
+            assertNotNull(tmpList);
+            stepData.put("DeviceList", tmpList);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I query for devices with Client Id \"(.*)\"$")
+    public void queryForDevicesBasedOnClientId(String id)
+            throws Exception {
+
+        DeviceListResult tmpList;
+        DeviceQuery tmpQuery = new DeviceQueryImpl(SYS_SCOPE_ID);
+        tmpQuery.setPredicate(attributeIsEqualTo("clientId", id));
+
+        // Search for the known client id string
+        try {
+            primeException();
+            tmpList = deviceRegistryService.query(tmpQuery);
+            assertNotNull(tmpList);
+            stepData.put("DeviceList", tmpList);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @And("^I extract the first device$")
+    public void getFirstDeviceFromList() {
+        // A device should have been found
+        DeviceListResult tmpList = (DeviceListResult) stepData.get("DeviceList");
+        assertNotEquals(0, tmpList.getSize());
+
+        Device tmpDev = tmpList.getFirstItem();
+        assertNotNull(tmpDev);
+
+        stepData.put("Device", tmpDev);
+    }
+
+    @When("^I count the devices in scope (\\d+)$")
+    public void countDevicesInScope(int scope)
+            throws Exception {
+
+        DeviceQuery tmpQuery = new DeviceQueryImpl(new KapuaEid(BigInteger.valueOf(scope)));
+
+        try {
+            primeException();
+            long count = deviceRegistryService.count(tmpQuery);
+            stepData.put("Count", count);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I count devices with BIOS version \"(.*)\"$")
+    public void countDevicesWithBIOSVersion(String version)
+            throws Exception {
+
+        DeviceQuery tmpQuery = new DeviceQueryImpl(SYS_SCOPE_ID);
+        assertNotNull(tmpQuery);
+        tmpQuery.setPredicate(attributeIsEqualTo("biosVersion", version));
+        stepData.remove("Count");
+
+        try {
+            primeException();
+            long count = deviceRegistryService.count(tmpQuery);
+            stepData.put("Count", count);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I update some device parameters$")
+    public void updateDeviceParameters()
+            throws Exception {
+
+        Device origDev = (Device) stepData.get("Device");
+        origDev.setBiosVersion(origDev.getBiosVersion() + "_upd");
+        origDev.setCustomAttribute1(origDev.getCustomAttribute1() + "_upd");
+
+        try {
+            primeException();
+            Device tmpDev = deviceRegistryService.update(origDev);
+            stepData.put("Device", tmpDev);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I update the device cleint ID to \"(.+)\"$")
+    public void updateDeviceClientId(String newId)
+            throws Exception {
+
+        Device origDev = (Device) stepData.get("Device");
+        stepData.put("StringValue", origDev.getClientId());
+        origDev.setClientId(newId);
+
+        try {
+            primeException();
+            Device tmpDev = deviceRegistryService.update(origDev);
+            stepData.put("Device", tmpDev);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I update a device with an invalid ID$")
+    public void updateDeviceWithInvalidId()
+            throws Exception {
+
+        Device origDev = (Device) stepData.get("Device");
+        origDev.setId(getRandomId());
+
+        try {
+            primeException();
+            Device tmpDev = deviceRegistryService.update(origDev);
+            stepData.put("Device", tmpDev);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete the device with the client id \"(.+)\"$")
+    public void deleteDeviceWithClientId(String clientId)
+            throws Exception {
+
+        try {
+            primeException();
+            Device tmpDev = deviceRegistryService.findByClientId(SYS_SCOPE_ID, clientId);
+            assertNotNull(tmpDev);
+            deviceRegistryService.delete(SYS_SCOPE_ID, tmpDev.getId());
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete a device with random IDs$")
+    public void deleteDeviceWithRandomIds()
+            throws Exception {
+
+        KapuaId rndScope = new KapuaEid(IdGenerator.generate());
+        KapuaId rndDev = new KapuaEid(IdGenerator.generate());
+
+        try {
+            primeException();
+            deviceRegistryService.delete(rndScope, rndDev);
+        } catch (KapuaEntityNotFoundException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Then("^It is possible to find the device based on its registry ID$")
+    public void fincDeviceByRememberedId()
+            throws KapuaException {
+
+        Device origDev = (Device) stepData.get("Device");
+        Device tmpDev = deviceRegistryService.find(SYS_SCOPE_ID, origDev.getId());
+
+        assertNotNull(tmpDev);
+        assertEquals(origDev.getClientId(), tmpDev.getClientId());
+    }
+
+    @Then("^It is possible to find the device based on its client ID$")
+    public void fincDeviceByRememberedClientId()
+            throws KapuaException {
+
+        Device origDev = (Device) stepData.get("Device");
+        Device tmpDev = deviceRegistryService.findByClientId(SYS_SCOPE_ID, origDev.getClientId());
+
+        assertNotNull(tmpDev);
+        assertEquals(origDev.getId(), tmpDev.getId());
+    }
+
+    @Then("^Named device registry searches are case sesntitive$")
+    public void checkCaseSensitivnessOfRegistrySearches()
+            throws KapuaException {
+
+        DeviceCreator deviceCreator = (DeviceCreator) stepData.get("DeviceCreator");
+        assertNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId().toLowerCase()));
+        assertNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId().toUpperCase()));
+        assertNotNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId()));
+    }
+
+    @Then("^The device matches the creator parameters$")
+    public void checkCreatedDeviceAgainstCreatorParameters() {
+
+        DeviceCreator origCreator = (DeviceCreator) stepData.get("DeviceCreator");
+        Device origDevice = (Device) stepData.get("Device");
+
+        assertNotNull(origDevice.getId());
+        assertEquals(origCreator.getScopeId(), origDevice.getScopeId());
+        assertEquals(origCreator.getClientId().length(), origDevice.getClientId().length());
+        assertEquals(origCreator.getClientId(), origDevice.getClientId());
+        assertEquals(origCreator.getConnectionId(), origDevice.getConnectionId());
+        assertEquals(origCreator.getDisplayName(), origDevice.getDisplayName());
+        assertEquals(origCreator.getSerialNumber(), origDevice.getSerialNumber());
+        assertEquals(origCreator.getModelId(), origDevice.getModelId());
+        assertEquals(origCreator.getImei(), origDevice.getImei());
+        assertEquals(origCreator.getImsi(), origDevice.getImsi());
+        assertEquals(origCreator.getIccid(), origDevice.getIccid());
+        assertEquals(origCreator.getBiosVersion(), origDevice.getBiosVersion());
+        assertEquals(origCreator.getFirmwareVersion(), origDevice.getFirmwareVersion());
+        assertEquals(origCreator.getOsVersion(), origDevice.getOsVersion());
+        assertEquals(origCreator.getJvmVersion(), origDevice.getJvmVersion());
+        assertEquals(origCreator.getOsgiFrameworkVersion(), origDevice.getOsgiFrameworkVersion());
+        assertEquals(origCreator.getApplicationFrameworkVersion(), origDevice.getApplicationFrameworkVersion());
+        assertEquals(origCreator.getApplicationIdentifiers(), origDevice.getApplicationIdentifiers());
+        assertEquals(origCreator.getAcceptEncoding(), origDevice.getAcceptEncoding());
+        assertEquals(origCreator.getCustomAttribute1(), origDevice.getCustomAttribute1());
+        assertEquals(origCreator.getCustomAttribute2(), origDevice.getCustomAttribute2());
+        assertEquals(origCreator.getCustomAttribute3(), origDevice.getCustomAttribute3());
+        assertEquals(origCreator.getCustomAttribute4(), origDevice.getCustomAttribute4());
+        assertEquals(origCreator.getCustomAttribute5(), origDevice.getCustomAttribute5());
+        assertEquals(origCreator.getStatus(), origDevice.getStatus());
+    }
+
+    @Then("^The device was correctly updated$")
+    public void checkUpdatedDeviceAgainstOriginal()
+            throws KapuaException {
+
+        Device tmpDevice;
+        Device origDevice = (Device) stepData.get("Device");
+
+        tmpDevice = deviceRegistryService.find(origDevice.getScopeId(), origDevice.getId());
+        assertNotNull(tmpDevice);
+
+        assertEquals(tmpDevice.getScopeId(), origDevice.getScopeId());
+        assertEquals(tmpDevice.getClientId().length(), origDevice.getClientId().length());
+        assertEquals(tmpDevice.getClientId(), origDevice.getClientId());
+        assertEquals(tmpDevice.getConnectionId(), origDevice.getConnectionId());
+        assertEquals(tmpDevice.getDisplayName(), origDevice.getDisplayName());
+        assertEquals(tmpDevice.getSerialNumber(), origDevice.getSerialNumber());
+        assertEquals(tmpDevice.getModelId(), origDevice.getModelId());
+        assertEquals(tmpDevice.getImei(), origDevice.getImei());
+        assertEquals(tmpDevice.getImsi(), origDevice.getImsi());
+        assertEquals(tmpDevice.getIccid(), origDevice.getIccid());
+        assertEquals(tmpDevice.getBiosVersion(), origDevice.getBiosVersion());
+        assertEquals(tmpDevice.getFirmwareVersion(), origDevice.getFirmwareVersion());
+        assertEquals(tmpDevice.getOsVersion(), origDevice.getOsVersion());
+        assertEquals(tmpDevice.getJvmVersion(), origDevice.getJvmVersion());
+        assertEquals(tmpDevice.getOsgiFrameworkVersion(), origDevice.getOsgiFrameworkVersion());
+        assertEquals(tmpDevice.getApplicationFrameworkVersion(), origDevice.getApplicationFrameworkVersion());
+        assertEquals(tmpDevice.getApplicationIdentifiers(), origDevice.getApplicationIdentifiers());
+        assertEquals(tmpDevice.getAcceptEncoding(), origDevice.getAcceptEncoding());
+        assertEquals(tmpDevice.getCustomAttribute1(), origDevice.getCustomAttribute1());
+        assertEquals(tmpDevice.getCustomAttribute2(), origDevice.getCustomAttribute2());
+        assertEquals(tmpDevice.getCustomAttribute3(), origDevice.getCustomAttribute3());
+        assertEquals(tmpDevice.getCustomAttribute4(), origDevice.getCustomAttribute4());
+        assertEquals(tmpDevice.getCustomAttribute5(), origDevice.getCustomAttribute5());
+        assertEquals(tmpDevice.getStatus(), origDevice.getStatus());
+    }
+
+    @Then("^The device client id is \"(.*)\"$")
+    public void checkDeviceClientName(String name)
+            throws KapuaException {
+        assertEquals(name, ((Device) stepData.get("Device")).getClientId());
+    }
+
+    @Then("^I find (\\d+) devices?$")
+    public void checkDeviceListLength(int cnt) {
+        assertNotNull(stepData.get("DeviceList"));
+        assertEquals(cnt, ((DeviceListResultImpl) stepData.get("DeviceList")).getSize());
+    }
+
+    @Then("^There (?:are|is) (\\d+) devices?$")
+    public void checkNumberOfDevices(int number) {
+        assertEquals((long) number, (long) stepData.get("Count"));
+    }
+
+    @Then("^The client ID was not changed$")
+    public void checkDeviceClientIdForChanges()
+            throws KapuaException {
+
+        Device origDevice = (Device) stepData.get("Device");
+        Device tmpDevice = deviceRegistryService.find(SYS_SCOPE_ID, origDevice.getId());
+        assertNotEquals(origDevice.getClientId(), tmpDevice.getClientId());
+        assertEquals((String) stepData.get("StringValue"), tmpDevice.getClientId());
+    }
+
+    @Then("^There is no device with the client ID \"(.+)\"$")
+    public void checkWhetherNamedDeviceStillExists(String clientId)
+            throws KapuaException {
+        Device tmpDevice = deviceRegistryService.findByClientId(SYS_SCOPE_ID, clientId);
+        assertNull(tmpDevice);
+    }
+
     @And("^I tag device with \"([^\"]*)\" tag$")
     public void iTagDeviceWithTag(String deviceTagName) throws Throwable {
 
         Device device = (Device) stepData.get("Device");
         // stepData.clear();
-        TagCreator tagCreator = new TagFactoryImpl().newCreator(DEFAULT_SCOPE_ID);
+        TagCreator tagCreator = new TagFactoryImpl().newCreator(SYS_SCOPE_ID);
         tagCreator.setName(deviceTagName);
         Tag tag = tagService.create(tagCreator);
         Set<KapuaId> tags = new HashSet<>();
@@ -408,7 +808,7 @@ public class DeviceServiceSteps extends TestBase {
         Account lastAcc = (Account) stepData.get("LastAccount");
         DeviceQueryImpl deviceQuery = new DeviceQueryImpl(lastAcc.getId());
 
-        KapuaQuery<Tag> tagQuery = new TagFactoryImpl().newQuery(DEFAULT_SCOPE_ID);
+        KapuaQuery<Tag> tagQuery = new TagFactoryImpl().newQuery(SYS_SCOPE_ID);
         tagQuery.setPredicate(new AttributePredicate<String>(TagPredicates.NAME, deviceTagName, KapuaAttributePredicate.Operator.EQUAL));
         TagListResult tagQueryResult = tagService.query(tagQuery);
         Tag tag = tagQueryResult.getFirstItem();
@@ -416,15 +816,6 @@ public class DeviceServiceSteps extends TestBase {
         DeviceListResult deviceList = (DeviceListResult) deviceRegistryService.query(deviceQuery);
 
         stepData.put("DeviceList", deviceList);
-    }
-
-    @Then("^I find device \"([^\"]*)\"$")
-    public void iFindDeviceWithTag(String deviceName) throws Throwable {
-
-        DeviceListResult deviceList = (DeviceListResult) stepData.get("DeviceList");
-        Device device = deviceList.getFirstItem();
-
-        assertEquals(deviceName, device.getClientId());
     }
 
     @And("^I untag device with \"([^\"]*)\" tag$")
@@ -480,12 +871,6 @@ public class DeviceServiceSteps extends TestBase {
         assertEquals(cnt, ((DeviceEventListResultImpl) stepData.get("DeviceEventList")).getSize());
     }
 
-    @Then("^I find (\\d+) devices?$")
-    public void checkDeviceListLength(int cnt) {
-        assertNotNull(stepData.get("DeviceList"));
-        assertEquals(cnt, ((DeviceListResultImpl) stepData.get("DeviceList")).getSize());
-    }
-
     @Then("^The type of the last event is \"(.+)\"$")
     public void checkLastEventType(String type) {
         DeviceEventListResult tmpList;
@@ -494,7 +879,24 @@ public class DeviceServiceSteps extends TestBase {
         assertNotEquals(0, ((DeviceEventListResultImpl) stepData.get("DeviceEventList")).getSize());
         tmpList = (DeviceEventListResultImpl) stepData.get("DeviceEventList");
         assertEquals(type.trim().toUpperCase(), tmpList.getItem(tmpList.getSize() - 1).getResource().trim().toUpperCase());
+    }
 
+    @Then("^All device factory functions must return non null values$")
+    public void exerciseAllDeviceFactoryFunctions() {
+        Device tmpDevice = null;
+        DeviceCreator tmpCreator = null;
+        DeviceQuery tmpQuery = null;
+        DeviceListResult tmpListRes = null;
+
+        tmpDevice = deviceFactory.newEntity(SYS_SCOPE_ID);
+        tmpCreator = deviceFactory.newCreator(SYS_SCOPE_ID, "TestDevice");
+        tmpQuery = deviceFactory.newQuery(SYS_SCOPE_ID);
+        tmpListRes = deviceFactory.newListResult();
+
+        assertNotNull(tmpDevice);
+        assertNotNull(tmpCreator);
+        assertNotNull(tmpQuery);
+        assertNotNull(tmpListRes);
     }
 
     // *******************
@@ -677,38 +1079,89 @@ public class DeviceServiceSteps extends TestBase {
     }
 
     private DeviceCreator prepareDefaultDeviceCreator(KapuaId scopeId, String clientId) {
-        DeviceCreator tmpCr;
 
-        tmpCr = KapuaLocator.getInstance().getFactory(DeviceFactory.class).newCreator(
-                scopeId,
-                clientId);
+//        DeviceCreator tmpDeviceCreator = KapuaLocator.getInstance().getFactory(DeviceFactory.class).newCreator(
+//                scopeId,
+//                clientId);
 
-        tmpCr.setConnectionId(generateRandomId());
-        tmpCr.setDisplayName("display_name");
-        tmpCr.setSerialNumber("serialNumber");
-        tmpCr.setModelId("modelId");
-        tmpCr.setImei(String.valueOf(random.nextInt()));
-        tmpCr.setImsi(String.valueOf(random.nextInt()));
-        tmpCr.setIccid(String.valueOf(random.nextInt()));
-        tmpCr.setBiosVersion("biosVersion");
-        tmpCr.setFirmwareVersion("firmwareVersion");
-        tmpCr.setOsVersion("osVersion");
-        tmpCr.setJvmVersion("jvmVersion");
-        tmpCr.setOsgiFrameworkVersion("osgiFrameworkVersion");
-        tmpCr.setApplicationFrameworkVersion("kapuaVersion");
-        tmpCr.setApplicationIdentifiers("applicationIdentifiers");
-        tmpCr.setAcceptEncoding("acceptEncoding");
-        tmpCr.setCustomAttribute1("customAttribute1");
-        tmpCr.setCustomAttribute2("customAttribute2");
-        tmpCr.setCustomAttribute3("customAttribute3");
-        tmpCr.setCustomAttribute4("customAttribute4");
-        tmpCr.setCustomAttribute5("customAttribute5");
-        tmpCr.setStatus(DeviceStatus.ENABLED);
+        DeviceCreatorImpl tmpDeviceCreator = DeviceCreatorProxy.newCreator(scopeId, clientId);
 
-        return tmpCr;
+        tmpDeviceCreator.setClientId(clientId);
+        tmpDeviceCreator.setConnectionId(new KapuaEid(IdGenerator.generate()));
+        tmpDeviceCreator.setDisplayName(TEST_DEVICE_NAME);
+        tmpDeviceCreator.setSerialNumber("serialNumber");
+        tmpDeviceCreator.setModelId("modelId");
+        tmpDeviceCreator.setImei(String.valueOf(random.nextInt()));
+        tmpDeviceCreator.setImsi(String.valueOf(random.nextInt()));
+        tmpDeviceCreator.setIccid(String.valueOf(random.nextInt()));
+        tmpDeviceCreator.setBiosVersion("biosVersion");
+        tmpDeviceCreator.setFirmwareVersion("firmwareVersion");
+        tmpDeviceCreator.setOsVersion("osVersion");
+        tmpDeviceCreator.setJvmVersion("jvmVersion");
+        tmpDeviceCreator.setOsgiFrameworkVersion("osgiFrameworkVersion");
+        tmpDeviceCreator.setApplicationFrameworkVersion("kapuaVersion");
+        tmpDeviceCreator.setApplicationIdentifiers("applicationIdentifiers");
+        tmpDeviceCreator.setAcceptEncoding("acceptEncoding");
+        tmpDeviceCreator.setGpsLatitude(45.2);
+        tmpDeviceCreator.setGpsLongitude(26.3);
+        tmpDeviceCreator.setCustomAttribute1("customAttribute1");
+        tmpDeviceCreator.setCustomAttribute2("customAttribute2");
+        tmpDeviceCreator.setCustomAttribute3("customAttribute3");
+        tmpDeviceCreator.setCustomAttribute4("customAttribute4");
+        tmpDeviceCreator.setCustomAttribute5("customAttribute5");
+        tmpDeviceCreator.setStatus(DeviceStatus.ENABLED);
+
+        return tmpDeviceCreator;
     }
 
-    private KapuaId generateRandomId() {
-        return new KapuaEid(IdGenerator.generate());
+    /**
+     * Set up the preconditions for unit tests. This includes filling the mock locator with the correct
+     * mocked services and the actual service implementation under test.
+     * Also, all the unit tests will be run with the kapua-sys user.
+     *
+     * @throws Exception
+     */
+    private void setupMockLocatorForDeviceService() {
+        MockedLocator mockedLocator = (MockedLocator) KapuaLocator.getInstance();
+
+        AbstractModule module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+
+                // Inject mocked Authorization Service method checkPermission
+                AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
+                try {
+                    Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(org.eclipse.kapua.service.authorization.permission.Permission.class));
+                } catch (KapuaException e) {
+                    // skip
+                }
+                bind(AuthorizationService.class).toInstance(mockedAuthorization);
+                // Inject actual implementations of required services and factories
+                KapuaIdFactory idFactory = new KapuaIdFactoryImpl();
+                bind(KapuaIdFactory.class).toInstance(idFactory);
+                KapuaMetatypeFactory metaFactory = new KapuaMetatypeFactoryImpl();
+                bind(KapuaMetatypeFactory.class).toInstance(metaFactory);
+                PermissionFactory permissionFactory = new PermissionFactoryImpl();
+                bind(PermissionFactory.class).toInstance(permissionFactory);
+                DeviceEntityManagerFactory deviceEntityManagerFactory = DeviceEntityManagerFactory.instance();
+                bind(DeviceEntityManagerFactory.class).toInstance(deviceEntityManagerFactory);
+                DeviceRegistryService deviceRegistryService = new DeviceRegistryServiceImpl();
+                bind(DeviceRegistryService.class).toInstance(deviceRegistryService);
+                DeviceFactory deviceFactory = new DeviceFactoryImpl();
+                bind(DeviceFactory.class).toInstance(deviceFactory);
+            }
+        };
+
+        Injector injector = Guice.createInjector(module);
+        mockedLocator.setInjector(injector);
+
+        deviceRegistryService = locator.getService(DeviceRegistryService.class);
+        deviceFactory = locator.getFactory(DeviceFactory.class);
+
+        // Create KapuaSession using KapuaSecurtiyUtils and kapua-sys user as logged in user.
+        // All operations on database are performed using system user.
+        KapuaSession kapuaSession = new KapuaSession(null, SYS_SCOPE_ID, SYS_USER_ID);
+        KapuaSecurityUtils.setSession(kapuaSession);
     }
 }

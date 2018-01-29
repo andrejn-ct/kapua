@@ -402,7 +402,7 @@ public class DeviceRegistryValidationTestSteps extends TestBase {
      *
      * @throws Exception
      */
-    private void setupMockLocatorForDeviceService() throws Exception {
+    private void setupMockLocatorForDeviceService() {
         MockedLocator mockedLocator = (MockedLocator) KapuaLocator.getInstance();
 
         AbstractModule module = new AbstractModule() {
@@ -421,7 +421,6 @@ public class DeviceRegistryValidationTestSteps extends TestBase {
                 // Inject mocked Permission Factory
 //                PermissionFactory mockedPermissionFactory = Mockito.mock(PermissionFactory.class);
 //                bind(PermissionFactory.class).toInstance(mockedPermissionFactory);
-                // Set KapuaMetatypeFactory for Metatype configuration
 
                 // Inject actual implementations of required services and factories
                 KapuaIdFactory idFactory = new KapuaIdFactoryImpl();

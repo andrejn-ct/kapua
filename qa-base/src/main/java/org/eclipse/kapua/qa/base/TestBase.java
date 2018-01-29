@@ -70,6 +70,10 @@ public class TestBase extends Assert {
         }
     }
 
+    public KapuaId getRandomId() {
+        return new KapuaEid(BigInteger.valueOf(random.nextLong()));
+    }
+
     public boolean isUnitTest() {
         return testType.equals("unit");
     }
