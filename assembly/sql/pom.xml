@@ -52,15 +52,18 @@
                                             <basedir>/</basedir>
                                         </assembly>
                                         <runCmds>
-                                            <runCmd><![CDATA[
-                                    mkdir -p /var/h2/data && \
-                                    chown kapua:kapua /var/h2/data && \
-                                    chmod a+rw /var/h2/data && \
-                                    cd /home/kapua && \
-                                    chmod a+rx run-h2 && \
-                                    mkdir tmp && chmod a+rwx tmp && \
-                                    curl -s http://repo2.maven.org/maven2/com/h2database/h2/1.4.193/h2-1.4.193.jar -o h2.jar
-                                    ]]></runCmd>
+                                            <run>
+                                                <![CDATA[
+                                                    mkdir -p /var/h2/data && \
+                                                    chown kapua:kapua /var/h2/data && \
+                                                    chmod a+rw /var/h2/data && \
+                                                    cd /home/kapua && \
+                                                    chmod a+rwx run-h2 && \
+                                                    mkdir tmp && \
+                                                    chmod a+rwx tmp && \
+                                                    curl -s http://repo2.maven.org/maven2/com/h2database/h2/1.4.193/h2-1.4.193.jar -o h2.jar
+                                                ]]>
+                                            </run>
                                         </runCmds>
                                         <volumes>
                                             <volume>/var/h2/data</volume>

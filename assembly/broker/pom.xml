@@ -653,11 +653,6 @@
                                         <assembly>
                                             <descriptor>${basedir}/src/main/descriptors/kapua-broker.xml</descriptor>
                                         </assembly>
-                                        <entryPoint>
-                                            <exec>
-                                                <arg>/maven/run-broker</arg>
-                                            </exec>
-                                        </entryPoint>
                                         <env>
                                             <SQL_DB_PORT>\${DB_PORT_3306_TCP_PORT}</SQL_DB_PORT>
                                             <SQL_DB_ADDR>\${DB_PORT_3306_TCP_ADDR}</SQL_DB_ADDR>
@@ -686,15 +681,22 @@
                                         </ports>
                                         <user>kapua</user>
                                         <runCmds>
-                                            <run><![CDATA[
-                                    chown -R kapua:kapua /maven && \
-                                    chmod -R a+rw /maven && \
-                                    chmod og+rwx /home/kapua \
-                                    find /maven/bin -type f ! -name "*.jar" -exec chmod a+x {} + && \
-                                    chmod a+x /maven/run-broker && \
-                                    find /maven -type d -exec chmod a+x {} +
-                                    ]]></run>
+                                            <run>
+                                                <![CDATA[
+                                                    chown -R kapua:kapua /maven && \
+                                                    chmod -R a+rw /maven && \
+                                                    chmod a+x /maven/run-broker && \
+                                                    chmod a+rwx /home/kapua && \
+                                                    find /maven -type d -exec chmod a+x {} + && \
+                                                    find /maven/bin -type f -exec chmod a+rwx {} +
+                                                ]]>
+                                            </run>
                                         </runCmds>
+                                        <entryPoint>
+                                            <exec>
+                                                <arg>/maven/run-broker</arg>
+                                            </exec>
+                                        </entryPoint>
                                         <volumes>
                                             <volume>/maven/data</volume>
                                         </volumes>

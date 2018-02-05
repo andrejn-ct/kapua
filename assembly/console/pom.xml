@@ -355,9 +355,9 @@
                                         <user>kapua</user>
                                         <runCmds>
                                             <runCmd><![CDATA[
-                                    chmod a+rwx /home/kapua/run-console && \
-                                    chown -R kapua:kapua /home/kapua
-                                    chmod og+rwx /home/kapua
+                                    chown -R kapua:kapua /home/kapua && \
+                                    chmod a+rwx /home/kapua && \
+                                    chmod a+rwx /home/kapua/run-console
                                     ]]>     </runCmd>
                                         </runCmds>
                                         <entryPoint>
