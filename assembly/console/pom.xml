@@ -354,11 +354,13 @@
                                         </env>
                                         <user>kapua</user>
                                         <runCmds>
-                                            <runCmd><![CDATA[
-                                    chown -R kapua:kapua /home/kapua && \
-                                    chmod a+rwx /home/kapua && \
-                                    chmod a+rwx /home/kapua/run-console
-                                    ]]>     </runCmd>
+                                            <run>
+                                                <![CDATA[
+                                                    chown -R kapua:kapua /home/kapua && \
+                                                    chmod a+rwx /home/kapua && \
+                                                    chmod a+rwx /home/kapua/run-console
+                                                ]]>
+                                            </run>
                                         </runCmds>
                                         <entryPoint>
                                             <exec>
