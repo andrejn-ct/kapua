@@ -33,6 +33,7 @@
         <class>org.eclipse.kapua.commons.model.AbstractKapuaUpdatableEntity</class>
 
         <properties>
+            <property name="javax.persistence.lock.timeout" value="1000" />
             <property name="eclipselink.logging.logger" value="org.eclipse.persistence.logging.slf4j.SLF4JLogger" />
         </properties>
 

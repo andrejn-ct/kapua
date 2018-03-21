@@ -26,6 +26,7 @@ import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.commons.util.CommonsValidationRegex;
+import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
 import org.eclipse.kapua.model.id.KapuaId;
@@ -56,10 +57,10 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
         implements AccountService {
 
     @Inject
-    private AuthorizationService authorizationService;
+    AuthorizationService authorizationService;
 
     @Inject
-    private PermissionFactory permissionFactory;
+    PermissionFactory permissionFactory;
 
     /**
      * Constructor.
@@ -84,7 +85,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.write, accountCreator.getScopeId()));
+//=======
+//        checkAccountDomainPermission(Actions.write, accountCreator.getScopeId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Check child account policy
@@ -155,10 +160,17 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
         // Check Access
         if (KapuaSecurityUtils.getSession().getScopeId().equals(account.getId())) {
             // Editing self
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
             authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.write, account.getId()));
         } else {
             // Editing child
             authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.write, account.getScopeId()));
+//=======
+//            checkAccountDomainPermission(Actions.write, account.getId());
+//        } else {
+//             Editing child
+//            checkAccountDomainPermission(Actions.write, account.getScopeId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
         }
 
         //
@@ -221,7 +233,7 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
     }
 
     @Override
-    //@RaiseServiceEvent
+    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId accountId) throws KapuaException {
         //
         // Argument validation
@@ -231,7 +243,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
         //
         // Check Access
         Actions action = Actions.delete;
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, action, scopeId));
+//=======
+//        checkAccountDomainPermission(action, scopeId);
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Check if it has children
@@ -271,7 +287,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, scopeId));
+//=======
+//        checkAccountDomainPermission(Actions.read, scopeId);
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Do find
@@ -286,7 +306,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, accountId));
+//=======
+//        checkAccountDomainPermission(Actions.read, accountId);
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Make sure account exists
@@ -307,7 +331,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
             //
             // Check Access
             if (account != null) {
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
                 authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, account.getId()));
+//=======
+//                checkAccountDomainPermission(Actions.read, account.getId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
             }
 
             return account;
@@ -329,7 +357,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, account.getId()));
+//=======
+//        checkAccountDomainPermission(Actions.read, account.getId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         return entityManagerSession.onResult(em -> {
             AccountListResult result = null;
@@ -351,7 +383,11 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, query.getScopeId()));
+//=======
+//        checkAccountDomainPermission(Actions.read, query.getScopeId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Do query
@@ -366,12 +402,30 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         //
         // Check Access
+//<<<<<<< 185e18b25222cb8f628167c5c2fdb65f2fcb010e
         authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, Actions.read, query.getScopeId()));
+//=======
+//        checkAccountDomainPermission(Actions.read, query.getScopeId());
+//>>>>>>> Service events are enabled for most (almost all) services. Basic tests are also implemented.
 
         //
         // Do count
         return entityManagerSession.onResult(em -> AccountDAO.count(em, query));
     }
+
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
+
+//    private void checkAccountDomainPermission(Actions action, KapuaId scope) throws KapuaException {
+//
+//        KapuaLocator locator = KapuaLocator.getInstance();
+//        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+//        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+//        authorizationService.checkPermission(permissionFactory.newPermission(AccountDomains.ACCOUNT_DOMAIN, action, scope));
+//    }
 
     /**
      * Find an {@link Account} without authorization checks.

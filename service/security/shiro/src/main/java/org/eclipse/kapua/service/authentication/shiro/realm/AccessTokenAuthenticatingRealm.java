@@ -50,11 +50,15 @@ public class AccessTokenAuthenticatingRealm extends AuthenticatingRealm {
      */
     public static final String REALM_NAME = "accessTokenAuthenticatingRealm";
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
+//    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
 
-    private static final AccessTokenService ACCESS_TOKEN_SERVICE = LOCATOR.getService(AccessTokenService.class);
-    private static final AccountService ACCOUNT_SERVICE = LOCATOR.getService(AccountService.class);
-    private static final UserService USER_SERVICE = LOCATOR.getService(UserService.class);
+//    private static final AccessTokenService ACCESS_TOKEN_SERVICE = LOCATOR.getService(AccessTokenService.class);
+//    private static final AccountService ACCOUNT_SERVICE = LOCATOR.getService(AccountService.class);
+//    private static final UserService USER_SERVICE = LOCATOR.getService(UserService.class);
+
+//    private static final AccessTokenService ACCESS_TOKEN_SERVICE = KapuaLocator.getInstance().getService(AccessTokenService.class);
+//    private static final AccountService ACCOUNT_SERVICE = KapuaLocator.getInstance().getService(AccountService.class);
+//    private static final UserService USER_SERVICE = KapuaLocator.getInstance().getService(UserService.class);
 
     /**
      * Constructor
@@ -80,7 +84,9 @@ public class AccessTokenAuthenticatingRealm extends AuthenticatingRealm {
         // Find accessToken
         final AccessToken accessToken;
         try {
-            accessToken = KapuaSecurityUtils.doPrivileged(() -> ACCESS_TOKEN_SERVICE.findByTokenId(tokenTokenId));
+            AccessTokenService ats = KapuaLocator.getInstance().getService(AccessTokenService.class);
+//            accessToken = KapuaSecurityUtils.doPrivileged(() -> ACCESS_TOKEN_SERVICE.findByTokenId(tokenTokenId));
+            accessToken = KapuaSecurityUtils.doPrivileged(() -> ats.findByTokenId(tokenTokenId));
         } catch (AuthenticationException ae) {
             throw ae;
         } catch (Exception e) {
@@ -102,7 +108,9 @@ public class AccessTokenAuthenticatingRealm extends AuthenticatingRealm {
         // Get the associated user by name
         final User user;
         try {
-            user = KapuaSecurityUtils.doPrivileged(() -> USER_SERVICE.find(accessToken.getScopeId(), accessToken.getUserId()));
+            UserService us = KapuaLocator.getInstance().getService(UserService.class);
+//            user = KapuaSecurityUtils.doPrivileged(() -> USER_SERVICE.find(accessToken.getScopeId(), accessToken.getUserId()));
+            user = KapuaSecurityUtils.doPrivileged(() -> us.find(accessToken.getScopeId(), accessToken.getUserId()));
         } catch (AuthenticationException ae) {
             throw ae;
         } catch (Exception e) {
@@ -128,7 +136,9 @@ public class AccessTokenAuthenticatingRealm extends AuthenticatingRealm {
         // Find account
         final Account account;
         try {
-            account = KapuaSecurityUtils.doPrivileged(() -> ACCOUNT_SERVICE.find(user.getScopeId()));
+            AccountService as = KapuaLocator.getInstance().getService(AccountService.class);
+//            account = KapuaSecurityUtils.doPrivileged(() -> ACCOUNT_SERVICE.find(user.getScopeId()));
+            account = KapuaSecurityUtils.doPrivileged(() -> as.find(user.getScopeId()));
         } catch (AuthenticationException ae) {
             throw ae;
         } catch (Exception e) {
