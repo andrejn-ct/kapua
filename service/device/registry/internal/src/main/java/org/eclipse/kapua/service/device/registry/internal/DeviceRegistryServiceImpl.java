@@ -201,8 +201,7 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
         });
     }
 
-    private void removeTagFromDevices(KapuaId scopeId, KapuaId tagId)
-            throws KapuaException {
+    private void removeTagFromDevices(KapuaId scopeId, KapuaId tagId) throws KapuaException {
 
         DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
         DeviceQuery query = deviceFactory.newQuery(scopeId);
