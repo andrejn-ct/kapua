@@ -33,7 +33,7 @@
     <include relativeToChangelogFile="true" file="./job_step_definition-foreignkey.xml"/>
 
     <!--<include relativeToChangelogFile="true" file="./trigger-foreignkey.xml"/>-->
-    <!-- <include relativeToChangelogFile="true" file="./user-foreignkey.xml"/> -->
+    <!--<include relativeToChangelogFile="true" file="./user-foreignkey.xml"/>-->
     <!--<include relativeToChangelogFile="true" file="./tag-foreignkey.xml"/>-->
 
 </databaseChangeLog>
