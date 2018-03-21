@@ -32,7 +32,6 @@ import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountFactory;
 import org.eclipse.kapua.service.account.AccountService;
-import org.eclipse.kapua.service.authentication.AuthenticationService;
 import org.eclipse.kapua.service.authentication.credential.CredentialService;
 import org.eclipse.kapua.service.authorization.access.AccessInfoService;
 import org.eclipse.kapua.service.device.registry.ConnectionUserCouplingMode;
@@ -41,12 +40,13 @@ import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionCreator;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionFactory;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionListResult;
+import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionQuery;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionService;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionStatus;
 import org.eclipse.kapua.service.device.registry.connection.internal.DeviceConnectionListResultImpl;
+import org.eclipse.kapua.service.device.registry.connection.internal.DeviceConnectionQueryImpl;
 import org.eclipse.kapua.service.device.steps.AclCreator;
 import org.eclipse.kapua.service.user.User;
-import org.eclipse.kapua.service.user.UserFactory;
 import org.eclipse.kapua.service.user.UserService;
 import org.eclipse.kapua.service.user.steps.TestUser;
 
@@ -58,11 +58,6 @@ import java.util.Vector;
 
 @ScenarioScoped
 public class ConnectionSteps extends BaseQATests {
-
-    /**
-     * Authentication service.
-     */
-    private static AuthenticationService authenticationService;
 
     /**
      * Account service.
@@ -78,11 +73,6 @@ public class ConnectionSteps extends BaseQATests {
      * User service.
      */
     private static UserService userService;
-
-    /**
-     * User factory.
-     */
-    private static UserFactory userFactory;
 
     /**
      * Credential service.
@@ -103,12 +93,9 @@ public class ConnectionSteps extends BaseQATests {
      */
     private static AclCreator aclCreator;
 
-    // Single point to database access.
-    private static DBHelper dbHelper;
-
     @Inject
     public ConnectionSteps(StepData stepData, DBHelper dbHelper) {
-        this.dbHelper = dbHelper;
+        this.database = dbHelper;
         this.stepData = stepData;
     }
 
@@ -116,11 +103,9 @@ public class ConnectionSteps extends BaseQATests {
     public void beforeScenario(Scenario scenario) {
 
         KapuaLocator locator = KapuaLocator.getInstance();
-        authenticationService = locator.getService(AuthenticationService.class);
         accountService = locator.getService(AccountService.class);
         accountFactory = locator.getFactory(AccountFactory.class);
         userService = locator.getService(UserService.class);
-        userFactory = locator.getFactory(UserFactory.class);
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
         deviceRegistryService = locator.getService(DeviceRegistryService.class);
@@ -130,7 +115,7 @@ public class ConnectionSteps extends BaseQATests {
         aclCreator = new AclCreator(accountService, accountFactory, userService, accessInfoService, credentialService);
 
         // Initialize the database
-        dbHelper.setup();
+        database.setup();
 
         this.scenario = scenario;
 
@@ -141,7 +126,7 @@ public class ConnectionSteps extends BaseQATests {
     public void afterScenario() throws Exception {
 
         // Clean up the database
-        dbHelper.deleteAll();
+        database.deleteAll();
         KapuaSecurityUtils.clearSession();
     }
 
@@ -213,12 +198,6 @@ public class ConnectionSteps extends BaseQATests {
         });
     }
 
-    @Given("^I wait for (\\d+) seconds?$")
-    public void waitForSpecifiedTime(int delay) throws InterruptedException {
-
-        Thread.sleep(delay * 1000);
-    }
-
     @When("^I search for a connection from the device \"(.+)\" in account \"(.+)\"$")
     public void searchForConnectionFromDeviceWithClientID(String clientId, String account)
             throws KapuaException {
@@ -233,7 +212,6 @@ public class ConnectionSteps extends BaseQATests {
             Assert.assertNotNull(tmpAcc.getId());
 
             tmpConn = deviceConnectionService.findByClientId(tmpAcc.getId(), clientId);
-            Map<String, Object> props = deviceRegistryService.getConfigValues(tmpAcc.getId());
             stepData.put("DeviceConnection", tmpConn);
             if (tmpConn != null) {
                 Vector<DeviceConnection> dcv = new Vector<>();
@@ -244,11 +222,58 @@ public class ConnectionSteps extends BaseQATests {
         });
     }
 
-    @Then("^I find (\\d+) connections?$")
-    public void countNumberOfConnections(int cnt) {
+    @When("^I search for device connections for account \"(.+)\"$")
+    public void searchFortAccountConnections(String accountName) throws KapuaException {
 
-        DeviceConnectionListResult tmpConnLst = (DeviceConnectionListResult) stepData.get("DeviceConnectionList");
-        Assert.assertEquals(cnt, tmpConnLst.getSize());
+        KapuaSecurityUtils.doPrivileged(() -> {
+            Account tmpAcc = accountService.findByName(accountName);
+            Assert.assertNotNull(tmpAcc);
+            Assert.assertNotNull(tmpAcc.getId());
+
+            stepData.remove("DeviceConnectionList");
+
+            DeviceConnectionQuery connQuery = new DeviceConnectionQueryImpl(tmpAcc.getId());
+            DeviceConnectionListResult tmpList = deviceConnectionService.query(connQuery);
+            Assert.assertNotNull(tmpList);
+
+            stepData.put("DeviceConnectionList", tmpList);
+        });
+    }
+
+    @When("^I search for device connections for the last account$")
+    public void searchForLastAccountConnections() throws KapuaException {
+
+        KapuaSecurityUtils.doPrivileged(() -> {
+            Account tmpAcc = (Account) stepData.get("LastAccount");
+            Assert.assertNotNull(tmpAcc);
+            Assert.assertNotNull(tmpAcc.getId());
+
+            stepData.remove("DeviceConnectionList");
+
+            DeviceConnectionQuery connQuery = new DeviceConnectionQueryImpl(tmpAcc.getId());
+            DeviceConnectionListResult tmpList = deviceConnectionService.query(connQuery);
+            Assert.assertNotNull(tmpList);
+
+            stepData.put("DeviceConnectionList", tmpList);
+        });
+    }
+
+    @Then("^I find (\\d+) connections?$")
+    public void checkConnectionListLength(int cnt) {
+        Assert.assertNotNull(stepData.get("DeviceConnectionList"));
+        Assert.assertEquals(cnt, ((DeviceConnectionListResult) stepData.get("DeviceConnectionList")).getSize());
+    }
+
+    @Then("^I find no connection$")
+    public void checkNoConnectionsFound() {
+
+        if (stepData.get("DeviceConnectionList") == null) {
+            return;
+        }
+        if (((DeviceConnectionListResult) stepData.get("DeviceConnectionList")).getSize() == 0) {
+            return;
+        }
+        Assert.fail("There were unexpected connections");
     }
 
     @Then("^The connection status is \"(.+)\"$")
@@ -327,7 +352,7 @@ public class ConnectionSteps extends BaseQATests {
     }
 
     @When("^I set the reserved user for the connection from device \"(.+)\" in account \"(.+)\" to \"(.*)\"$")
-    public void modifyDeviceConnectionReservedUser(String device, String scope, String resUser) throws KapuaException {
+    public void modifyDeviceConnectionReservedUser(String device, String scope, String resUser) throws Exception {
 
         KapuaSecurityUtils.doPrivileged(() -> {
             Account tmpAcc = accountService.findByName(scope);
@@ -349,8 +374,6 @@ public class ConnectionSteps extends BaseQATests {
                 deviceConnectionService.update(tmpConn);
             } catch (KapuaException ex) {
                 verifyException(ex);
-            } catch (Exception e) {
-                int a = 10;
             }
         });
     }

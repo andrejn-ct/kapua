@@ -18,5 +18,6 @@
         logicalFilePath="KapuaDB/changelog-job-1.0.0.xml">
 
     <include relativeToChangelogFile="true" file="./job-domain.xml"/>
+    <include relativeToChangelogFile="true" file="./job-sys-housekeeper-run-seed.xml" />
 
 </databaseChangeLog>

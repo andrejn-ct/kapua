@@ -32,31 +32,26 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.qa.steps.BaseQATests;
 import org.eclipse.kapua.qa.steps.DBHelper;
 import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountCreator;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.account.internal.AccountFactoryImpl;
 import org.eclipse.kapua.service.authentication.AuthenticationService;
-import org.eclipse.kapua.service.authentication.LoginCredentials;
-import org.eclipse.kapua.service.authentication.credential.Credential;
-import org.eclipse.kapua.service.authentication.credential.CredentialCreator;
+import org.eclipse.kapua.service.authentication.credential.CredentialListResult;
 import org.eclipse.kapua.service.authentication.credential.CredentialService;
-import org.eclipse.kapua.service.authentication.credential.CredentialStatus;
-import org.eclipse.kapua.service.authentication.credential.CredentialType;
-import org.eclipse.kapua.service.authentication.credential.shiro.CredentialFactoryImpl;
-import org.eclipse.kapua.service.authentication.shiro.UsernamePasswordCredentialsImpl;
 import org.eclipse.kapua.service.authorization.access.AccessInfoCreator;
 import org.eclipse.kapua.service.authorization.access.AccessInfoService;
 import org.eclipse.kapua.service.authorization.access.shiro.AccessInfoFactoryImpl;
 import org.eclipse.kapua.service.authorization.permission.Permission;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.authorization.permission.shiro.PermissionFactoryImpl;
+import org.eclipse.kapua.service.authorization.steps.TestPermission;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserCreator;
 import org.eclipse.kapua.service.user.UserDomain;
 import org.eclipse.kapua.service.user.UserService;
 import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
-import org.eclipse.kapua.service.user.internal.UsersJAXBContextProvider;
 
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -111,8 +106,6 @@ public class UserServiceSteps extends BaseQATests {
      */
     private AccessInfoService accessInfoService;
 
-    private DBHelper database;
-
     @Inject
     public UserServiceSteps(StepData stepData, DBHelper dbHelper) {
 
@@ -121,26 +114,25 @@ public class UserServiceSteps extends BaseQATests {
     }
 
     @Before
-    public void beforeScenario(Scenario scenario) throws KapuaException {
+    public void beforeScenario(Scenario scenario) {
 
         this.database.setup();
+        this.scenario = scenario;
+        this.stepData.clear();
 
         // Services by default Locator
         KapuaLocator locator = KapuaLocator.getInstance();
         userService = locator.getService(UserService.class);
-        authenticationService = locator.getService(AuthenticationService.class);
         accountService = locator.getService(AccountService.class);
+        authenticationService = locator.getService(AuthenticationService.class);
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
 
-        XmlUtil.setContextProvider(new UsersJAXBContextProvider());
-
-        this.scenario = scenario;
-        this.stepData.clear();
+        XmlUtil.setContextProvider(new TestJAXBContextProvider());
     }
 
     @After
-    public void afterScenario() throws KapuaException {
+    public void afterScenario() {
         try {
             logger.info("Logging out in cleanup");
             SecurityUtils.getSubject().logout();
@@ -150,26 +142,26 @@ public class UserServiceSteps extends BaseQATests {
         }
     }
 
-    @Given("^Account$")
+    @Given("^Accounts?$")
     public void givenAccount(List<TestAccount> accountList) throws Exception {
-        TestAccount testAccount = accountList.get(0);
-        // If accountId is not set in account list, use last created Account for scope id
-        if (testAccount.getScopeId() == null) {
-            testAccount.setScopeId(((Account) stepData.get("LastAccount")).getId().getId());
+
+        Account newAccount = null;
+        Account lastAccount = (Account) stepData.get("LastAccount");
+
+        for (TestAccount tmpTestAccount : accountList) {
+            // If accountId is not set in account list, use last created Account for scope id
+            if (tmpTestAccount.getScopeId() == null) {
+                tmpTestAccount.setScopeId(lastAccount.getId().getId());
+            }
+            newAccount = createAccount(tmpTestAccount);
+            stepData.put("LastAccount", newAccount);
         }
 
-        stepData.put("LastAccount", createAccount(testAccount));
-    }
-
-    @Given("^Credentials$")
-    public void givenCredentials(List<TestCredentials> credentialsList) throws Exception {
-        TestCredentials testCredentials = credentialsList.get(0);
-        createCredentials(testCredentials);
     }
 
     @Given("^Permissions$")
     public void givenPermissions(List<TestPermission> permissionList) throws Exception {
-        createPermissions(permissionList, (ComparableUser) stepData.get("LastUser"), (Account) stepData.get("LastAccount"));
+        createPermissions(permissionList, new ComparableUser((User) stepData.get("LastUser")), (Account) stepData.get("LastAccount"));
     }
 
     @Given("^Full permissions$")
@@ -188,7 +180,7 @@ public class UserServiceSteps extends BaseQATests {
         }
 
         stepData.put("UserA", tmpUser);
-        stepData.put("LastUser", tmpUser);
+        stepData.put("LastUser", tmpUser.getUser());
     }
 
     @Given("^User B$")
@@ -202,10 +194,10 @@ public class UserServiceSteps extends BaseQATests {
         }
 
         stepData.put("UserB", tmpUser);
-        stepData.put("LastUser", tmpUser);
+        stepData.put("LastUser", tmpUser.getUser());
     }
 
-    @Given("^A generic user$")
+    @Given("^(?:A|The) generic users?$")
     public void givenGenericUser(List<TestUser> userList) throws Exception {
         // User is created within account that was last created in steps
         ComparableUser tmpUser = null;
@@ -214,21 +206,27 @@ public class UserServiceSteps extends BaseQATests {
         while (userIterator.hasNext()) {
             tmpUser = userIterator.next();
         }
-        stepData.put("LastUser", tmpUser);
+        stepData.put("LastUser", tmpUser.getUser());
     }
 
-    @When("^I login as user with name \"(.*)\" and password \"(.*)\"$")
-    public void loginUser(String userName, String password) throws Exception {
+    @When("^I select user \"(.*)\"$")
+    public void selectUser(String name) throws KapuaException{
 
-        String passwd = password;
-        LoginCredentials credentials = new UsernamePasswordCredentialsImpl(userName, passwd);
-        authenticationService.logout();
+        stepData.remove("LastUser");
+        User tmpUsr = userService.findByName(name);
+        stepData.put("LastUser", tmpUsr);
+    }
+
+    @When ("^I search for account \"(.+)\"$")
+    public void findAccountByName(String accName) throws Exception {
 
         primeException();
         try {
-            authenticationService.login(credentials);
-        } catch (KapuaException e) {
-            verifyException(e);
+            stepData.remove("Account");
+            Account tmpAcc = accountService.findByName(accName);
+            stepData.put("Account", tmpAcc);
+        } catch (KapuaException ex) {
+            verifyException(ex);
         }
     }
 
@@ -259,6 +257,16 @@ public class UserServiceSteps extends BaseQATests {
         }
     }
 
+    @Then("^I find the account$")
+    public void checkThatAnAccountWasFound() {
+        Assert.assertNotNull("No such account was found", stepData.get("Account"));
+    }
+
+    @Then("^I don't find the account$")
+    public void checkThatTheAccountWasNotFound() {
+        Assert.assertNull("The account still exists", stepData.get("Account"));
+    }
+
     @When("^I try to delete account \"(.*)\"$")
     public void deleteAccount(String accountName) throws KapuaException {
         Account accountToDelete;
@@ -266,6 +274,8 @@ public class UserServiceSteps extends BaseQATests {
         if (accountToDelete != null) {
             accountService.delete(accountToDelete.getScopeId(), accountToDelete.getId());
         }
+        accountToDelete = accountService.findByName(accountName);
+        Assert.assertNull("Account not deleted.", accountToDelete);
     }
 
     @Then("^I try to delete user \"(.*)\"$")
@@ -301,12 +311,30 @@ public class UserServiceSteps extends BaseQATests {
         try {
             User user = userService.findByName(userName);
             Assert.assertNull("User still exists.", user);
+            Account findAcc = (Account) stepData.get("LastAccount");
+            User findUser = (User) stepData.get("LastUser");
+            user = userService.find(findAcc.getId(), findUser.getId());
+            Assert.assertNull("User still exists.", user);
         } catch (KapuaException e) {
             verifyException(e);
         }
     }
 
-    @When("^I configure account service$")
+    @Then("^I don't find user credentials$")
+    public void thenIdontFindUserCredentials() throws Exception {
+
+        primeException();
+        try {
+            Account findAcc = (Account) stepData.get("LastAccount");
+            User findUser = (User) stepData.get("LastUser");
+            CredentialListResult credentials = credentialService.findByUserId(findAcc.getId(), findUser.getId());
+            Assert.assertTrue("Credentials for user still exists.", credentials.isEmpty());
+        } catch (KapuaException e) {
+            verifyException(e);
+        }
+    }
+
+    @When("^I configure the account service$")
     public void setAccountServiceConfig(List<TestConfig> testConfigs)
             throws Exception {
         Map<String, Object> valueMap = new HashMap<>();
@@ -322,10 +350,10 @@ public class UserServiceSteps extends BaseQATests {
             Account tmpAccount = (Account) stepData.get("LastAccount");
             if (tmpAccount != null) {
                 accId = tmpAccount.getId();
-                scopeId = new KapuaEid(BigInteger.ONE);
+                scopeId = (tmpAccount.getScopeId() != null) ? tmpAccount.getScopeId() : ROOT_SCOPE_ID;
             } else {
-                accId = new KapuaEid(BigInteger.ONE);
-                scopeId = new KapuaEid(BigInteger.ONE);
+                accId = ROOT_SCOPE_ID;
+                scopeId = ROOT_SCOPE_ID;
             }
             accountService.setConfigValues(accId, scopeId, valueMap);
         } catch (KapuaException ex) {
@@ -333,7 +361,7 @@ public class UserServiceSteps extends BaseQATests {
         }
     }
 
-    @When("^I configure user service$")
+    @When("^I configure the user service$")
     public void setUserServiceConfig(List<TestConfig> testConfigs)
             throws Exception {
         Map<String, Object> valueMap = new HashMap<>();
@@ -343,10 +371,10 @@ public class UserServiceSteps extends BaseQATests {
 
         if (tmpAccount != null) {
             accId = tmpAccount.getId();
-            scopeId = tmpAccount.getScopeId();
+            scopeId = (tmpAccount.getScopeId() != null) ? tmpAccount.getScopeId() : ROOT_SCOPE_ID;
         } else {
-            accId = new KapuaEid(BigInteger.ONE);
-            scopeId = new KapuaEid(BigInteger.ONE);
+            accId = ROOT_SCOPE_ID;
+            scopeId = ROOT_SCOPE_ID;
         }
 
         for (TestConfig config : testConfigs) {
@@ -359,39 +387,6 @@ public class UserServiceSteps extends BaseQATests {
         } catch (KapuaException ex) {
             verifyException(ex);
         }
-    }
-
-    @When("^I configure credential service$")
-    public void setCredentialServiceConfig(List<TestConfig> testConfigs)
-            throws Exception {
-        Map<String, Object> valueMap = new HashMap<>();
-        KapuaId accId;
-        KapuaId scopeId;
-        Account tmpAccount = (Account) stepData.get("LastAccount");
-
-        if (tmpAccount != null) {
-            accId = tmpAccount.getId();
-            scopeId = tmpAccount.getScopeId();
-        } else {
-            accId = new KapuaEid(BigInteger.ONE);
-            scopeId = new KapuaEid(BigInteger.ONE);
-        }
-
-        for (TestConfig config : testConfigs) {
-            config.addConfigToMap(valueMap);
-        }
-
-        primeException();
-        try {
-            credentialService.setConfigValues(accId, scopeId, valueMap);
-        } catch (KapuaException ex) {
-            verifyException(ex);
-        }
-    }
-
-    @Then("^I logout$")
-    public void logout() throws KapuaException {
-        authenticationService.logout();
     }
 
     @And("^Using kapua-sys account$")
@@ -464,35 +459,6 @@ public class UserServiceSteps extends BaseQATests {
     }
 
     /**
-     * Create credentials for specific user, set users password.
-     * It finds user by name and sets its password.
-     *
-     * @param testCredentials username and open password
-     * @return created credential
-     */
-    private Credential createCredentials(TestCredentials testCredentials) throws Exception {
-        List<Credential> credentialList = new ArrayList<>();
-
-        KapuaSecurityUtils.doPrivileged(() -> {
-            primeException();
-            try {
-                User user = userService.findByName(testCredentials.getName());
-
-                Credential credential = credentialService.create(credentialCreatorCreator(user.getScopeId(),
-                        user.getId(), testCredentials.getPassword(),
-                        testCredentials.getStatus(), testCredentials.getExpirationDate()));
-                credentialList.add(credential);
-            } catch (KapuaException ke) {
-                verifyException(ke);
-            }
-
-            return null;
-        });
-
-        return credentialList.size() == 1 ? credentialList.get(0) : null;
-    }
-
-    /**
      * Creates permissions for user with specified account. Permissions are created in priveledged mode.
      *
      * @param permissionList list of permissions for user, if targetScopeId is not set user scope that is
@@ -536,24 +502,6 @@ public class UserServiceSteps extends BaseQATests {
         accountCreator.setOrganizationEmail("some@one.com");
 
         return accountCreator;
-    }
-
-    /**
-     * Create credential creator for user with password.
-     *
-     * @param scopeId        scopeId in which user is
-     * @param userId         userId for which credetntials are set
-     * @param password       open password as credetntials
-     * @param status         status of credentials enabled or disabled
-     * @param expirationDate credential expiration date
-     * @return credential creator used for creating credentials
-     */
-    private CredentialCreator credentialCreatorCreator(KapuaId scopeId, KapuaId userId, String password, CredentialStatus status, Date expirationDate) {
-        CredentialCreator credentialCreator;
-
-        credentialCreator = new CredentialFactoryImpl().newCreator(scopeId, userId, CredentialType.PASSWORD, password, status, expirationDate);
-
-        return credentialCreator;
     }
 
     /**

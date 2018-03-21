@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.device.integration;
 
-import org.eclipse.kapua.test.cucumber.CucumberProperty;
 import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
 import org.junit.runner.RunWith;
 
@@ -24,13 +23,12 @@ import cucumber.api.CucumberOptions;
         glue = {"org.eclipse.kapua.qa.steps",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.device.steps",
-                "org.eclipse.kapua.service.tag.steps"
+                "org.eclipse.kapua.service.tag.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty", 
                   "html:target/cucumber/DeviceI9n",
                   "json:target/DeviceI9n_cucumber.json"
                  },
         monochrome = true )
-@CucumberProperty(key="broker.ip", value="192.168.33.10")
-@CucumberProperty(key="kapua.config.url", value="")
 public class RunDeviceI9nTest {}

@@ -25,6 +25,8 @@ import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.commons.util.CommonsValidationRegex;
+import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
@@ -55,11 +57,6 @@ import java.util.Objects;
 public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<User, UserCreator, UserService, UserListResult, UserQuery, UserFactory> implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
-
-    private static final AuthorizationService AUTHORIZATION_SERVICE = LOCATOR.getService(AuthorizationService.class);
-    private static final PermissionFactory PERMISSION_FACTORY = LOCATOR.getFactory(PermissionFactory.class);
 
     /**
      * Constructor
@@ -93,7 +90,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.write, userCreator.getScopeId()));
+        checkUserDomainPermission(Actions.write, userCreator.getScopeId());
 
         //
         // Check duplicate name
@@ -131,7 +128,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.write, user.getScopeId()));
+        checkUserDomainPermission(Actions.write, user.getScopeId());
 
         //
         // Check existence
@@ -165,7 +162,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     }
 
     @Override
-    //@RaiseServiceEvent
+    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId userId) throws KapuaException {
         //
         // Argument validation
@@ -174,7 +171,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.delete, scopeId));
+        checkUserDomainPermission(Actions.delete, scopeId);
 
         //
         // Check existence
@@ -211,7 +208,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.read, scopeId));
+        checkUserDomainPermission(Actions.read, scopeId);
 
         // Do the find
         return entityManagerSession.onResult(em -> UserDAO.find(em, scopeId, userId));
@@ -249,7 +246,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.read, query.getScopeId()));
+        checkUserDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do query
@@ -266,11 +263,22 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.read, query.getScopeId()));
+        checkUserDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do count
         return entityManagerSession.onResult(em -> UserDAO.count(em, query));
+    }
+
+    @ListenServiceEvent(fromAddress = "account")
+    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
+        if (kapuaEvent == null) {
+            // service bus error. Throw some exception?
+        }
+        LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            deleteUserByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
+        }
     }
 
     // -----------------------------------------------------------------------------------------
@@ -279,9 +287,17 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     //
     // -----------------------------------------------------------------------------------------
 
-    private User checkReadAccess(User user) throws KapuaException {
+    private void checkUserDomainPermission(Actions action, KapuaId scope) throws KapuaException {
+
+        KapuaLocator locator = KapuaLocator.getInstance();
+        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, action, scope));
+    }
+
+    private User checkReadAccess(final User user) throws KapuaException {
         if (user != null) {
-            AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(UserDomains.USER_DOMAIN, Actions.read, user.getScopeId()));
+            checkUserDomainPermission(Actions.read, user.getScopeId());
         }
         return user;
     }
@@ -300,17 +316,6 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
         }
     }
 
-    //@ListenServiceEvent(fromAddress = "account")
-    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
-        if (kapuaEvent == null) {
-            // service bus error. Throw some exception?
-        }
-        LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("account".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
-            deleteUserByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        }
-    }
-
     private void deleteUserByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
         UserQuery query = new UserQueryImpl(accountId);
         UserListResult usersToDelete = query(query);
@@ -319,5 +324,4 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
             delete(u.getScopeId(), u.getId());
         }
     }
-
 }

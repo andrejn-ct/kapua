@@ -20,10 +20,11 @@ import org.eclipse.kapua.commons.event.ServiceEventClientConfiguration;
 import org.eclipse.kapua.commons.event.ServiceEventModule;
 import org.eclipse.kapua.commons.event.ServiceEventModuleConfiguration;
 import org.eclipse.kapua.commons.event.ServiceInspector;
+import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionService;
 import org.eclipse.kapua.service.device.registry.internal.DeviceEntityManagerFactory;
 
-//@KapuaProvider
+@KapuaProvider
 public class DeviceServiceModule extends ServiceEventModule {
 
     @Inject

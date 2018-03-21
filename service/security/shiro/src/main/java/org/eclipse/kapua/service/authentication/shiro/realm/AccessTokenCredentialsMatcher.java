@@ -47,10 +47,10 @@ public class AccessTokenCredentialsMatcher implements CredentialsMatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenCredentialsMatcher.class);
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
-
-    private static final CertificateService CERTIFICATE_SERVICE = LOCATOR.getService(CertificateService.class);
-    private static final CertificateFactory CERTIFICATE_FACTORY = LOCATOR.getFactory(CertificateFactory.class);
+//    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
+//
+//    private static final CertificateService CERTIFICATE_SERVICE = LOCATOR.getService(CertificateService.class);
+//    private static final CertificateFactory CERTIFICATE_FACTORY = LOCATOR.getFactory(CertificateFactory.class);
 
     @Override
     public boolean doCredentialsMatch(AuthenticationToken authenticationToken, AuthenticationInfo authenticationInfo) {
@@ -71,7 +71,8 @@ public class AccessTokenCredentialsMatcher implements CredentialsMatcher {
             try {
                 String issuer = settings.getString(KapuaAuthenticationSettingKeys.AUTHENTICATION_SESSION_JWT_ISSUER);
 
-                CertificateQuery certificateQuery = CERTIFICATE_FACTORY.newQuery(null);
+//                CertificateQuery certificateQuery = CERTIFICATE_FACTORY.newQuery(null);
+                CertificateQuery certificateQuery = KapuaLocator.getInstance().getFactory(CertificateFactory.class).newQuery(null);
                 certificateQuery.setPredicate(
                         new AndPredicateImpl(
                                 new AttributePredicateImpl<>(CertificateAttributes.USAGE_NAME, "JWT"),
@@ -82,7 +83,8 @@ public class AccessTokenCredentialsMatcher implements CredentialsMatcher {
                 certificateQuery.setIncludeInherited(true);
                 certificateQuery.setLimit(1);
 
-                Certificate certificate = KapuaSecurityUtils.doPrivileged(() -> CERTIFICATE_SERVICE.query(certificateQuery)).getFirstItem();
+//                Certificate certificate = KapuaSecurityUtils.doPrivileged(() -> CERTIFICATE_SERVICE.query(certificateQuery)).getFirstItem();
+                Certificate certificate = KapuaSecurityUtils.doPrivileged(() -> KapuaLocator.getInstance().getService(CertificateService.class).query(certificateQuery)).getFirstItem();
 
                 if (certificate == null) {
                     throw new JwtCertificateNotFoundException();

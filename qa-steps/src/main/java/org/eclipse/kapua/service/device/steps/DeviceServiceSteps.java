@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017, 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -19,6 +19,20 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Vector;
+
+import javax.inject.Inject;
+
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.model.id.IdGenerator;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
@@ -67,6 +81,7 @@ import org.eclipse.kapua.service.device.registry.DeviceAttributes;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceListResult;
+import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventListResult;
@@ -80,62 +95,55 @@ import org.eclipse.kapua.service.device.registry.lifecycle.DeviceLifeCycleServic
 import org.eclipse.kapua.service.tag.Tag;
 import org.eclipse.kapua.service.tag.TagAttributes;
 import org.eclipse.kapua.service.tag.TagCreator;
+import org.eclipse.kapua.service.tag.TagFactory;
 import org.eclipse.kapua.service.tag.TagListResult;
+import org.eclipse.kapua.service.tag.TagQuery;
 import org.eclipse.kapua.service.tag.TagService;
 import org.eclipse.kapua.service.tag.internal.TagFactoryImpl;
+import org.eclipse.kapua.service.tag.internal.TagQueryImpl;
 import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.junit.Assert;
-
-import javax.inject.Inject;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Vector;
+import org.springframework.security.crypto.codec.Hex;
 
 // Implementation of Gherkin steps used in DeviceRegistryI9n.feature scenarios.
 @ScenarioScoped
-public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
+public class DeviceServiceSteps extends BaseQATests {
 
-    private static final KapuaEid DEFAULT_SCOPE_ID = new KapuaEid(BigInteger.valueOf(1L));
     protected static Random random = new Random();
 
     // Device registry services
     private DeviceRegistryService deviceRegistryService;
+    private DeviceFactory deviceFactory;
     private DeviceEventService deviceEventsService;
     private DeviceLifeCycleService deviceLifeCycleService;
     private TagService tagService;
-
-    // Single point to database access.
-    private DBHelper dbHelper;
+    private TagFactory tagFactory;
+    private AccountService accountService;
 
     @Inject
     public DeviceServiceSteps(StepData stepData, DBHelper dbHelper) {
-        this.dbHelper = dbHelper;
+        this.database = dbHelper;
         this.stepData = stepData;
     }
 
     // Database setup and tear-down steps
     @Before
-    public void beforeScenario(Scenario scenario) throws KapuaException {
+    public void beforeScenario(Scenario scenario) {
 
         // Find all the required services with the default Locator
         KapuaLocator locator = KapuaLocator.getInstance();
         deviceRegistryService = locator.getService(DeviceRegistryService.class);
+        deviceFactory = locator.getFactory(DeviceFactory.class);
         deviceEventsService = locator.getService(DeviceEventService.class);
         deviceLifeCycleService = locator.getService(DeviceLifeCycleService.class);
         tagService = locator.getService(TagService.class);
+        tagFactory = locator.getFactory(TagFactory.class);
+        accountService = locator.getService(AccountService.class);
 
         this.scenario = scenario;
 
         // Initialize the database
-        dbHelper.setup();
+        database.setup();
 
         stepData.clear();
 
@@ -146,7 +154,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     public void afterScenario() throws Exception {
 
         // Clean up the database
-        dbHelper.deleteAll();
+        database.deleteAll();
         KapuaSecurityUtils.clearSession();
     }
 
@@ -325,19 +333,44 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         }
     }
 
-    @When("^I configure the tag service$")
-    public void setTagServiceConfig(List<TestConfig> testConfigs)
-            throws Exception {
+    @When("^I search for the devices with the tag \"(.+)\"$")
+    public void findDevicesWithTag(String tagName) throws Exception {
 
-        Account tmpAccount = (Account) stepData.get("LastAccount");
-        Map<String, Object> valueMap = new HashMap<>();
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        DeviceQuery devQuery = deviceFactory.newQuery(tmpAcc.getId());
+        TagQuery tagQuery = tagFactory.newQuery(tmpAcc.getId());
+        tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, tagName));
 
-        for (TestConfig config : testConfigs) {
-            config.addConfigToMap(valueMap);
-        }
+        TagListResult tmpTagList;
+        DeviceListResult tmpDevList;
+
         try {
             primeException();
-            tagService.setConfigValues(tmpAccount.getId(), tmpAccount.getScopeId(), valueMap);
+            stepData.remove("DeviceList");
+            tmpTagList = tagService.query(tagQuery);
+            Assert.assertNotNull("Required tag not found", tmpTagList);
+            Assert.assertFalse("Required tag not found", tmpTagList.isEmpty());
+            devQuery.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.TAG_IDS, tmpTagList.getFirstItem().getId()));
+            tmpDevList = deviceRegistryService.query(devQuery);
+            stepData.put("DeviceList", tmpDevList);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I search for the devices that are tagged with the last tag$")
+    public void findDeviceWithLastTag() throws Exception {
+
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        Tag tmpTag = (Tag) stepData.get("Tag");
+        DeviceQuery tmpQuery = deviceFactory.newQuery(tmpTag.getScopeId());
+        tmpQuery.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.TAG_IDS, tmpTag.getId()));
+        DeviceListResult tmpList;
+
+        try {
+            primeException();
+            tmpList = deviceRegistryService.query(tmpQuery);
+            stepData.put("DeviceList", tmpList);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -364,13 +397,40 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     public void searchForDeviceWithClientID(String clientId, String account)
             throws KapuaException {
 
+        Device tmpDev;
+        DeviceListResult tmpList = new DeviceListResultImpl();
+
+        Account tmpAcc = accountService.findByName(account);
+        Assert.assertNotNull(tmpAcc);
+        Assert.assertNotNull(tmpAcc.getId());
+
+        stepData.remove("Device");
+        stepData.remove("DeviceList");
+
+        tmpDev = deviceRegistryService.findByClientId(tmpAcc.getId(), clientId);
+        if (tmpDev != null) {
+            Vector<Device> dv = new Vector<>();
+            dv.add(tmpDev);
+            tmpList.addItems(dv);
+            stepData.put("Device", tmpDev);
+            stepData.put("DeviceList", tmpList);
+        }
+    }
+
+    @When("^I search for the device \"(.+)\" in the last account$")
+    public void searchForDeviceWithClientIDInLastAccount(String clientId)
+            throws KapuaException {
+
         Account tmpAcc;
         Device tmpDev;
         DeviceListResult tmpList = new DeviceListResultImpl();
 
-        tmpAcc = KapuaLocator.getInstance().getService(AccountService.class).findByName(account);
+        tmpAcc = (Account) stepData.get("LastAccount");
         Assert.assertNotNull(tmpAcc);
         Assert.assertNotNull(tmpAcc.getId());
+
+        stepData.remove("Device");
+        stepData.remove("DeviceList");
 
         tmpDev = deviceRegistryService.findByClientId(tmpAcc.getId(), clientId);
         if (tmpDev != null) {
@@ -386,23 +446,47 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     public void iTagDeviceWithTag(String deviceTagName) throws Throwable {
 
         Account account = (Account) stepData.get("LastAccount");
-
         Device device = (Device) stepData.get("Device");
-
         TagCreator tagCreator = new TagFactoryImpl().newCreator(account.getId());
+
         tagCreator.setName(deviceTagName);
         Tag tag = tagService.create(tagCreator);
         Set<KapuaId> tags = new HashSet<>();
         try {
-            stepData.put("ExceptionCaught", false);
+            primeException();
             tags.add(tag.getId());
             device.setTagIds(tags);
-            Device updatedDevice = deviceRegistryService.update(device);
-            stepData.put("tag", tag);
-            stepData.put("tags", tags);
-            stepData.put("Device", updatedDevice);
+            deviceRegistryService.update(device);
+            stepData.put("Tag", tag);
+            stepData.put("Tags", tags);
         } catch (KapuaException ex) {
-            stepData.put("ExceptionCaught", true);
+            verifyException(ex);
+        }
+    }
+
+    @When("^I tag device \"(.+)\" with the existing tag \"(.+)\"$")
+    public void tagExistingDeviceWithExistingTag(String devName, String tagName)
+            throws Exception {
+
+        try {
+            primeException();
+            KapuaId tmpAccId = getLastAccountId();
+            Device tmpDevice = deviceRegistryService.findByClientId(tmpAccId, devName);
+            Assert.assertNotNull("Requested device not found", tmpDevice);
+
+            TagQuery tagQuery = tagFactory.newQuery(tmpAccId);
+            tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, tagName));
+            TagListResult tagLst = tagService.query(tagQuery);
+            Assert.assertNotNull("Requested tag not found", tagLst);
+            Assert.assertNotEquals("Requested tag not found", 0, tagLst.getSize());
+            Tag tmpTag = tagLst.getFirstItem();
+
+            Set<KapuaId> devTagList = tmpDevice.getTagIds();
+            devTagList.add(tmpTag.getId());
+            tmpDevice.setTagIds(devTagList);
+            deviceRegistryService.update(tmpDevice);
+        } catch (KapuaException ex) {
+            verifyException(ex);
         }
     }
 
@@ -414,6 +498,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
 
         KapuaQuery<Tag> tagQuery = new TagFactoryImpl().newQuery(lastAcc.getId());
         tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName, AttributePredicate.Operator.EQUAL));
+
         TagListResult tagQueryResult = tagService.query(tagQuery);
         Tag tag = tagQueryResult.getFirstItem();
         deviceQuery.setPredicate(AttributePredicateImpl.attributeIsEqualTo(DeviceAttributes.TAG_IDS, tag.getId()));
@@ -423,7 +508,7 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     }
 
     @Then("^I find device \"([^\"]*)\"$")
-    public void iFindDeviceWithTag(String deviceName) throws Throwable {
+    public void iFindDeviceWithTag(String deviceName) {
 
         DeviceListResult deviceList = (DeviceListResult) stepData.get("DeviceList");
         Device device = deviceList.getFirstItem();
@@ -432,14 +517,70 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         Assert.assertEquals(deviceName, device.getClientId());
     }
 
+    @Then("^Device \"(.+)\" has the tag \"(.+)\"$")
+    public void checkThatDeviceHasTag(String deviceName, String tagName)
+            throws Exception {
+
+        try {
+            primeException();
+            KapuaId tmpAccId = getLastAccountId();
+            Device tmpDevice = deviceRegistryService.findByClientId(tmpAccId, deviceName);
+            Assert.assertNotNull("Requested device not found", tmpDevice);
+
+            TagQuery tmpQuery = new TagQueryImpl(tmpDevice.getScopeId());
+            tmpQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, tagName));
+            Tag tmpTag = tagService.query(tmpQuery).getFirstItem();
+            Assert.assertNotNull("Requested tag not found", tmpTag);
+
+            Assert.assertTrue("The device does not have the required tag", tmpDevice.getTagIds().contains(tmpTag.getId()));
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Then("^The device \"(.+)\" does not have the tag \"(.+)\"$")
+    public void checkThatDeviceHasNoSuchTag(String deviceName, String tagName)
+            throws Exception {
+
+        try {
+            primeException();
+            KapuaId tmpAccId = getLastAccountId();
+            Device tmpDevice = deviceRegistryService.findByClientId(tmpAccId, deviceName);
+            Assert.assertNotNull("Requested device not found", tmpDevice);
+
+            Set<KapuaId> tagList = tmpDevice.getTagIds();
+            for(KapuaId tmpId : tagList) {
+                Tag tmpTag = tagService.find(tmpDevice.getScopeId(), tmpId);
+                Assert.assertNotEquals("The device still has the obsolete tag", tagName.trim(), tmpTag.getName());
+            }
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Then("^The device \"(.+)\" has (\\d+) tags$")
+    public void checkThatDeviceHasANumberOfTags(String deviceName, int count)
+            throws Exception {
+
+        try {
+            primeException();
+            KapuaId tmpAccId = getLastAccountId();
+            Device tmpDevice = deviceRegistryService.findByClientId(tmpAccId, deviceName);
+            Assert.assertNotNull("Requested device not found", tmpDevice);
+            Assert.assertEquals("The device has an unexpected number of tags", count, tmpDevice.getTagIds().size());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @And("^I untag device with \"([^\"]*)\" tag$")
     public void iDeleteTag(String deviceTagName) throws Throwable {
 
         Tag foundTag = (Tag) stepData.get("tag");
         Assert.assertEquals(deviceTagName, foundTag.getName());
         Device device = (Device) stepData.get("Device");
-        stepData.remove("tag");
-        stepData.remove("tags");
+        stepData.remove("Tag");
+        stepData.remove("Tags");
         Set<KapuaId> tags = new HashSet<>();
         device.setTagIds(tags);
         Device updatedDevice = deviceRegistryService.update(device);
@@ -492,6 +633,18 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         Assert.assertEquals(cnt, ((DeviceListResultImpl) stepData.get("DeviceList")).getSize());
     }
 
+    @Then("^I find no device$")
+    public void checkNoDevicesAreFound() {
+
+        if (stepData.get("DeviceList") == null) {
+            return;
+        }
+        if (((DeviceListResult) stepData.get("DeviceList")).getSize() == 0) {
+            return;
+        }
+        Assert.fail("There were unexpected device items");
+    }
+
     @Then("^The type of the last event is \"(.+)\"$")
     public void checkLastEventType(String type) {
         DeviceEventListResult tmpList;
@@ -500,7 +653,6 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
         Assert.assertNotEquals(0, ((DeviceEventListResultImpl) stepData.get("DeviceEventList")).getSize());
         tmpList = (DeviceEventListResultImpl) stepData.get("DeviceEventList");
         Assert.assertEquals(type.trim().toUpperCase(), tmpList.getItem(tmpList.getSize() - 1).getResource().trim().toUpperCase());
-
     }
 
     // *******************
@@ -551,9 +703,9 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
                 "1", // availableProcessors
                 "1024", // totalMemory
                 "linux", // osArch
-                "123456789ABCDEF", // modemImei
-                "123456789", // modemImsi
-                "ABCDEF" // modemIccid
+                generateRandomHexString(24), // modemImei
+                generateRandomHexString(15), // modemImsi
+                generateRandomHexString(22)  // modemIccid
         );
 
     }
@@ -598,9 +750,9 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
                 "1", // availableProcessors
                 "1024", // totalMemory
                 "linux", // osArch
-                "123456789ABCDEF", // modemImei
-                "123456789", // modemImsi
-                "ABCDEF" // modemIccid
+                generateRandomHexString(24), // modemImei
+                generateRandomHexString(15), // modemImsi
+                generateRandomHexString(22)  // modemIccid
         );
     }
 
@@ -680,17 +832,15 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
     private DeviceCreator prepareDefaultDeviceCreator(KapuaId scopeId, String clientId) {
         DeviceCreator tmpCr;
 
-        tmpCr = KapuaLocator.getInstance().getFactory(DeviceFactory.class).newCreator(
-                scopeId,
-                clientId);
+        tmpCr = deviceFactory.newCreator(scopeId, clientId);
 
         tmpCr.setConnectionId(generateRandomId());
         tmpCr.setDisplayName("display_name");
         tmpCr.setSerialNumber("serialNumber");
         tmpCr.setModelId("modelId");
-        tmpCr.setImei(String.valueOf(random.nextInt()));
-        tmpCr.setImsi(String.valueOf(random.nextInt()));
-        tmpCr.setIccid(String.valueOf(random.nextInt()));
+        tmpCr.setImei(generateRandomHexString(24));
+        tmpCr.setImsi(generateRandomHexString(15));
+        tmpCr.setIccid(generateRandomHexString(22));
         tmpCr.setBiosVersion("biosVersion");
         tmpCr.setFirmwareVersion("firmwareVersion");
         tmpCr.setOsVersion("osVersion");
@@ -711,5 +861,15 @@ public class DeviceServiceSteps extends BaseQATests /*KapuaTest*/ {
 
     private KapuaId generateRandomId() {
         return new KapuaEid(IdGenerator.generate());
+    }
+
+    private String generateRandomHexString(int length) {
+
+        byte[] tmpBuff = new byte[length];
+
+        random.nextBytes(tmpBuff);
+        String hexString = (new String(Hex.encode(tmpBuff))).substring(0, length -1);
+
+        return hexString;
     }
 }
