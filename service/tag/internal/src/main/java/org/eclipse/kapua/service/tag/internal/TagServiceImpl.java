@@ -58,12 +58,6 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
-    private final KapuaLocator locator = KapuaLocator.getInstance();
-
-    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-
-
     public TagServiceImpl() {
         super(TagService.class.getName(), TagDomains.TAG_DOMAIN, TagEntityManagerFactory.getInstance(), TagService.class, TagFactory.class);
     }

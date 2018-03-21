@@ -229,5 +229,4 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
 
         return dev;
     }
-
 }
