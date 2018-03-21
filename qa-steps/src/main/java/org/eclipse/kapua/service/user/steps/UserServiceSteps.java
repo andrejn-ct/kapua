@@ -328,7 +328,7 @@ public class UserServiceSteps extends BaseQATests {
             Account findAcc = (Account) stepData.get("LastAccount");
             User findUser = (User) stepData.get("LastUser");
             CredentialListResult credentials = credentialService.findByUserId(findAcc.getId(), findUser.getId());
-            Assert.assertTrue("Credentials for user still exists.", credentials.isEmpty());
+            Assert.assertTrue("Credentials for user still exist.", credentials.isEmpty());
         } catch (KapuaException e) {
             verifyException(e);
         }

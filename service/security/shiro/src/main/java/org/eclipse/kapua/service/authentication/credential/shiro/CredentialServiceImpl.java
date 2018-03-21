@@ -418,7 +418,6 @@ public class CredentialServiceImpl extends AbstractKapuaConfigurableService impl
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
     private void deleteCredentialByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
 
         CredentialFactory credentialFactory = KapuaLocator.getInstance().getFactory(CredentialFactory.class);

@@ -62,12 +62,11 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
     private final JobEngineService jobEngineService = locator.getService(JobEngineService.class);
     private final TriggerService triggerService = locator.getService(TriggerService.class);
     private final TriggerFactory triggerFactory = locator.getFactory(TriggerFactory.class);
-    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
     public JobServiceImpl() {
         super(JobService.class.getName(), JobDomains.JOB_DOMAIN, JobEntityManagerFactory.getInstance(), JobService.class, JobFactory.class);
