@@ -62,7 +62,6 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-
     private final JobEngineService jobEngineService = locator.getService(JobEngineService.class);
     private final TriggerService triggerService = locator.getService(TriggerService.class);
     private final TriggerFactory triggerFactory = locator.getFactory(TriggerFactory.class);
@@ -231,7 +230,6 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
         entityManagerSession.onTransactedAction(em -> JobDAO.delete(em, scopeId, jobId));
     }
 
-
     @ListenServiceEvent(fromAddress = "account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
@@ -255,13 +253,11 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private void deleteJobsByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         JobQuery query = new JobQueryImpl(accountId);
+        JobListResult jobsToDelete = query(query);
 
-        KapuaSecurityUtils.doPrivileged(()-> {
-            JobListResult jobsToDelete = query(query);
-            for (Job j : jobsToDelete.getItems()) {
-                delete(j.getScopeId(), j.getId());
-            }
-        });
+        for (Job j : jobsToDelete.getItems()) {
+            delete(j.getScopeId(), j.getId());
+        }
     }
 
 }

@@ -56,7 +56,6 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 

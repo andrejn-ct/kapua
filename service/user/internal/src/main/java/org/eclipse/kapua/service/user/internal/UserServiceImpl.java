@@ -61,7 +61,6 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 

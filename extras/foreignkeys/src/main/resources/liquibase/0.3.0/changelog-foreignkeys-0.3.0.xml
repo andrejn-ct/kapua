@@ -18,24 +18,22 @@
 
     <include relativeToChangelogFile="true" file="./account-foreignkey.xml"/>
 
-    <include relativeToChangelogFile="true" file="./atht_credential-foreignkey.xml"/>
-    <include relativeToChangelogFile="true" file="./atht_access_token-foreignkey.xml"/>
+    <!--<include relativeToChangelogFile="true" file="./atht_credential-foreignkey.xml"/>-->
+    <!--<include relativeToChangelogFile="true" file="./atht_access_token-foreignkey.xml"/>-->
 
-    <include relativeToChangelogFile="true" file="./athz_access_info-foreignkey.xml"/>
-    <include relativeToChangelogFile="true" file="./athz_group-foreignkey.xml"/>
-    <include relativeToChangelogFile="true" file="./athz_role-foreignkey.xml"/>
+    <!--<include relativeToChangelogFile="true" file="./athz_access_info-foreignkey.xml"/>-->
+    <!--<include relativeToChangelogFile="true" file="./athz_group-foreignkey.xml"/>-->
+    <!--<include relativeToChangelogFile="true" file="./athz_role-foreignkey.xml"/>-->
 
-    <include relativeToChangelogFile="true" file="./device-foreignkey.xml"/>
-    <include relativeToChangelogFile="true" file="./device-connection-foreignkey.xml"/>
-    <include relativeToChangelogFile="true" file="./device-tag-foreignkey.xml"/>
+    <!--<include relativeToChangelogFile="true" file="./device-foreignkey.xml"/>-->
+    <!--<include relativeToChangelogFile="true" file="./device-connection-foreignkey.xml"/>-->
+    <!--<include relativeToChangelogFile="true" file="./device-tag-foreignkey.xml"/>-->
 
-    <include relativeToChangelogFile="true" file="./job-foreignkey.xml"/>
+    <!--<include relativeToChangelogFile="true" file="./job-foreignkey.xml"/>-->
     <include relativeToChangelogFile="true" file="./job_step_definition-foreignkey.xml"/>
 
-    <include relativeToChangelogFile="true" file="./trigger-foreignkey.xml"/>
-
-    <include relativeToChangelogFile="true" file="./user-foreignkey.xml"/>
-
-    <include relativeToChangelogFile="true" file="./tag-foreignkey.xml"/>
+    <!--<include relativeToChangelogFile="true" file="./trigger-foreignkey.xml"/>-->
+    <!-- <include relativeToChangelogFile="true" file="./user-foreignkey.xml"/> -->
+    <!--<include relativeToChangelogFile="true" file="./tag-foreignkey.xml"/>-->
 
 </databaseChangeLog>

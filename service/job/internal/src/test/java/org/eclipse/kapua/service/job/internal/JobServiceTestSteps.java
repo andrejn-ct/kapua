@@ -121,6 +121,9 @@ public class JobServiceTestSteps extends AbstractKapuaSteps {
 
         commonData.scenario = scenario;
 
+        jobFactory = locator.getFactory(JobFactory.class);
+        jobService = locator.getService(JobService.class);
+
         // Create User Service tables
         enableH2Connection();
         SystemSetting config = SystemSetting.getInstance();
