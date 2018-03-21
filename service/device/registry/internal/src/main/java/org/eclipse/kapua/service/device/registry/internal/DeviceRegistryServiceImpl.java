@@ -188,6 +188,21 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
         });
     }
 
+    private void deleteDeviceByGroupId(KapuaId scopeId, KapuaId groupId) throws KapuaException {
+
+        DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
+        DeviceQuery query = deviceFactory.newQuery(scopeId);
+        query.setPredicate(new AttributePredicateImpl<>(DevicePredicates.GROUP_ID, groupId));
+
+        KapuaSecurityUtils.doPrivileged(()-> {
+            DeviceListResult devicesToRemove = query(query);
+            for (Device d : devicesToRemove.getItems()) {
+                d.setGroupId(null);
+                update(d);
+            }
+        });
+    }
+
     private void deleteDeviceByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
