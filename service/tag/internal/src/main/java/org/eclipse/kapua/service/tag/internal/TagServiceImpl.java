@@ -19,6 +19,9 @@ import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResource
 import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
+import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.RaiseServiceEvent;
+import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -34,6 +37,8 @@ import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagPredicates;
 import org.eclipse.kapua.service.tag.TagQuery;
 import org.eclipse.kapua.service.tag.TagService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TagService} implementation.
@@ -43,10 +48,7 @@ import org.eclipse.kapua.service.tag.TagService;
 @KapuaProvider
 public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Tag, TagCreator, TagService, TagListResult, TagQuery, TagFactory> implements TagService {
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
-
-    private static final AuthorizationService AUTHORIZATION_SERVICE = LOCATOR.getService(AuthorizationService.class);
-    private static final PermissionFactory PERMISSION_FACTORY = LOCATOR.getFactory(PermissionFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TagServiceImpl.class);
 
     public TagServiceImpl() {
         super(TagService.class.getName(), TAG_DOMAIN, TagEntityManagerFactory.getInstance(), TagService.class, TagFactory.class);
@@ -62,7 +64,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.write, tagCreator.getScopeId()));
+        checkTagDomainPermission(Actions.write, tagCreator.getScopeId());
 
         //
         // Check limit
@@ -95,7 +97,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.write, tag.getScopeId()));
+        checkTagDomainPermission(Actions.write, tag.getScopeId());
 
         //
         // Check existence
@@ -122,6 +124,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     }
 
     @Override
+    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId tagId) throws KapuaException {
         //
         // Argument validation
@@ -130,7 +133,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.delete, scopeId));
+        checkTagDomainPermission(Actions.delete, scopeId);
 
         //
         // Check existence
@@ -152,7 +155,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.read, scopeId));
+        checkTagDomainPermission(Actions.read, scopeId);
 
         //
         // Do find
@@ -168,7 +171,7 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.read, query.getScopeId()));
+        checkTagDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do query
@@ -184,10 +187,46 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(TAG_DOMAIN, Actions.read, query.getScopeId()));
+        checkTagDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do count
         return entityManagerSession.onResult(em -> TagDAO.count(em, query));
+    }
+
+    @ListenServiceEvent(fromAddress = "account")
+    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
+        if (kapuaEvent == null) {
+            // service bus error. Throw some exception?
+        }
+        LOG.info("TagService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            deleteTagByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
+
+    private void checkTagDomainPermission(Actions action, KapuaId scope) throws KapuaException {
+
+        KapuaLocator locator = KapuaLocator.getInstance();
+        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+        authorizationService.checkPermission(permissionFactory.newPermission(TAG_DOMAIN, action, scope));
+    }
+
+    private void deleteTagByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
+
+        TagFactory tagFactory = KapuaLocator.getInstance().getFactory(TagFactory.class);
+        TagQuery query = tagFactory.newQuery(accountId);
+        TagListResult tagsToDelete = query(query);
+
+        for (Tag tag : tagsToDelete.getItems()) {
+            delete(tag.getScopeId(), tag.getId());
+        }
     }
 }

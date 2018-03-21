@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.event;
 
-import org.eclipse.kapua.KapuaRuntimeException;
 import org.eclipse.kapua.event.ServiceEvent;
 
 import java.util.Stack;

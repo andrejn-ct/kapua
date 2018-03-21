@@ -16,6 +16,7 @@ import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
+import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
@@ -45,11 +46,6 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
-
-    private static final AuthorizationService AUTHORIZATION_SERVICE = LOCATOR.getService(AuthorizationService.class);
-    private static final PermissionFactory PERMISSION_FACTORY = LOCATOR.getFactory(PermissionFactory.class);
-
     /**
      * Constructor
      */
@@ -69,7 +65,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.write, accessTokenCreator.getScopeId()));
+        checkAccessTokenDomainPermission(Actions.write, accessTokenCreator.getScopeId());
 
         //
         // Do create
@@ -88,7 +84,8 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.write, accessToken.getScopeId()));
+//        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.write, accessToken.getScopeId()));
+        checkAccessTokenDomainPermission(Actions.write, accessToken.getScopeId());;
 
         //
         // Check existence
@@ -110,7 +107,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, scopeId));
+        checkAccessTokenDomainPermission(Actions.read, scopeId);
 
         //
         // Do find
@@ -126,7 +123,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, query.getScopeId()));
+        checkAccessTokenDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do query
@@ -142,7 +139,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, query.getScopeId()));
+        checkAccessTokenDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do count
@@ -158,7 +155,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.delete, scopeId));
+        checkAccessTokenDomainPermission(Actions.delete, scopeId);
 
         //
         // Check existence
@@ -180,7 +177,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, scopeId));
+        checkAccessTokenDomainPermission(Actions.read, scopeId);
 
         //
         // Build query
@@ -205,7 +202,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
         //
         // Check Access
         if (accessToken != null) {
-            AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, accessToken.getScopeId()));
+            checkAccessTokenDomainPermission(Actions.read, accessToken.getScopeId());
         }
 
         return accessToken;
@@ -220,7 +217,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.read, scopeId));
+        checkAccessTokenDomainPermission(Actions.read, scopeId);
 
         //
         // Do find
@@ -232,19 +229,33 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
         });
     }
 
-    //@ListenServiceEvent(fromAddress="account")
-    //@ListenServiceEvent(fromAddress="user")
+    @ListenServiceEvent(fromAddress="account")
+    @ListenServiceEvent(fromAddress="user")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             //service bus error. Throw some exception?
         }
 
         LOGGER.info("AccessTokenService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("user".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteAccessTokenByUserId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("account".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteAccessTokenByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
+
+    private void checkAccessTokenDomainPermission(Actions action, KapuaId scope) throws KapuaException {
+
+        KapuaLocator locator = KapuaLocator.getInstance();
+        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN, action, scope));
     }
 
     private void deleteAccessTokenByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {

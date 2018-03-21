@@ -23,22 +23,22 @@ Feature: User and Credential expiration abd lockout features
     enabled, user can login into system. All other expiration settings are set for
     successful login. Only state is tested.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 20     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -58,22 +58,22 @@ Feature: User and Credential expiration abd lockout features
     disabled, user can not login into system. All other expiration settings are set for
     successful login. Only state is tested.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30    |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -95,22 +95,22 @@ Feature: User and Credential expiration abd lockout features
     Expiration date on credentials is set one day in the past and is in state enabled.
     This prevents user from logging in.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30    |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 20    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -130,22 +130,22 @@ Feature: User and Credential expiration abd lockout features
     Expiration date on credentials is set to today and is in state enabled.
     This prevents user from logging in, because expiration is today and is day inclusive.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30    |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 20    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -165,22 +165,22 @@ Feature: User and Credential expiration abd lockout features
     Expiration date on credentials is set to tomorrow and is in state enabled.
     This allows user to login, because expiration is not yet reached.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -200,18 +200,18 @@ Feature: User and Credential expiration abd lockout features
     Expiration on Credentials is not set and is in state enabled.
     This doesn't allow user to login, because expiration was reached.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -232,18 +232,18 @@ Feature: User and Credential expiration abd lockout features
     Expiration on Credentials is not set and is in state enabled.
     This doesn't allow user to login, because expiration is reached.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -264,18 +264,18 @@ Feature: User and Credential expiration abd lockout features
     Expiration on Credentials is not set and is in state enabled.
     This allows user to login, because expiration is not yet reached.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -298,18 +298,18 @@ Feature: User and Credential expiration abd lockout features
     User tries to login three times with wrong password and is locked out. Then
     it logins with correct password but is locked out and denied access.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -334,18 +334,18 @@ Feature: User and Credential expiration abd lockout features
     User tries to login two times with wrong password and is not yet locked out. Then
     it logins with correct password and is loged in.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -371,25 +371,25 @@ Feature: User and Credential expiration abd lockout features
     User tries to login with wrong password and is locked out. Then it waits for lockout
     time of 1 second to pass and then it logins with correct password and is loged in.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     And User A
       | name    | displayName  | email             | phoneNumber     | status  | userType | expirationDate |
       | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL | tomorrow       |
-    And I configure credential service
+    And I configure the credential service
       | type    | name                       | value |
       | boolean | lockoutPolicy.enabled      | true  |
       | integer | lockoutPolicy.maxFailures  | 1     |
@@ -414,25 +414,25 @@ Feature: User and Credential expiration abd lockout features
   time of 1 second to pass. This wait is not enough, it should wait 5 seconds.
   After wait it logins with correct password and but it is not loged in.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     And User A
       | name    | displayName  | email             | phoneNumber     | status  | userType | expirationDate |
       | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL | tomorrow       |
-    And I configure credential service
+    And I configure the credential service
       | type    | name                       | value |
       | boolean | lockoutPolicy.enabled      | true  |
       | integer | lockoutPolicy.maxFailures  | 1     |
@@ -457,25 +457,25 @@ Feature: User and Credential expiration abd lockout features
   logins are reset every second, so user does not get locked out.
   After two failed attempts it logins with correct password and is loged in.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  5    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
     And User A
       | name    | displayName  | email             | phoneNumber     | status  | userType | expirationDate |
       | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL | tomorrow       |
-    And I configure credential service
+    And I configure the credential service
       | type    | name                       | value |
       | boolean | lockoutPolicy.enabled      | true  |
       | integer | lockoutPolicy.maxFailures  | 2     |

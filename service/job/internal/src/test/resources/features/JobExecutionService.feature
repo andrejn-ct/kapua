@@ -13,10 +13,6 @@
 Feature: Job Execution service CRUD tests
     The Job service is responsible for maintaining the status of the target step executions.
 
-Scenario: A mock test scenario
-    Given A mock test step
-    Then Nothing happens
-
 Scenario: Regular job execution creation
 
     Given I create a job with the name "TestJob"

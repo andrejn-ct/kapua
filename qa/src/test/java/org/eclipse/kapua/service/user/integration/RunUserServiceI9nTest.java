@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.user.integration;
 
-import org.eclipse.kapua.test.cucumber.CucumberProperty;
 import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
 import org.junit.runner.RunWith;
 
@@ -22,16 +21,12 @@ import cucumber.api.CucumberOptions;
 @CucumberOptions(
         features = "classpath:features/user/UserServiceI9n.feature",
         glue = {"org.eclipse.kapua.qa.steps",
-                "org.eclipse.kapua.service.user.steps"
+                "org.eclipse.kapua.service.user.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty", 
                   "html:target/cucumber/UserServiceI9n",
                   "json:target/UserServiceI9n_cucumber.json"
                  },
         monochrome=true)
-@CucumberProperty(key="broker.ip", value="192.168.33.10")
-@CucumberProperty(key="kapua.config.url", value="")
-@CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
-@CucumberProperty(key="org.eclipse.kapua.qa.datastore.extraStartupDelay", value="5")
-@CucumberProperty(key="org.eclipse.kapua.qa.broker.extraStartupDelay", value="5")
 public class RunUserServiceI9nTest {}

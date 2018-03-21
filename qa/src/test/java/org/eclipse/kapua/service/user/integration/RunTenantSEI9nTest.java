@@ -12,7 +12,6 @@
 package org.eclipse.kapua.service.user.integration;
 
 import cucumber.api.CucumberOptions;
-import org.eclipse.kapua.test.cucumber.CucumberProperty;
 import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
 import org.junit.runner.RunWith;
 
@@ -20,14 +19,16 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = "classpath:features/user/TenantSEI9n.feature",
         glue = {"org.eclipse.kapua.qa.steps",
-                "org.eclipse.kapua.service.user.steps"
+                "org.eclipse.kapua.service.user.steps",
+                "org.eclipse.kapua.service.device.steps",
+                "org.eclipse.kapua.service.connection.steps",
+                "org.eclipse.kapua.service.tag.steps",
+                "org.eclipse.kapua.service.job.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty", 
                   "html:target/cucumber/TenantSEI9n",
                   "json:target/TenantSEI9n_cucumber.json"
                  },
         monochrome=true)
-@CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
-@CucumberProperty(key="org.eclipse.kapua.qa.datastore.extraStartupDelay", value="1")
-@CucumberProperty(key="org.eclipse.kapua.qa.broker.extraStartupDelay", value="1")
 public class RunTenantSEI9nTest {}

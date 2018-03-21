@@ -21,11 +21,11 @@ Feature: User Service Integration
   level higher than scope of B. Scope of A is parent of scope B. This allows user A to delete
   user B.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -36,11 +36,11 @@ Feature: User Service Integration
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 5     |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -65,7 +65,7 @@ Feature: User Service Integration
     And Account
       | name      |
       | account-b |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -98,11 +98,11 @@ Feature: User Service Integration
   level lower than scope of A. Scope of A is parent of scope B. Subordinate scope should not be
   allowed to delete user in parent scope, unless it has permissions in that scope.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 50    |
@@ -113,11 +113,11 @@ Feature: User Service Integration
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -139,11 +139,11 @@ Feature: User Service Integration
     Given Account
       | name      |
       | account-b |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |

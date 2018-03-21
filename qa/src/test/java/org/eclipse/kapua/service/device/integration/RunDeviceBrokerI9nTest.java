@@ -23,7 +23,8 @@ import cucumber.api.CucumberOptions;
         features = {"classpath:features/broker/DeviceBrokerI9n.feature"},
         glue = {"org.eclipse.kapua.qa.steps",
                 "org.eclipse.kapua.service.user.steps",
-                "org.eclipse.kapua.service.device.steps"
+                "org.eclipse.kapua.service.device.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty", 
                   "html:target/cucumber/DeviceBrokerI9n",

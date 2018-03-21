@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.user.steps;
+package org.eclipse.kapua.service.authorization.steps;
 
 import org.eclipse.kapua.service.authentication.credential.CredentialStatus;
 
@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  * Data object used in Gherkin to transfer Credentials data.
  */
-public class TestCredentials {
+public class TestCredential {
 
     private String name;
 
