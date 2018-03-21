@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.job.steps;
 
+import com.google.inject.Inject;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -51,9 +52,9 @@ import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Calendar;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
