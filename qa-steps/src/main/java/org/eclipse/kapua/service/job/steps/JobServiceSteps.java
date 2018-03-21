@@ -501,5 +501,4 @@ public class JobServiceSteps extends BaseQATests {
 
         return tmpCreator;
     }
-
 }

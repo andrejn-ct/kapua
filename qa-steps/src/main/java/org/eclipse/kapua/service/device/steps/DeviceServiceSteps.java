@@ -31,8 +31,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
-import javax.inject.Inject;
-
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.model.id.IdGenerator;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
@@ -109,6 +107,8 @@ import org.eclipse.kapua.service.tag.internal.TagQueryImpl;
 import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.junit.Assert;
 import org.springframework.security.crypto.codec.Hex;
+
+import javax.inject.Inject;
 
 // Implementation of Gherkin steps used in DeviceRegistryI9n.feature scenarios.
 @ScenarioScoped
@@ -585,7 +585,11 @@ public class DeviceServiceSteps extends BaseQATests {
     @And("^I untag device with \"([^\"]*)\" tag$")
     public void iDeleteTag(String deviceTagName) throws Throwable {
 
-        Device device = ((DeviceListResult) stepData.get("DeviceList")).getFirstItem();
+        Tag foundTag = (Tag) stepData.get("Tag");
+        Assert.assertEquals(deviceTagName, foundTag.getName());
+        Device device = (Device) stepData.get("Device");
+        stepData.remove("Tag");
+        stepData.remove("Tags");
         Set<KapuaId> tags = new HashSet<>();
         device.setTagIds(tags);
         Device updatedDevice = deviceRegistryService.update(device);

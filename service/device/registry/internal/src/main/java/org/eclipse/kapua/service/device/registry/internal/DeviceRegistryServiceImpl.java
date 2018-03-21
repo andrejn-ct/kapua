@@ -173,7 +173,6 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
     //
     // -----------------------------------------------------------------------------------------
 
-
     private void removeDevicesFromGroup(KapuaId scopeId, KapuaId groupId) throws KapuaException {
 
         DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);

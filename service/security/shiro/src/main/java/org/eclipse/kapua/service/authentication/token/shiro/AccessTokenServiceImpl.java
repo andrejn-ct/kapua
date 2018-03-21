@@ -51,7 +51,6 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
-
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
