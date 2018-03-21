@@ -16,6 +16,7 @@ import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.jpa.AbstractEntityManagerFactory;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
+import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
@@ -162,6 +163,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
         AccessInfoFactory accessInfoFactory = locator.getFactory(AccessInfoFactory.class);
         PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
         authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ACCESS_INFO_DOMAIN, Actions.read, scopeId));
+
         AccessInfoQuery query = accessInfoFactory.newQuery(scopeId);
         query.setPredicate(query.attributePredicate(AccessInfoAttributes.USER_ID, userId));
         AccessInfoListResult result = entityManagerSession.onResult(em -> AccessInfoDAO.query(em, query));
@@ -206,6 +208,8 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
     @Override
     public void delete(KapuaId scopeId, KapuaId accessInfoId) throws KapuaException {
+
+        //
         // Check Access
         KapuaLocator locator = KapuaLocator.getInstance();
         AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
@@ -221,24 +225,29 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
         });
     }
 
-    //@ListenServiceEvent(fromAddress="account")
-    //@ListenServiceEvent(fromAddress="user")
+    @ListenServiceEvent(fromAddress="account")
+    @ListenServiceEvent(fromAddress="user")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             //service bus error. Throw some exception?
         }
         LOGGER.info("AccessInfoService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("user".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteAccessInfoByUserId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("account".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteAccessInfoByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
 
-    private void deleteAccessInfoByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AccessInfoFactory accessInfoFactory = locator.getFactory(AccessInfoFactory.class);
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
 
+    private void deleteAccessInfoByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
+
+        AccessInfoFactory accessInfoFactory = KapuaLocator.getInstance().getFactory(AccessInfoFactory.class);
         AccessInfoQuery query = accessInfoFactory.newQuery(scopeId);
         query.setPredicate(query.attributePredicate(AccessInfoAttributes.USER_ID, userId));
 
@@ -250,9 +259,8 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
     }
 
     private void deleteAccessInfoByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AccessInfoFactory accessInfoFactory = locator.getFactory(AccessInfoFactory.class);
 
+        AccessInfoFactory accessInfoFactory = KapuaLocator.getInstance().getFactory(AccessInfoFactory.class);
         AccessInfoQuery query = accessInfoFactory.newQuery(accountId);
 
         AccessInfoListResult accessInfosToDelete = query(query);

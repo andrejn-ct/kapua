@@ -19,6 +19,8 @@ import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResource
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.job.engine.JobEngineService;
+import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -42,6 +44,8 @@ import org.eclipse.kapua.service.scheduler.trigger.TriggerFactory;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerListResult;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerQuery;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link JobService} implementation
@@ -51,13 +55,12 @@ import org.eclipse.kapua.service.scheduler.trigger.TriggerService;
 @KapuaProvider
 public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Job, JobCreator, JobService, JobListResult, JobQuery, JobFactory> implements JobService {
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
-    private static final AuthorizationService AUTHORIZATION_SERVICE = LOCATOR.getService(AuthorizationService.class);
-    private static final PermissionFactory PERMISSION_FACTORY = LOCATOR.getFactory(PermissionFactory.class);
-    private final JobEngineService jobEngineService = LOCATOR.getService(JobEngineService.class);
-    private final TriggerService triggerService = LOCATOR.getService(TriggerService.class);
-    private final TriggerFactory triggerFactory = LOCATOR.getFactory(TriggerFactory.class);
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+    private final JobEngineService jobEngineService = locator.getService(JobEngineService.class);
+    private final TriggerService triggerService = locator.getService(TriggerService.class);
+    private final TriggerFactory triggerFactory = locator.getFactory(TriggerFactory.class);
 
     public JobServiceImpl() {
         super(JobService.class.getName(), JobDomains.JOB_DOMAIN, JobEntityManagerFactory.getInstance(), JobService.class, JobFactory.class);
@@ -73,7 +76,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.write, creator.getScopeId()));
+        checkJobDomainPermission(Actions.write, creator.getScopeId());
 
         //
         // Check limits
@@ -104,7 +107,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.write, job.getScopeId()));
+        checkJobDomainPermission(Actions.write, job.getScopeId());
 
         //
         // Check existence
@@ -140,7 +143,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.read, scopeId));
+        checkJobDomainPermission(Actions.write, scopeId);
 
         //
         // Do find
@@ -156,7 +159,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.read, query.getScopeId()));
+        checkJobDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do query
@@ -172,7 +175,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.read, query.getScopeId()));
+        checkJobDomainPermission(Actions.read, query.getScopeId());
 
         //
         // Do query
@@ -188,7 +191,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(JobDomains.JOB_DOMAIN, Actions.delete, scopeId));
+        checkJobDomainPermission(Actions.delete, scopeId);
 
         //
         // Check existence
@@ -220,6 +223,42 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
         // Do delete
         KapuaSecurityUtils.doPrivileged(() -> jobEngineService.cleanJobData(scopeId, jobId));
         entityManagerSession.onTransactedAction(em -> JobDAO.delete(em, scopeId, jobId));
+    }
+
+
+    @ListenServiceEvent(fromAddress = "account")
+    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
+        if (kapuaEvent == null) {
+            // service bus error. Throw some exception?
+        }
+        LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            deleteJobsByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
+
+    private void checkJobDomainPermission(Actions action, KapuaId scope) throws KapuaException {
+
+        KapuaLocator locator = KapuaLocator.getInstance();
+        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN, action, scope));
+    }
+
+    private void deleteJobsByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
+
+        JobQuery query = new JobQueryImpl(accountId);
+        JobListResult jobsToDelete = query(query);
+
+        for (Job j : jobsToDelete.getItems()) {
+            delete(j.getScopeId(), j.getId());
+        }
     }
 
 }

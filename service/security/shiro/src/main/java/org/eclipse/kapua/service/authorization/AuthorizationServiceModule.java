@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017, 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -15,6 +15,7 @@ import org.eclipse.kapua.commons.event.ServiceEventClientConfiguration;
 import org.eclipse.kapua.commons.event.ServiceEventModule;
 import org.eclipse.kapua.commons.event.ServiceEventModuleConfiguration;
 import org.eclipse.kapua.commons.event.ServiceInspector;
+import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.service.authorization.access.AccessInfoService;
 import org.eclipse.kapua.service.authorization.domain.DomainRegistryService;
 import org.eclipse.kapua.service.authorization.group.GroupService;
@@ -27,7 +28,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-//@KapuaProvider
+@KapuaProvider
 public class AuthorizationServiceModule extends ServiceEventModule {
 
     @Inject

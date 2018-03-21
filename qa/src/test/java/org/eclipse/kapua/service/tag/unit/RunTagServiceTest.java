@@ -12,7 +12,6 @@
 package org.eclipse.kapua.service.tag.unit;
 
 import cucumber.api.CucumberOptions;
-import org.eclipse.kapua.test.cucumber.CucumberProperty;
 import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
 import org.junit.runner.RunWith;
 
@@ -21,16 +20,13 @@ import org.junit.runner.RunWith;
         features = "classpath:features/tag/TagService.feature",
         glue = {"org.eclipse.kapua.qa.steps",
                 "org.eclipse.kapua.service.user.steps",
-                "org.eclipse.kapua.service.tag.steps"
+                "org.eclipse.kapua.service.tag.steps",
+                "org.eclipse.kapua.service.authentication.steps"
         },
         plugin = { "pretty",
                 "html:target/cucumber/TagService",
                 "json:target/TagService_cucumber.json"
         },
         monochrome = true)
-@CucumberProperty(key="broker.ip", value="192.168.33.10")
-@CucumberProperty(key="kapua.config.url", value="")
-@CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
-@CucumberProperty(key="org.eclipse.kapua.qa.datastore.extraStartupDelay", value="5")
 public class RunTagServiceTest {
 }

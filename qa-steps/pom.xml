@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-device-management-registry-api</artifactId>
+            <artifactId>kapua-job-api</artifactId>
         </dependency>
 
         <!-- Internal dependencies -->
@@ -109,6 +109,10 @@
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-datastore-client-embedded</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-job-internal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
