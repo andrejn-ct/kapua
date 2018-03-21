@@ -13,9 +13,17 @@
 package org.eclipse.kapua.qa.steps;
 
 import cucumber.api.Scenario;
+
+import java.math.BigInteger;
+
+import org.eclipse.kapua.commons.model.id.KapuaEid;
+import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.StepData;
+import org.eclipse.kapua.service.account.Account;
 
 public class BaseQATests {
+
+    public static final KapuaEid ROOT_SCOPE_ID = new KapuaEid(BigInteger.ONE);
 
     /**
      * Inter step data scratchpad.
@@ -23,11 +31,22 @@ public class BaseQATests {
     public StepData stepData;
 
     /**
+     * Database setup and cleanup helper
+     */
+    public DBHelper database;
+
+    /**
      * Current scenario scope
      */
     public Scenario scenario;
 
     public BaseQATests() {
+    }
+
+    public KapuaId getLastAccountId() {
+
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        return (tmpAcc == null) ? ROOT_SCOPE_ID : ((tmpAcc.getId() != null) ? tmpAcc.getId() : ROOT_SCOPE_ID);
     }
 
     public void primeException() {

@@ -66,6 +66,12 @@ public class BasicSteps extends Assert {
         waitSeconds(seconds);
     }
 
+    @Given("^I wait for (\\d+) seconds?$")
+    public void waitForSpecifiedTime(int delay) throws InterruptedException {
+
+        Thread.sleep(delay * 1000);
+    }
+
     @Then("^An exception was thrown$")
     public void exceptionCaught() {
         String exName = stepData.contains("ExceptionName") ? (String)stepData.get("ExceptionName") : "Unknown";

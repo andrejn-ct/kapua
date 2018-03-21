@@ -38,6 +38,7 @@ import org.eclipse.kapua.model.config.metatype.KapuaMetatypeFactory;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
+import org.eclipse.kapua.service.authorization.permission.Permission;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.job.JobCreator;
 import org.eclipse.kapua.service.job.JobFactory;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.security.acl.Permission;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +122,9 @@ public class JobServiceTestSteps extends AbstractKapuaSteps {
 
         commonData.scenario = scenario;
         locator = KapuaLocator.getInstance();
+
+        jobFactory = locator.getFactory(JobFactory.class);
+        jobService = locator.getService(JobService.class);
 
         // Create User Service tables
         enableH2Connection();

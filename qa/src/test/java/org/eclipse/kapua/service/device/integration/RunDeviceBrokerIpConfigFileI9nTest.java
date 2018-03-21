@@ -22,7 +22,8 @@ import org.junit.runner.RunWith;
         features = {"classpath:features/broker/DeviceBrokerIpConfigFileI9n.feature"},
         glue = {"org.eclipse.kapua.qa.steps",
                 "org.eclipse.kapua.service.user.steps",
-                "org.eclipse.kapua.service.device.steps"
+                "org.eclipse.kapua.service.device.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty",
                   "html:target/cucumber/DeviceBrokerIpConfigFileI9n",

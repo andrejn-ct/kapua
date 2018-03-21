@@ -11,7 +11,7 @@
 ###############################################################################
 @device
 Feature: Device Registry Integration
-    Device Registy integration test scenarios. These scenarios test higher level device service functionality
+    Device Registry integration test scenarios. These scenarios test higher level device service functionality
     with all services live.
 
   Scenario: Set environment variables
@@ -31,6 +31,7 @@ Feature: Device Registry Integration
   Scenario: Start broker for all scenarios
 
     Given Start Broker
+
 Scenario: Birth message handling from a new device
     A birth message is received. The referenced device does not yet exist and is created on-the-fly. After the
     message is processed a new device must be created and a BIRTH event inserted in the database.
@@ -39,7 +40,7 @@ Scenario: Birth message handling from a new device
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -70,7 +71,7 @@ Scenario: Birth message handling from an existing device
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -102,7 +103,7 @@ Scenario: Handling of 2 birth messages
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -131,7 +132,7 @@ Scenario: Handling of a disconnect message from a non existing device
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -161,7 +162,7 @@ Scenario: Birth and death message handling
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -193,7 +194,7 @@ Scenario: Birth and missing event handling
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -225,7 +226,7 @@ Scenario: Birth and applications event handling
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -255,7 +256,7 @@ Scenario: Creating new device and tagging it with specific Tag
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -287,7 +288,7 @@ Scenario: Creating new device, tagging it with specific Tag and then deleting th
     Given Account
       | name      | scopeId |
       | AccountA  | 1       |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
