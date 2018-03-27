@@ -439,8 +439,6 @@ public class AuthorizationServiceSteps extends BaseQATests {
             tmpCreator.setUserId(tmpUser.getId());
             accessInfo = accessInfoService.create(tmpCreator);
             stepData.put("AccessInfo", accessInfo);
-            logger.info("Created the access info item {} for user {} in scope {}.",
-                    accessInfo.getId().toString(), tmpUser.getName(), accessInfo.getScopeId().toString());
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -532,8 +530,6 @@ public class AuthorizationServiceSteps extends BaseQATests {
             stepData.put("AccessInfoList", accessInfoList);
             if (accessInfoList != null) {
                 stepData.put("AccessInfo", accessInfoList.getFirstItem());
-                logger.info("A query for access info items for user {} in scope {} returns {} items.",
-                        targetUser.getId().toString(), targetUser.getScopeId().toString(), accessInfoList.getSize());
             }
         } catch (KapuaException ex) {
             verifyException(ex);
