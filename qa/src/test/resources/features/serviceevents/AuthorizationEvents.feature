@@ -9,7 +9,7 @@
 # Contributors:
 #     Eurotech
 ###############################################################################
-@authorization
+@serviceevents
 Feature: Authorization Service
 
     Background:
@@ -112,7 +112,7 @@ Feature: Authorization Service
         Given I select user "kapua-a"
         When I try to delete user "kapua-a"
         Then I don't find user "kapua-a"
-        And I wait for 30 seconds
+        And I wait for 10 seconds
         When I query for the access info entities for the last user
         Then I find no such access info item
         When I query for the access info entities for the user "kapua-a-2"

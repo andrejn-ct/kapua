@@ -9,7 +9,7 @@
 # Contributors:
 #     Eurotech
 ###############################################################################
-@authentication
+@serviceevents
 Feature: Authentication Service
 
     Background:
