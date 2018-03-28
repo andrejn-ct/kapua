@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.authorization.integration;
+package org.eclipse.kapua.service.serviceevents.integration;
 
 import cucumber.api.CucumberOptions;
 import org.eclipse.kapua.test.cucumber.CucumberWithProperties;
@@ -17,16 +17,18 @@ import org.junit.runner.RunWith;
 
 @RunWith(CucumberWithProperties.class)
 @CucumberOptions(
-        features = "classpath:features/authorization/AuthorizationI9n.feature",
+        features = "classpath:features/serviceevents/TenantEvents.feature",
         glue = {"org.eclipse.kapua.qa.steps",
                 "org.eclipse.kapua.service.user.steps",
-                "org.eclipse.kapua.service.authentication.steps",
-                "org.eclipse.kapua.service.authorization.steps"
-        },
-        plugin = {"pretty",
-                "html:target/cucumber/AuthorizationI9n",
-                "json:target/AuthorizationI9n_cucumber.json"
-        },
-        monochrome = true)
-public class RunAthzServiceTest {
-}
+                "org.eclipse.kapua.service.device.steps",
+                "org.eclipse.kapua.service.connection.steps",
+                "org.eclipse.kapua.service.tag.steps",
+                "org.eclipse.kapua.service.job.steps",
+                "org.eclipse.kapua.service.authentication.steps"
+               },
+        plugin = {"pretty", 
+                  "html:target/cucumber/TenantSEI9n",
+                  "json:target/TenantSEI9n_cucumber.json"
+                 },
+        monochrome=true)
+public class RunTenantSEI9nTest {}
