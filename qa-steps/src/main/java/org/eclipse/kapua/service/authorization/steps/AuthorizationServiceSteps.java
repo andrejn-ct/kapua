@@ -351,6 +351,22 @@ public class AuthorizationServiceSteps extends BaseQATests {
         }
     }
 
+    @When("^I delete the group \"(.+)\"$")
+    public void deleteGroup(String groupName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        GroupQuery grpQuery = groupFactory.newQuery(currAccount.getId());
+        grpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        Group targetGroup = groupService.query(grpQuery).getFirstItem();
+
+        try {
+            primeException();
+            groupService.delete(targetGroup.getScopeId(), targetGroup.getId());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @When("^I query for the group \"(.+)\" in the last account$")
     public void queryForGroupInCurrentScope(String groupName) throws Exception {
 
@@ -374,12 +390,33 @@ public class AuthorizationServiceSteps extends BaseQATests {
     }
 
     @When("^I query for the group \"(.+)\" in account \"(.+)\"$")
-    public void queryForGroupInScope(String roleName, String scopeName) throws Exception {
+    public void queryForGroupInScope(String groupName, String scopeName) throws Exception {
 
         GroupListResult tmpList;
         Account tmpAcc = accountService.findByName(scopeName);
         GroupQuery tmpQuery = groupFactory.newQuery(tmpAcc.getId());
-        tmpQuery.setPredicate(new AttributePredicateImpl<>(RoleAttributes.NAME, roleName));
+        tmpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+
+        try {
+            stepData.remove("GroupList");
+            stepData.remove("Group");
+            primeException();
+            tmpList = groupService.query(tmpQuery);
+            stepData.put("GroupList", tmpList);
+            if (!tmpList.isEmpty()) {
+                stepData.put("Group", tmpList.getFirstItem());
+            }
+        } catch(KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I query for groups in account \"(.+)\"$")
+    public void queryAllGroupsInScope(String scopeName) throws Exception {
+
+        GroupListResult tmpList;
+        Account tmpAcc = accountService.findByName(scopeName);
+        GroupQuery tmpQuery = groupFactory.newQuery(tmpAcc.getId());
 
         try {
             stepData.remove("GroupList");
@@ -403,6 +440,13 @@ public class AuthorizationServiceSteps extends BaseQATests {
     @Then("^I find no such group$")
     public void verifyThatNoGroupWasFound() {
         Assert.assertNull("Am unexpected group was found!", stepData.get("Group"));
+    }
+
+    @Then("^There (?:are|is) exactly (\\d+) groups?$")
+    public void checkNumberOfGroups(int count) {
+
+        GroupListResult tmpList = (GroupListResult) stepData.get("GroupList");
+        Assert.assertEquals("Wrong number of groups!", count, tmpList.getSize());
     }
 
     @When("^I create an empty access info entity for user \"(.+)\" in the current scope$")
