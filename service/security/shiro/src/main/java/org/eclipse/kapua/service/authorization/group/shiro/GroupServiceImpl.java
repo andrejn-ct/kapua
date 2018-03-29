@@ -20,6 +20,7 @@ import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
@@ -125,6 +126,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
     }
 
     @Override
+    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId groupId) throws KapuaException {
         //
         // Argument validation
