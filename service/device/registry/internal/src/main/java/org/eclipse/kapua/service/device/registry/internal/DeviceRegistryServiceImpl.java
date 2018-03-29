@@ -143,15 +143,15 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
     }
 
     @ListenServiceEvent(fromAddress="account")
-//    @ListenServiceEvent(fromAddress="authorization")
+    @ListenServiceEvent(fromAddress="authorization")
     @ListenServiceEvent(fromAddress="tag")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             //service bus error. Throw some exception?
         }
         LOGGER.info("DeviceRegistryService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.authorization.group.shiro.GroupService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
-            deleteDeviceByGroupId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
+        if ("org.eclipse.kapua.service.authorization.group.GroupService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            removeDevicesFromGroup(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteDeviceByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         } else if ("org.eclipse.kapua.service.tag.TagService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
@@ -166,15 +166,15 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
     // -----------------------------------------------------------------------------------------
 
 
-    private void deleteDeviceByGroupId(KapuaId scopeId, KapuaId groupId) throws KapuaException {
+    private void removeDevicesFromGroup(KapuaId scopeId, KapuaId groupId) throws KapuaException {
 
         DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
         DeviceQuery query = deviceFactory.newQuery(scopeId);
         query.setPredicate(query.attributePredicate(DeviceAttributes.GROUP_ID, groupId));
 
-        DeviceListResult devicesToDelete = query(query);
+        DeviceListResult devicesToRemove = query(query);
 
-        for (Device d : devicesToDelete.getItems()) {
+        for (Device d : devicesToRemove.getItems()) {
             d.setGroupId(null);
             update(d);
         }
