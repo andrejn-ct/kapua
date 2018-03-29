@@ -41,6 +41,10 @@ Feature: Authorization Service
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
         And User A
             | name    | displayName  | email             | phoneNumber     | status  | userType |
             | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
@@ -66,6 +70,10 @@ Feature: Authorization Service
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
         And User B
             | name    | displayName  | email             | phoneNumber     | status  | userType |
             | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
@@ -186,6 +194,56 @@ Feature: Authorization Service
         Then I find no such group
         When I query for the group "group-a-1" in account "account-a"
         Then I find such a group
+
+    Scenario: Delete a group and all relevant devices will be removed from that group
+    Provide a number of accounts, users, groups and devices. Assign the devices to the various groups. When
+    a group is deleted, all the devices that are assigned to that group must be removed from that group.
+    All other devices should remain unaffected.
+
+        Given The following groups in scope "account-a"
+            |name        |
+            |group-a-1   |
+            |group-a-2   |
+            |group-a-3   |
+        When I query for the group "group-a-2" in account "account-a"
+        Then I find such a group
+        Given I select account "account-a"
+        And I select user "kapua-a"
+        Given A birth message from device "device-a-1"
+        Given A birth message from device "device-a-2"
+        Given A birth message from device "device-a-3"
+        Given A birth message from device "device-b-1"
+        Given A birth message from device "device-b-2"
+        Given A birth message from device "device-b-3"
+        Given A birth message from device "device-c-1"
+        Given A birth message from device "device-c-2"
+        Given A birth message from device "device-c-3"
+        When I search for the device "device-a-1" in account "account-a"
+        Then I find 1 device
+        Given Device "device-a-1" is assigned to group "group-a-1"
+        And Device "device-a-2" is assigned to group "group-a-1"
+        And Device "device-a-3" is assigned to group "group-a-1"
+        And Device "device-b-1" is assigned to group "group-a-2"
+        And Device "device-b-2" is assigned to group "group-a-2"
+        And Device "device-b-3" is assigned to group "group-a-2"
+        And Device "device-c-1" is assigned to group "group-a-3"
+        And Device "device-c-2" is assigned to group "group-a-3"
+        And Device "device-c-3" is assigned to group "group-a-3"
+        When I query for all devices in group "group-a-1"
+        Then I find 3 devices
+        When I query for all devices in group "group-a-2"
+        Then I find 3 devices
+        And Device "device-b-1" belongs to group "group-a-2"
+        When I query for groups in account "account-a"
+        Then There are exactly 3 groups
+        When I delete the group "group-a-1"
+        And I query for groups in account "account-a"
+        Then There are exactly 2 groups
+        Given I wait for 10 seconds
+        Then Device "device-a-1" does not belong to any group
+        And Device "device-a-2" does not belong to any group
+        And Device "device-a-3" does not belong to any group
+        And Device "device-b-1" belongs to group "group-a-2"
 
     Scenario: Delete an account and all the access info items for this account have to be deleted too
     Provide a number of accounts and users. Create a number of access info items for the users in the accounts.

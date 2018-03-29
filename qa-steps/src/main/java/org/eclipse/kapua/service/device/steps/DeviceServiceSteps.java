@@ -76,6 +76,11 @@ import org.eclipse.kapua.service.StepData;
 import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
+import org.eclipse.kapua.service.authorization.group.Group;
+import org.eclipse.kapua.service.authorization.group.GroupAttributes;
+import org.eclipse.kapua.service.authorization.group.GroupFactory;
+import org.eclipse.kapua.service.authorization.group.GroupQuery;
+import org.eclipse.kapua.service.authorization.group.GroupService;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceAttributes;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
@@ -119,6 +124,8 @@ public class DeviceServiceSteps extends BaseQATests {
     private TagService tagService;
     private TagFactory tagFactory;
     private AccountService accountService;
+    private GroupService groupService;
+    private GroupFactory groupFactory;
 
     @Inject
     public DeviceServiceSteps(StepData stepData, DBHelper dbHelper) {
@@ -139,6 +146,8 @@ public class DeviceServiceSteps extends BaseQATests {
         tagService = locator.getService(TagService.class);
         tagFactory = locator.getFactory(TagFactory.class);
         accountService = locator.getService(AccountService.class);
+        groupService = locator.getService(GroupService.class);
+        groupFactory = locator.getFactory(GroupFactory.class);
 
         this.scenario = scenario;
 
@@ -591,8 +600,84 @@ public class DeviceServiceSteps extends BaseQATests {
     @And("^I verify that tag \"([^\"]*)\" is deleted$")
     public void iVerifyTagIsDeleted(String deviceTagName) throws Throwable {
 
-        Tag foundTag = (Tag) stepData.get("tag");
-        Assert.assertEquals(null, foundTag);
+        Account currAccount = (Account) stepData.get("LastAccount");
+        TagQuery tagQuery = tagFactory.newQuery(currAccount.getId());
+        tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName));
+
+        TagListResult tmpList = tagService.query(tagQuery);
+
+        Assert.assertTrue("The tag still exists!", tmpList.isEmpty());
+    }
+
+    @When("^Device \"(.+)\" is assigned to group \"(.+)\"$")
+    public void assignDeviceToGroup(String deviceName, String groupName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
+        GroupQuery tmpQuery = groupFactory.newQuery(currAccount.getId());
+        tmpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        Group targetGroup = groupService.query(tmpQuery).getFirstItem();
+
+        try {
+            primeException();
+            targetDevice.setGroupId(targetGroup.getId());
+            deviceRegistryService.update(targetDevice);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^Device \"(.+)\" is removed from its group$")
+    public void removeDeviceFromGroup(String deviceName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
+
+        try {
+            primeException();
+            targetDevice.setGroupId(null);
+            deviceRegistryService.update(targetDevice);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I query for all devices in group \"(.+)\"$")
+    public void queryForDevicesInGroup(String groupName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        GroupQuery grpQuery = groupFactory.newQuery(currAccount.getId());
+        grpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        Group targetGroup = groupService.query(grpQuery).getFirstItem();
+        DeviceQuery devQuery = deviceFactory.newQuery(currAccount.getId());
+        devQuery.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.GROUP_ID, targetGroup.getId()));
+
+        stepData.remove("DeviceList");
+        DeviceListResult devicesInGroup = deviceRegistryService.query(devQuery);
+        stepData.put("DeviceList", devicesInGroup);
+    }
+
+    @Then("^Device \"(.+)\" belongs to group \"(.+)\"$")
+    public void checkThatDeviceBelongsToGroup(String deviceName, String groupName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
+        GroupQuery grpQuery = groupFactory.newQuery(currAccount.getId());
+        grpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        Group targetGroup = groupService.query(grpQuery).getFirstItem();
+
+        Assert.assertNotNull("Group does not exist!", targetGroup);
+        Assert.assertNotNull("Device does not exist!", targetDevice);
+        Assert.assertEquals("The device belongs to the wrong group!", targetGroup.getId(), targetDevice.getGroupId());
+    }
+
+    @Then("^Device \"(.+)\" does not belong to any group$")
+    public void checkThatDeviceHasNoGroup(String deviceName) throws Exception {
+
+        Account currAccount = (Account) stepData.get("LastAccount");
+        Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
+
+        Assert.assertNull("The device still belongs to a group!", targetDevice.getGroupId());
     }
 
     @When("^I search for events from device \"(.+)\" in account \"(.+)\"$")
