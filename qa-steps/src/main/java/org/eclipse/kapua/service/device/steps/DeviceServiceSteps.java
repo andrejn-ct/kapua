@@ -603,7 +603,6 @@ public class DeviceServiceSteps extends BaseQATests {
         Account currAccount = (Account) stepData.get("LastAccount");
         TagQuery tagQuery = tagFactory.newQuery(currAccount.getId());
         tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName));
-
         TagListResult tmpList = tagService.query(tagQuery);
 
         Assert.assertTrue("The tag still exists!", tmpList.isEmpty());
