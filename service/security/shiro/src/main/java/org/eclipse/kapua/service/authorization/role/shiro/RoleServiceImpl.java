@@ -55,6 +55,11 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
     private static final Logger LOG = LoggerFactory.getLogger(RoleServiceImpl.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     public RoleServiceImpl() {
         super(RoleService.class.getName(), AuthorizationDomains.ROLE_DOMAIN, AuthorizationEntityManagerFactory.getInstance(), RoleService.class, RoleFactory.class);
     }
@@ -70,7 +75,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.write, roleCreator.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.write, roleCreator.getScopeId()));
 
         //
         // Check limits
@@ -134,7 +139,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.write, role.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.write, role.getScopeId()));
 
         //
         // Check existence
@@ -170,7 +175,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.delete, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.delete, scopeId));
 
         //
         // Check existence
@@ -192,7 +197,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.read, scopeId));
 
         //
         // Do find
@@ -208,7 +213,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -224,7 +229,7 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkRoleDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do count
@@ -248,14 +253,6 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
-    private void checkRoleDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.ROLE_DOMAIN, action, scope));
-    }
 
     private void deleteRoleByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 

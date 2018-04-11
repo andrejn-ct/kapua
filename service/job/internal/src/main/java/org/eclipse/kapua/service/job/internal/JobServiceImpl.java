@@ -59,9 +59,12 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
+
     private final JobEngineService jobEngineService = locator.getService(JobEngineService.class);
     private final TriggerService triggerService = locator.getService(TriggerService.class);
     private final TriggerFactory triggerFactory = locator.getFactory(TriggerFactory.class);
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
     public JobServiceImpl() {
         super(JobService.class.getName(), JobDomains.JOB_DOMAIN, JobEntityManagerFactory.getInstance(), JobService.class, JobFactory.class);
@@ -77,7 +80,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check access
-        checkJobDomainPermission(Actions.write, creator.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.write, creator.getScopeId()));
 
         //
         // Check limits
@@ -108,7 +111,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check access
-        checkJobDomainPermission(Actions.write, job.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.write, job.getScopeId()));
 
         //
         // Check existence
@@ -144,7 +147,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        checkJobDomainPermission(Actions.write, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.write, scopeId));
 
         //
         // Do find
@@ -160,7 +163,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        checkJobDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -176,7 +179,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        checkJobDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -192,7 +195,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         //
         // Check Access
-        checkJobDomainPermission(Actions.delete, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN,Actions.delete, scopeId));
 
         //
         // Check existence
@@ -241,14 +244,6 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
-    private void checkJobDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(JobDomains.JOB_DOMAIN, action, scope));
-    }
 
     private void deleteJobsByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
