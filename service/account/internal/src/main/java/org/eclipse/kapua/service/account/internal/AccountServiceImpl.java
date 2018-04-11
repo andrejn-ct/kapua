@@ -58,6 +58,7 @@ public class AccountServiceImpl extends AbstractKapuaConfigurableResourceLimited
         implements AccountService {
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
+
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
