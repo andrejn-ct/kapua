@@ -50,6 +50,11 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupServiceImpl.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     public GroupServiceImpl() {
         super(GroupService.class.getName(), AuthorizationDomains.GROUP_DOMAIN, AuthorizationEntityManagerFactory.getInstance(), GroupService.class, GroupFactory.class);
     }
@@ -64,7 +69,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.write, groupCreator.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.write, groupCreator.getScopeId()));
 
         //
         // Check limits
@@ -97,7 +102,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.write, group.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.write, group.getScopeId()));
 
         //
         // Check existence
@@ -134,7 +139,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.delete, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.delete, scopeId));
 
         //
         // Check existence
@@ -156,7 +161,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.read, scopeId));
 
         //
         // Do find
@@ -172,7 +177,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -188,7 +193,7 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
 
         //
         // Check Access
-        checkGroupDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do count
@@ -212,14 +217,6 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
-    private void checkGroupDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(AuthorizationDomains.GROUP_DOMAIN, action, scope));
-    }
 
     private void deleteGroupByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
