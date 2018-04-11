@@ -46,6 +46,11 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     /**
      * Constructor
      */
@@ -65,7 +70,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check access
-        checkAccessTokenDomainPermission(Actions.write, accessTokenCreator.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.write, accessTokenCreator.getScopeId()));
 
         //
         // Do create
@@ -84,8 +89,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check access
-//        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(ACCESS_TOKEN_DOMAIN, Actions.write, accessToken.getScopeId()));
-        checkAccessTokenDomainPermission(Actions.write, accessToken.getScopeId());;
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.write, accessToken.getScopeId()));
 
         //
         // Check existence
@@ -107,7 +111,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, scopeId));
 
         //
         // Do find
@@ -123,7 +127,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -139,7 +143,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, query.getScopeId()));
 
         //
         // Do count
@@ -155,7 +159,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.delete, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.delete, scopeId));
 
         //
         // Check existence
@@ -177,7 +181,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, scopeId));
 
         //
         // Build query
@@ -202,7 +206,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
         //
         // Check Access
         if (accessToken != null) {
-            checkAccessTokenDomainPermission(Actions.read, accessToken.getScopeId());
+            authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, accessToken.getScopeId()));
         }
 
         return accessToken;
@@ -217,7 +221,7 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
 
         //
         // Check Access
-        checkAccessTokenDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN,Actions.read, scopeId));
 
         //
         // Do find
@@ -249,14 +253,6 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
-    private void checkAccessTokenDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_TOKEN_DOMAIN, action, scope));
-    }
 
     private void deleteAccessTokenByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
 

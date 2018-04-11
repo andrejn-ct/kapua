@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017, 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -134,19 +134,23 @@ public class AccountServiceTestSteps extends AbstractKapuaSteps {
                 } catch (KapuaException e) {
                     // skip
                 }
-                bind(AuthorizationService.class).toInstance(mockedAuthorization);
+
+                MockedLocator mockedLocator = (MockedLocator)locator;
+
+                mockedLocator.setMockedService(AuthorizationService.class, mockedAuthorization);
                 // Inject mocked Permission Factory
                 PermissionFactory mockedPermissionFactory = Mockito.mock(PermissionFactory.class);
-                bind(PermissionFactory.class).toInstance(mockedPermissionFactory);
+                mockedLocator.setMockedFactory(PermissionFactory.class, mockedPermissionFactory);
                 // Set KapuaMetatypeFactory for Metatype configuration
                 KapuaMetatypeFactory metaFactory = new KapuaMetatypeFactoryImpl();
-                bind(KapuaMetatypeFactory.class).toInstance(metaFactory);
-
-                // Inject actual account related services
+                mockedLocator.setMockedFactory(KapuaMetatypeFactory.class, metaFactory);
+                // Inject actual implementation of AccountService
+                AccountEntityManagerFactory accountEntityManagerFactory = AccountEntityManagerFactory.getInstance();
+                bind(AccountEntityManagerFactory.class).toInstance(accountEntityManagerFactory);
                 AccountService accountService = new AccountServiceImpl();
-                bind(AccountService.class).toInstance(accountService);
+                mockedLocator.setMockedService(AccountService.class, accountService);
                 AccountFactory accountFactory = new AccountFactoryImpl();
-                bind(AccountFactory.class).toInstance(accountFactory);
+                mockedLocator.setMockedFactory(AccountFactory.class, accountFactory);
             }
         };
 

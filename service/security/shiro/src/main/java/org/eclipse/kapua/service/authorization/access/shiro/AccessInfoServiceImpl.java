@@ -58,6 +58,11 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessInfoServiceImpl.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     /**
      * Constructor.<br>
      * It initialize the {@link AbstractEntityManagerFactory} with the specific {@link AuthorizationEntityManagerFactory#getInstance()}.
@@ -75,9 +80,6 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
         authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN, Actions.write, accessInfoCreator.getScopeId()));
 
         //
@@ -144,7 +146,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        checkAccessInfoDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN,Actions.read, scopeId));
 
         return entityManagerSession.onResult(em -> AccessInfoDAO.find(em, accessInfoId));
     }
@@ -156,7 +158,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        checkAccessInfoDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN,Actions.read, scopeId));
 
         AccessInfoFactory accessInfoFactory = KapuaLocator.getInstance().getFactory(AccessInfoFactory.class);
         AccessInfoQuery query = accessInfoFactory.newQuery(scopeId);
@@ -177,7 +179,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        checkAccessInfoDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN,Actions.read, query.getScopeId()));
 
         return entityManagerSession.onResult(em -> AccessInfoDAO.query(em, query));
     }
@@ -190,7 +192,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        checkAccessInfoDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN,Actions.read, query.getScopeId()));
 
         return entityManagerSession.onResult(em -> AccessInfoDAO.count(em, query));
     }
@@ -200,7 +202,7 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
 
         //
         // Check Access
-        checkAccessInfoDomainPermission(Actions.write, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN,Actions.write, scopeId));
 
         entityManagerSession.onTransactedAction(em -> {
             if (AccessInfoDAO.find(em, accessInfoId) == null) {
@@ -230,14 +232,6 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
     // Private Methods
     //
     // -----------------------------------------------------------------------------------------
-
-    private void checkAccessInfoDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(ACCESS_INFO_DOMAIN, action, scope));
-    }
 
     private void deleteAccessInfoByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
 
