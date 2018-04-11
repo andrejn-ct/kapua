@@ -62,6 +62,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private static final Logger LOGGER = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
+
     private final JobEngineService jobEngineService = locator.getService(JobEngineService.class);
     private final TriggerService triggerService = locator.getService(TriggerService.class);
     private final TriggerFactory triggerFactory = locator.getFactory(TriggerFactory.class);
