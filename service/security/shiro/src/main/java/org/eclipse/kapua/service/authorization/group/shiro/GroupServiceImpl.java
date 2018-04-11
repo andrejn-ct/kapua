@@ -59,6 +59,11 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     public GroupServiceImpl() {
         super(GroupService.class.getName(), AuthorizationDomains.GROUP_DOMAIN, AuthorizationEntityManagerFactory.getInstance(), GroupService.class, GroupFactory.class);
     }
