@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -45,10 +45,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 @KapuaProvider
-public class DeviceConnectionServiceImpl extends
-        //        AbstractKapuaConfigurableResourceLimitedService<DeviceConnection, DeviceConnectionCreator, DeviceConnectionService, DeviceConnectionListResult, DeviceConnectionQuery, DeviceConnectionFactory>
-        AbstractKapuaConfigurableService
-        implements DeviceConnectionService {
+public class DeviceConnectionServiceImpl extends AbstractKapuaConfigurableService implements DeviceConnectionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceConnectionServiceImpl.class);
 

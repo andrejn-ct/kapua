@@ -58,6 +58,11 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     /**
      * Constructor
      */
@@ -90,7 +95,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.write, userCreator.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.write, userCreator.getScopeId()));
 
         //
         // Check duplicate name
@@ -128,7 +133,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.write, user.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.write, user.getScopeId()));
 
         //
         // Check existence
@@ -171,7 +176,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.delete, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.delete, scopeId));
 
         //
         // Check existence
@@ -208,7 +213,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.read, scopeId);
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.read, scopeId));
 
         // Do the find
         return entityManagerSession.onResult(em -> UserDAO.find(em, scopeId, userId));
@@ -246,7 +251,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -263,7 +268,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
         //
         // Check Access
-        checkUserDomainPermission(Actions.read, query.getScopeId());
+        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do count
@@ -287,17 +292,9 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     //
     // -----------------------------------------------------------------------------------------
 
-    private void checkUserDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, action, scope));
-    }
-
     private User checkReadAccess(final User user) throws KapuaException {
         if (user != null) {
-            checkUserDomainPermission(Actions.read, user.getScopeId());
+            authorizationService.checkPermission(permissionFactory.newPermission(UserDomains.USER_DOMAIN, Actions.read, user.getScopeId()));
         }
         return user;
     }

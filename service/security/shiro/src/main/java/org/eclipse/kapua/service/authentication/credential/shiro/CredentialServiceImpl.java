@@ -412,14 +412,6 @@ public class CredentialServiceImpl extends AbstractKapuaConfigurableService impl
     //
     // -----------------------------------------------------------------------------------------
 
-    private void checkCredentialsDomainPermission(Actions action, KapuaId scope) throws KapuaException {
-
-        KapuaLocator locator = KapuaLocator.getInstance();
-        AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
-        PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
-        authorizationService.checkPermission(permissionFactory.newPermission(AuthenticationDomains.CREDENTIAL_DOMAIN, action, scope));
-    }
-
     private void deleteCredentialByUserId(KapuaId scopeId, KapuaId userId) throws KapuaException {
 
         CredentialFactory credentialFactory = KapuaLocator.getInstance().getFactory(CredentialFactory.class);
