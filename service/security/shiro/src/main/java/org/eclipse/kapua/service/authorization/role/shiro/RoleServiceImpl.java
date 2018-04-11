@@ -62,6 +62,11 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
     private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
 
+    private final KapuaLocator locator = KapuaLocator.getInstance();
+
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
     public RoleServiceImpl() {
         super(RoleService.class.getName(), AuthorizationDomains.ROLE_DOMAIN, AuthorizationEntityManagerFactory.getInstance(), RoleService.class, RoleFactory.class);
     }
