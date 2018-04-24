@@ -295,7 +295,7 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
     }
 
     @ListenServiceEvent(fromAddress = "job")
-    public void onKapuaJobEvent(ServiceEvent kapuaEvent) throws KapuaException {
+    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("TriggerService: Service bus error. Received null ServiceEvent.");
             throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
