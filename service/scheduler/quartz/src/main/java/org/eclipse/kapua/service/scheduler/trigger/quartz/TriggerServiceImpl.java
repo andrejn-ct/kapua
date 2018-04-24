@@ -19,6 +19,8 @@ import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
+import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -49,6 +51,8 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
 import java.util.TimeZone;
@@ -61,6 +65,8 @@ import java.util.TimeZone;
 @KapuaProvider
 public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Trigger, TriggerCreator, TriggerService, TriggerListResult, TriggerQuery, TriggerFactory>
         implements TriggerService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TriggerServiceImpl.class);
 
     private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
 
@@ -303,4 +309,39 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
         return entityManagerSession.onResult(em -> TriggerDAO.count(em, query));
     }
 
+    @ListenServiceEvent(fromAddress = "job")
+    public void onKapuaAccountEvent(ServiceEvent kapuaEvent) throws KapuaException {
+        if (kapuaEvent == null) {
+            LOGGER.warn("SchedulerService: received null kapua event from job");
+            return;
+        }
+        LOGGER.trace("SchedulerService: received kapua {} event from {}, context {}",
+                kapuaEvent.getOperation(), kapuaEvent.getService(), kapuaEvent.getContextId());
+        if ("org.eclipse.kapua.service.job.JobService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            deleteTriggersByJobId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    //
+    // Private Methods
+    //
+    // -----------------------------------------------------------------------------------------
+
+    private void deleteTriggersByJobId(KapuaId scopeId, KapuaId jobId) throws KapuaException {
+
+        TriggerFactory triggerFactory = KapuaLocator.getInstance().getFactory(TriggerFactory.class);
+        TriggerQuery query = triggerFactory.newQuery(scopeId);
+        AndPredicateImpl predicateList = new AndPredicateImpl()
+                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_NAME, "jobId"))
+                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_VALUE, jobId.toStringId()))
+                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_TYPE, KapuaId.class.getName()));
+        query.setPredicate(predicateList);
+
+        TriggerListResult triggersToDelete = query(query);
+
+        for (Trigger td : triggersToDelete.getItems()) {
+            delete(td.getScopeId(), td.getId());
+        }
+    }
 }
