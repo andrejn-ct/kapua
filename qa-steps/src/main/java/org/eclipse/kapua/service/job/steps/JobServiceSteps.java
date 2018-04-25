@@ -38,12 +38,21 @@ import org.eclipse.kapua.service.job.JobListResult;
 import org.eclipse.kapua.service.job.JobPredicates;
 import org.eclipse.kapua.service.job.JobQuery;
 import org.eclipse.kapua.service.job.JobService;
+import org.eclipse.kapua.service.scheduler.trigger.Trigger;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerCreator;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerFactory;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerListResult;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerPredicates;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerProperty;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerQuery;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerService;
 import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +70,8 @@ public class JobServiceSteps extends BaseQATests {
 
     private static JobService jobService;
     private static JobFactory jobFactory;
+    private static TriggerService triggerService;
+    private static TriggerFactory triggerFactory;
     private static AccountService accountService;
 
     @Inject
@@ -83,6 +94,8 @@ public class JobServiceSteps extends BaseQATests {
         KapuaLocator locator = KapuaLocator.getInstance();
         jobService = locator.getService(JobService.class);
         jobFactory = locator.getFactory(JobFactory.class);
+        triggerService = locator.getService(TriggerService.class);
+        triggerFactory = locator.getFactory(TriggerFactory.class);
         accountService = locator.getService(AccountService.class);
 
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
@@ -139,6 +152,24 @@ public class JobServiceSteps extends BaseQATests {
             stepData.remove("Job");
             tmpJob = jobService.create(tmpCreator);
             stepData.put("Job", tmpJob);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete the job \"(.+)\" in the current account$")
+    public void deleteJobInCurrentAccount(String jobName) throws Exception {
+
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        KapuaId tmpScope = (tmpAcc != null) ? tmpAcc.getId() : ROOT_SCOPE_ID;
+
+        JobQuery jobQuery = jobFactory.newQuery(tmpScope);
+        jobQuery.setPredicate(new AttributePredicateImpl<>(JobPredicates.NAME, jobName));
+        JobListResult jobList = jobService.query(jobQuery);
+
+        try {
+            primeException();
+            jobService.delete(tmpScope, jobList.getFirstItem().getId());
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -202,6 +233,90 @@ public class JobServiceSteps extends BaseQATests {
         Assert.assertNotNull(stepData.get("Job"));
     }
 
+    @Given("^I configure the scheduler service$")
+    public void setTriggerServiceConfig(List<TestConfig> testConfigs)
+            throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = ROOT_SCOPE_ID;
+        KapuaId parentId = ROOT_SCOPE_ID;
+        if (lastAcc != null) {
+            scopeId = lastAcc.getId();
+            parentId = lastAcc.getScopeId();
+        }
+        Map<String, Object> valueMap = new HashMap<>();
+
+        for (TestConfig config : testConfigs) {
+            config.addConfigToMap(valueMap);
+        }
+        try {
+            primeException();
+            triggerService.setConfigValues(scopeId, parentId, valueMap);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Given("^I create the schedule \"(.+)\" for the job \"(.+)\" in the current account$")
+    public void createScheduleForJob(String scheduleName, String jobName)
+            throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = ROOT_SCOPE_ID;
+        if (lastAcc != null) {
+            scopeId = lastAcc.getId();
+        }
+
+        JobQuery jobQuery = jobFactory.newQuery(scopeId);
+        jobQuery.setPredicate(new AttributePredicateImpl<>(JobPredicates.NAME, jobName));
+        Job targetJob = jobService.query(jobQuery).getFirstItem();
+
+        TriggerCreator triggerCreator = prepareRegularTriggerCreator(scopeId, scheduleName, targetJob.getId());
+
+        primeException();
+        try {
+            stepData.remove("LastTrigger");
+            Trigger trigger = triggerService.create(triggerCreator);
+            stepData.put("LastTrigger", trigger);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Given("^I search for the schedule \"(.+)\" in the current account$")
+    public void queryForScheduleInCurrentAccount(String scheduleName) throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = ROOT_SCOPE_ID;
+        if (lastAcc != null) {
+            scopeId = lastAcc.getId();
+        }
+
+        TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+
+        try {
+            primeException();
+            stepData.remove("LastTrigger");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            stepData.put("LastTrigger", trigLst.getFirstItem());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Then("^There is no such schedule")
+    public void checkThatThereIsNoTrigger() {
+
+        assertNull(stepData.get("LastTrigger"));
+    }
+
+    @Then("^There is such a schedule")
+    public void checkThatTheTriggerExists() {
+
+        assertNotNull(stepData.get("LastTrigger"));
+    }
+
 /**
  * Private helper functions
  */
@@ -210,6 +325,27 @@ public class JobServiceSteps extends BaseQATests {
 
         tmpCreator.setName(jobName);
         tmpCreator.setDescription("TestJobDescription");
+
+        return tmpCreator;
+    }
+
+    TriggerCreator prepareRegularTriggerCreator(KapuaId scopeId, String triggerName, KapuaId jobId) {
+
+        TriggerCreator tmpCreator = triggerFactory.newCreator(scopeId);
+        tmpCreator.setName(triggerName);
+
+        Calendar tmpCalStart = Calendar.getInstance();
+        tmpCalStart.add(Calendar.HOUR, 5);
+        Calendar tmpCalEnd = tmpCalStart;
+        tmpCalEnd.add(Calendar.HOUR, 5);
+
+        tmpCreator.setStartsOn(tmpCalStart.getTime());
+        tmpCreator.setEndsOn(tmpCalEnd.getTime());
+        tmpCreator.setRetryInterval(Long.valueOf(5));
+
+        List<TriggerProperty> propList = new ArrayList<>();
+        propList.add(triggerFactory.newTriggerProperty("jobId", KapuaId.class.getName(), jobId.toStringId()));
+        tmpCreator.setTriggerProperties(propList);
 
         return tmpCreator;
     }

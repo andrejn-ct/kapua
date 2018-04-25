@@ -22,6 +22,7 @@ import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.job.engine.JobEngineService;
 import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
@@ -186,6 +187,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     }
 
     @Override
+    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId jobId) throws KapuaException {
         //
         // Argument Validation
