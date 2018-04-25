@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.job.steps;
 
-import com.google.inject.Inject;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -52,6 +51,7 @@ import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -242,6 +242,7 @@ public class JobServiceSteps extends BaseQATests {
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
         KapuaId parentId = (lastAcc != null) ? lastAcc.getScopeId() : ROOT_SCOPE_ID;
+
         Map<String, Object> valueMap = new HashMap<>();
 
         for (TestConfig config : testConfigs) {
