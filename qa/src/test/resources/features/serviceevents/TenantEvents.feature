@@ -89,7 +89,7 @@ Feature: Tenant service with Service Events
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
-            And User B
+        And User B
             | name    | displayName  | email             | phoneNumber     | status  | userType |
             | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
         And Credentials
