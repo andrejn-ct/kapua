@@ -52,6 +52,10 @@ Feature: Tenant service with Service Events
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
         And User A
             | name    | displayName  | email             | phoneNumber     | status  | userType |
             | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
@@ -78,6 +82,10 @@ Feature: Tenant service with Service Events
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
         And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
@@ -583,6 +591,87 @@ Feature: Tenant service with Service Events
         And I wait 1 second
         Then I don't find user credentials
         And I logout
+
+    Scenario: Job is deleted, the job schedules must be deleted too
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the tag service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the tag service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And A job named "test-job-a-2" in the current scope
+        When I create the schedule "test-trigger-1" for the job "test-job-a-1" in the current account
+        And I search for the schedule "test-trigger-1" in the current account
+        Then There is such a schedule
+        When I delete the job "test-job-a-1" in the current account
+        And I wait 5 seconds
+        When I search for the schedule "test-trigger-1" in the current account
+        Then There is no such schedule
 
     Scenario: Stop event broker for all scenarios
         Given Stop Event Broker
