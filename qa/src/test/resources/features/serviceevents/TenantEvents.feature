@@ -676,6 +676,8 @@ Feature: Tenant service with Service Events
         And I wait 5 seconds
         When I search for the schedule "test-trigger-1" in the current account
         Then There is no such schedule
+        When I count the schedules in the current account
+        Then There is exactly 1 schedule
 
     Scenario: Stop event broker for all scenarios
         Given Stop Event Broker
