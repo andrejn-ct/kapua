@@ -314,11 +314,11 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
 
         TriggerFactory triggerFactory = KapuaLocator.getInstance().getFactory(TriggerFactory.class);
         TriggerQuery query = triggerFactory.newQuery(scopeId);
-        AndPredicateImpl predicateList = new AndPredicateImpl()
-                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_NAME, "jobId"))
-                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_VALUE, jobId.toStringId()))
-                .and(new AttributePredicateImpl<>(TriggerPredicates.TRIGGER_PROPERTIES_TYPE, KapuaId.class.getName()));
-        query.setPredicate(predicateList);
+        AndPredicateImpl andPredicate = new AndPredicateImpl()
+                .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_NAME, "jobId"))
+                .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_VALUE, jobId.toStringId()))
+                .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_TYPE, KapuaId.class.getName()));
+        query.setPredicate(andPredicate);
 
         TriggerListResult triggersToDelete = query(query);
 
