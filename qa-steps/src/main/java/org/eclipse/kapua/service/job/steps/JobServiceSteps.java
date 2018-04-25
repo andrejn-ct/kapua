@@ -287,10 +287,7 @@ public class JobServiceSteps extends BaseQATests {
     public void queryForScheduleInCurrentAccount(String scheduleName) throws Exception {
 
         Account lastAcc = (Account) stepData.get("LastAccount");
-        KapuaId scopeId = ROOT_SCOPE_ID;
-        if (lastAcc != null) {
-            scopeId = lastAcc.getId();
-        }
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
 
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
         trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
@@ -305,10 +302,35 @@ public class JobServiceSteps extends BaseQATests {
         }
     }
 
+    @When("^I count the schedules in the current account$")
+    public void countSchedulesInCurrentAccount() throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
+
+        TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
+
+        try {
+            primeException();
+            stepData.remove("TriggerList");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            stepData.put("TriggerList", trigLst);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @Then("^There is no such schedule")
     public void checkThatThereIsNoTrigger() {
 
         Assert.assertNull(stepData.get("LastTrigger"));
+    }
+
+    @Then("^There (?:are|is) exactly (\\d+) schedules?$")
+    public void checkNumberOfSchedules(int num) {
+
+        TriggerListResult trigLst = (TriggerListResult) stepData.get("TriggerList");
+        Assert.assertEquals(num, trigLst.getSize());
     }
 
     @Then("^There is such a schedule")
