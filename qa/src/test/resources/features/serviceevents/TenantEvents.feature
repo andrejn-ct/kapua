@@ -53,6 +53,10 @@ Feature: Tenant service with Service Events
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
         And User A
             | name    | displayName  | email             | phoneNumber     | status  | userType |
             | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
@@ -79,6 +83,10 @@ Feature: Tenant service with Service Events
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
         And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
@@ -584,6 +592,19 @@ Feature: Tenant service with Service Events
         And I wait 1 second
         Then I don't find user credentials
         And I logout
+
+    Scenario: Job is deleted, the job schedules must be deleted too
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And A job named "test-job-a-2" in the current scope
+        When I create the schedule "test-trigger-1" for the job "test-job-a-1" in the current account
+        And I search for the schedule "test-trigger-1" in the current account
+        Then There is such a schedule
+        When I delete the job "test-job-a-1" in the current account
+        And I wait 5 seconds
+        When I search for the schedule "test-trigger-1" in the current account
+        Then There is no such schedule
 
     Scenario: Stop event broker for all scenarios
         Given Stop Event Broker
