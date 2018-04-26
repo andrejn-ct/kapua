@@ -585,16 +585,12 @@ public class DeviceServiceSteps extends BaseQATests {
     @And("^I untag device with \"([^\"]*)\" tag$")
     public void iDeleteTag(String deviceTagName) throws Throwable {
 
-        Tag foundTag = (Tag) stepData.get("tag");
-        Assert.assertEquals(deviceTagName, foundTag.getName());
-        Device device = (Device) stepData.get("Device");
-        stepData.remove("Tag");
-        stepData.remove("Tags");
+        Device device = ((DeviceListResult) stepData.get("DeviceList")).getFirstItem();
         Set<KapuaId> tags = new HashSet<>();
         device.setTagIds(tags);
         Device updatedDevice = deviceRegistryService.update(device);
         stepData.put("Device", updatedDevice);
-        Assert.assertEquals(device.getTagIds().isEmpty(), true);
+        Assert.assertTrue(updatedDevice.getTagIds().isEmpty());
     }
 
     @And("^I verify that tag \"([^\"]*)\" is deleted$")
