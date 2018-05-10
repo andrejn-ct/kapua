@@ -256,28 +256,5 @@ Feature: Tenant service with Service Events
         Then I don't find user credentials
         And I logout
 
-    Scenario: Job is deleted, the job schedules must be deleted too
-
-        Given I select account "account-a"
-        And A job named "test-job-a-1" in the current scope
-        And A job named "test-job-a-2" in the current scope
-        When I create the schedule "test-trigger-1" for the job "test-job-a-1" in the current account
-        When I create the schedule "test-trigger-2" for the job "test-job-a-1" in the current account
-        When I create the schedule "test-trigger-3" for the job "test-job-a-2" in the current account
-        And I search for the schedule "test-trigger-1" in the current account
-        Then There is such a schedule
-        When I count the schedules in the current account
-        Then There are exactly 3 schedules
-        When I delete the job "test-job-a-1" in the current account
-        And I wait 5 seconds
-        When I search for the schedule "test-trigger-1" in the current account
-        Then There is no such schedule
-        When I count the schedules in the current account
-        Then There is exactly 1 schedule
-
-    Scenario: User is deleted, access permissions for that user have to be deleted too
-
-    To be implemented.
-
     @StopEventBroker
     Scenario: Stop event broker for all scenarios
