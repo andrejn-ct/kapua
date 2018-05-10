@@ -292,12 +292,12 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
     }
 
     @ListenServiceEvent(fromAddress = "job")
-    public void onKapuaAccountEvent(ServiceEvent kapuaEvent) throws KapuaException {
+    public void onKapuaJobEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            LOGGER.warn("SchedulerService: received null kapua event from job");
+            LOGGER.warn("TriggerService: received null kapua event from job");
             return;
         }
-        LOGGER.trace("SchedulerService: received kapua {} event from {}, context {}",
+        LOGGER.trace("TriggerService: received kapua {} event from {}, context {}",
                 kapuaEvent.getOperation(), kapuaEvent.getService(), kapuaEvent.getContextId());
         if ("org.eclipse.kapua.service.job.JobService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteTriggersByJobId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
