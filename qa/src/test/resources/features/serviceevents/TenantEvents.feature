@@ -592,6 +592,7 @@ Feature: Tenant service with Service Events
         Then I don't find user credentials
         And I logout
 
+<<<<<<< d9744b63325d6d57fc0f8aaac31af49c35a641e5
     Scenario: Job is deleted, the job schedules must be deleted too
 
         Given I login as user with name "kapua-sys" and password "kapua-password"
