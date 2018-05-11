@@ -173,16 +173,18 @@ public class JobStepServiceTestSteps extends AbstractKapuaSteps {
     // * Cucumber Test steps                                                              *
     // ************************************************************************************
 
-    @Given("^A regular step creator with the name \"(.*)\" and the following properties$")
-    public void prepareARegularStepCreatorWithPropertyList(String name, List<CucStepProperty> list) {
+    @Given("^A regular step creator with the name \"(.*)\" at index (\\d+) and the following properties$")
+    public void prepareARegularStepCreatorWithPropertyList(String name, int index, List<CucStepProperty> list) {
 
         stepData.stepCreator = prepareDefaultCreator();
         stepData.stepCreator.setName(name);
         stepData.stepCreator.setJobStepDefinitionId(stepDefinitionData.currentStepDefinitionId);
+        stepData.stepCreator.setStepIndex(index);
 
         List<JobStepProperty> tmpPropLst = new ArrayList<>();
         for (CucStepProperty prop : list) {
-            tmpPropLst.add(stepFactory.newStepProperty(prop.getName(), prop.getType(), prop.getValue()));
+            JobStepProperty tmpProp = stepFactory.newStepProperty(prop.getName(), prop.getType(), prop.getValue());
+            tmpPropLst.add(tmpProp);
         }
         stepData.stepCreator.setJobStepProperties(tmpPropLst);
     }

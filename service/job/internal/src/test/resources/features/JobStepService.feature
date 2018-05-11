@@ -21,7 +21,7 @@ Scenario: Regular step creation
         | prop1 | t1   |
         | prop2 | t2   |
         | prop3 | t3   |
-    And A regular step creator with the name "TestStep" and the following properties
+    And A regular step creator with the name "TestStep" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
         | prop2 | t2   | v2    |
@@ -40,7 +40,7 @@ Scenario: Step with a null scope ID
         | prop2 | t2   |
         | prop3 | t3   |
     Given A null scope
-    And A regular step creator with the name "TestStep" and the following properties
+    And A regular step creator with the name "TestStep" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
         | prop2 | t2   | v2    |
@@ -57,7 +57,7 @@ Scenario: Change an existing step name
         | prop1 | t1   |
         | prop2 | t2   |
         | prop3 | t3   |
-    And A regular step creator with the name "TestStep" and the following properties
+    And A regular step creator with the name "TestStep" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
     Then I create a new step entity from the existing creator
@@ -73,15 +73,15 @@ Scenario: Count steps in the database
         | prop1 | t1   |
         | prop2 | t2   |
         | prop3 | t3   |
-    Given A regular step creator with the name "TestStep1" and the following properties
+    Given A regular step creator with the name "TestStep1" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
     Then I create a new step entity from the existing creator
-    Given A regular step creator with the name "TestStep2" and the following properties
+    Given A regular step creator with the name "TestStep2" at index 1 and the following properties
         | name  | type | value |
         | prop2 | t2   | v2    |
     Then I create a new step entity from the existing creator
-    Given A regular step creator with the name "TestStep3" and the following properties
+    Given A regular step creator with the name "TestStep3" at index 2 and the following properties
         | name  | type | value |
         | prop3 | t3   | v3    |
     Then I create a new step entity from the existing creator
@@ -96,7 +96,7 @@ Scenario: Delete an existing step
         | prop1 | t1   |
         | prop2 | t2   |
         | prop3 | t3   |
-    And A regular step creator with the name "TestStep" and the following properties
+    And A regular step creator with the name "TestStep" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
     Then I create a new step entity from the existing creator
@@ -112,7 +112,7 @@ Scenario: Delete a non-existing step
         | prop1 | t1   |
         | prop2 | t2   |
         | prop3 | t3   |
-    And A regular step creator with the name "TestStep" and the following properties
+    And A regular step creator with the name "TestStep" at index 0 and the following properties
         | name  | type | value |
         | prop1 | t1   | v1    |
     Then I create a new step entity from the existing creator
