@@ -366,7 +366,7 @@ public class JobServiceSteps extends BaseQATests {
         tmpCreator.setRetryInterval(Long.valueOf(5));
 
         List<TriggerProperty> propList = new ArrayList<>();
-        propList.add(triggerFactory.newTriggerProperty("jobId", KapuaId.class.getName(), jobId.toStringId()));
+        propList.add(triggerFactory.newTriggerProperty("jobId", KapuaId.class.getName(), jobId.toCompactId()));
         tmpCreator.setTriggerProperties(propList);
 
         return tmpCreator;
