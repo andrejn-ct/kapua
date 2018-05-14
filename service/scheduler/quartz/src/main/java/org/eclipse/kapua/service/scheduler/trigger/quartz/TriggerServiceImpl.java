@@ -316,7 +316,7 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
         TriggerQuery query = triggerFactory.newQuery(scopeId);
         AndPredicateImpl andPredicate = new AndPredicateImpl()
                 .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_NAME, "jobId"))
-                .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_VALUE, jobId.toStringId()))
+                .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_VALUE, jobId.toCompactId()))
                 .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_TYPE, KapuaId.class.getName()));
         query.setPredicate(andPredicate);
 
