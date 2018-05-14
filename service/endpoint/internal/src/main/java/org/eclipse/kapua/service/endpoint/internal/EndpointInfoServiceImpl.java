@@ -19,6 +19,8 @@ import org.eclipse.kapua.commons.jpa.EntityManager;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.commons.util.CommonsValidationRegex;
+import org.eclipse.kapua.event.ListenServiceEvent;
+import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -38,6 +40,8 @@ import org.eclipse.kapua.service.endpoint.EndpointInfoFactory;
 import org.eclipse.kapua.service.endpoint.EndpointInfoListResult;
 import org.eclipse.kapua.service.endpoint.EndpointInfoQuery;
 import org.eclipse.kapua.service.endpoint.EndpointInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -54,14 +58,16 @@ public class EndpointInfoServiceImpl
         extends AbstractKapuaConfigurableResourceLimitedService<EndpointInfo, EndpointInfoCreator, EndpointInfoService, EndpointInfoListResult, EndpointInfoQuery, EndpointInfoFactory>
         implements EndpointInfoService {
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndpointInfoServiceImpl.class);
 
-    private static final AccountService ACCOUNT_SERVICE = LOCATOR.getService(AccountService.class);
+    private final KapuaLocator locator = KapuaLocator.getInstance();
 
-    private static final AuthorizationService AUTHORIZATION_SERVICE = LOCATOR.getService(AuthorizationService.class);
-    private static final PermissionFactory PERMISSION_FACTORY = LOCATOR.getFactory(PermissionFactory.class);
+    private final AccountService accountService = locator.getService(AccountService.class);
 
-    private static final EndpointInfoFactory ENDPOINT_INFO_FACTORY = LOCATOR.getFactory(EndpointInfoFactory.class);
+    private final AuthorizationService authorizationService = locator.getService(AuthorizationService.class);
+    private final PermissionFactory permissionFactory = locator.getFactory(PermissionFactory.class);
+
+    private final EndpointInfoFactory endpointInfoFactory = locator.getFactory(EndpointInfoFactory.class);
 
     public EndpointInfoServiceImpl() {
         super(EndpointInfoService.class.getName(), EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, EndpointEntityManagerFactory.getInstance(), EndpointInfoService.class, EndpointInfoFactory.class);
@@ -86,7 +92,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.write, null));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.write, null));
 
         //
         // Check duplicate endpoint
@@ -120,7 +126,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.write, null));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.write, null));
 
         //
         // Check duplicate endpoint
@@ -143,7 +149,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.delete, null));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.delete, null));
 
         //
         // Do delete
@@ -158,7 +164,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, scopeId));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, scopeId));
 
         //
         // Do find
@@ -172,7 +178,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, query.getScopeId()));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do Query
@@ -190,7 +196,7 @@ public class EndpointInfoServiceImpl
                 KapuaId originalScopeId = query.getScopeId();
 
                 do {
-                    Account account = KapuaSecurityUtils.doPrivileged(() -> ACCOUNT_SERVICE.find(query.getScopeId()));
+                    Account account = KapuaSecurityUtils.doPrivileged(() -> accountService.find(query.getScopeId()));
 
                     if (account == null) {
                         throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
@@ -215,7 +221,7 @@ public class EndpointInfoServiceImpl
 
         //
         // Check Access
-        AUTHORIZATION_SERVICE.checkPermission(PERMISSION_FACTORY.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, query.getScopeId()));
+        authorizationService.checkPermission(permissionFactory.newPermission(EndpointInfoDomains.ENDPOINT_INFO_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do count
@@ -233,7 +239,7 @@ public class EndpointInfoServiceImpl
                 KapuaId originalScopeId = query.getScopeId();
 
                 do {
-                    Account account = KapuaSecurityUtils.doPrivileged(() -> ACCOUNT_SERVICE.find(query.getScopeId()));
+                    Account account = KapuaSecurityUtils.doPrivileged(() -> accountService.find(query.getScopeId()));
 
                     if (account == null) {
                         throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
@@ -249,6 +255,17 @@ public class EndpointInfoServiceImpl
 
             return endpointInfoCount;
         });
+    }
+
+    @ListenServiceEvent(fromAddress = "account")
+    public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
+        if (kapuaEvent == null) {
+            LOGGER.warn("EndpointInfoService: received null kapua event from account");
+        }
+        LOGGER.info("EndpointInfoService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+            deleteEndpointsByAccountId(kapuaEvent.getScopeId());
+        }
     }
 
     //
@@ -294,8 +311,19 @@ public class EndpointInfoServiceImpl
     }
 
     private boolean countAllEndpointsInScope(EntityManager em, KapuaId scopeId) throws KapuaException {
-        EndpointInfoQuery totalQuery = ENDPOINT_INFO_FACTORY.newQuery(scopeId);
+
+        EndpointInfoQuery totalQuery = endpointInfoFactory.newQuery(scopeId);
         long totalCount = EndpointInfoDAO.count(em, totalQuery);
         return totalCount != 0;
+    }
+
+    private void deleteEndpointsByAccountId(KapuaId scope) throws KapuaException {
+
+        EndpointInfoQuery query = new EndpointInfoQueryImpl(scope);
+        EndpointInfoListResult toDelete = query(query);
+
+        for(EndpointInfo epi : toDelete.getItems()) {
+            delete(epi.getScopeId(), epi.getId());
+        }
     }
 }

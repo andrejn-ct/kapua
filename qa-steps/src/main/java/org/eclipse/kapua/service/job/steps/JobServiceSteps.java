@@ -39,10 +39,10 @@ import org.eclipse.kapua.service.job.JobListResult;
 import org.eclipse.kapua.service.job.JobQuery;
 import org.eclipse.kapua.service.job.JobService;
 import org.eclipse.kapua.service.scheduler.trigger.Trigger;
+import org.eclipse.kapua.service.scheduler.trigger.TriggerAttributes;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerCreator;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerFactory;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerListResult;
-import org.eclipse.kapua.service.scheduler.trigger.TriggerPredicates;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerProperty;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerQuery;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerService;
@@ -164,7 +164,7 @@ public class JobServiceSteps extends BaseQATests {
         KapuaId tmpScope = (tmpAcc != null) ? tmpAcc.getId() : ROOT_SCOPE_ID;
 
         JobQuery jobQuery = jobFactory.newQuery(tmpScope);
-        jobQuery.setPredicate(new AttributePredicateImpl<>(JobPredicates.NAME, jobName));
+        jobQuery.setPredicate(new AttributePredicateImpl<>(JobAttributes.NAME, jobName));
         JobListResult jobList = jobService.query(jobQuery);
 
         try {
@@ -268,7 +268,7 @@ public class JobServiceSteps extends BaseQATests {
         }
 
         JobQuery jobQuery = jobFactory.newQuery(scopeId);
-        jobQuery.setPredicate(new AttributePredicateImpl<>(JobPredicates.NAME, jobName));
+        jobQuery.setPredicate(new AttributePredicateImpl<>(JobAttributes.NAME, jobName));
         Job targetJob = jobService.query(jobQuery).getFirstItem();
 
         TriggerCreator triggerCreator = prepareRegularTriggerCreator(scopeId, scheduleName, targetJob.getId());
@@ -290,7 +290,7 @@ public class JobServiceSteps extends BaseQATests {
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
 
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();
