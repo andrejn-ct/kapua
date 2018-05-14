@@ -19,5 +19,6 @@
 
     <include relativeToChangelogFile="true" file="./endpoint_info.xml"/>
     <include relativeToChangelogFile="true" file="./endpoint_info_usage.xml"/>
+    <include relativeToChangelogFile="true" file="./endpoint-sys-housekeeper-run-seed.xml"/>
 
 </databaseChangeLog>
