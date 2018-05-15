@@ -45,15 +45,14 @@
 
         <api>org.eclipse.kapua.service.job.JobService</api>
         <api>org.eclipse.kapua.service.job.JobFactory</api>
+        <api>org.eclipse.kapua.service.job.step.definition.JobStepDefinitionService</api>
+        <api>org.eclipse.kapua.service.job.step.definition.JobStepDefinitionFactory</api>
 
         <api>org.eclipse.kapua.service.scheduler.trigger.TriggerService</api>
         <api>org.eclipse.kapua.service.scheduler.trigger.TriggerFactory</api>
 
         <api>org.eclipse.kapua.service.endpoint.EndpointInfoService</api>
         <api>org.eclipse.kapua.service.endpoint.EndpointInfoFactory</api>
-
-        <api>org.eclipse.kapua.service.job.step.definition.JobStepDefinitionService</api>
-        <api>org.eclipse.kapua.service.job.step.definition.JobStepDefinitionFactory</api>
 
         <api>org.eclipse.kapua.service.certificate.CertificateService</api>
         <api>org.eclipse.kapua.service.certificate.CertificateFactory</api>
