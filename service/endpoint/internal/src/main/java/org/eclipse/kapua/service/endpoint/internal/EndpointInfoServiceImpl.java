@@ -264,7 +264,7 @@ public class EndpointInfoServiceImpl
         }
         LOGGER.info("EndpointInfoService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
-            deleteEndpointsByAccountId(kapuaEvent.getScopeId());
+            deleteEndpointsByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
 
@@ -317,9 +317,9 @@ public class EndpointInfoServiceImpl
         return totalCount != 0;
     }
 
-    private void deleteEndpointsByAccountId(KapuaId scope) throws KapuaException {
+    private void deleteEndpointsByAccountId(KapuaId scope, KapuaId id) throws KapuaException {
 
-        EndpointInfoQuery query = new EndpointInfoQueryImpl(scope);
+        EndpointInfoQuery query = new EndpointInfoQueryImpl(id);
         EndpointInfoListResult toDelete = query(query);
 
         for(EndpointInfo epi : toDelete.getItems()) {
