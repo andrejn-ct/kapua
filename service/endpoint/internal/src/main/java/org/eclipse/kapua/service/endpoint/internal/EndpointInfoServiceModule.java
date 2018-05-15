@@ -27,12 +27,12 @@ import java.util.List;
 public class EndpointInfoServiceModule extends ServiceEventModule {
 
     @Inject
-    private EndpointInfoService endPointService;
+    private EndpointInfoService endpointInfoService;
 
     @Override
     protected ServiceEventModuleConfiguration initializeConfiguration() {
         KapuaEndpointSetting kes = KapuaEndpointSetting.getInstance();
-        List<ServiceEventClientConfiguration> selc = ServiceInspector.getEventBusClients(endPointService, EndpointInfoService.class);
+        List<ServiceEventClientConfiguration> selc = ServiceInspector.getEventBusClients(endpointInfoService, EndpointInfoService.class);
         return new ServiceEventModuleConfiguration(
                 kes.getString(KapuaEndpointSettingKeys.ENDPOINT_KEY.ENDPOINT_EVENT_ADDRESS),
                 EndpointEntityManagerFactory.getInstance(),
