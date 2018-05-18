@@ -67,5 +67,32 @@ Feature: EndpointInfo service with Service Events
         When I query for endpoints in account "account-a"
         Then There are exactly 3 endpoints
 
+    Scenario: A subaccount with no endpoints is deleted. The parent account endpoints must remain
+
+        Given I select account "account-a"
+        And The following endpoints for the current account
+            | schema  | url    | port  |
+            | http    | a.b.c  | 111   |
+            | http    | a.b.c  | 112   |
+            | http    | a.b.c  | 113   |
+        Given Account
+            | name        |
+            | account-a-2 |
+        Given I select account "account-b"
+        And The following endpoints for the current account
+            | schema  | url    | port  |
+            | http    | d.e.f  | 222   |
+            | http    | d.e.f  | 223   |
+        When I query for endpoints in account "account-a"
+        Then There are exactly 3 endpoints
+        When I query for endpoints in account "account-b"
+        Then There are exactly 2 endpoints
+        Given I try to delete account "account-a-2"
+        And I wait for 10 seconds
+        When I query for endpoints in account "account-a"
+        Then There are exactly 3 endpoints
+        When I query for endpoints in account "account-b"
+        Then There are exactly 2 endpoints
+
     @StopEventBroker
     Scenario: Stop event broker for all scenarios

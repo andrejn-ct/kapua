@@ -323,7 +323,9 @@ public class EndpointInfoServiceImpl
         EndpointInfoListResult toDelete = query(query);
 
         for(EndpointInfo epi : toDelete.getItems()) {
-            delete(epi.getScopeId(), epi.getId());
+            if (epi.getScopeId().equals(id)) {
+                delete(epi.getScopeId(), epi.getId());
+            }
         }
     }
 }
