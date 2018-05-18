@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017, 2018 Eurotech and/or its affiliates and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -26,6 +26,8 @@ DELETE FROM dvc_device;
 
 DELETE FROM dvc_device_event;
 
+DELETE FROM tag_tag;
+
 DELETE FROM sys_configuration WHERE NOT (scope_id = 1 AND id IN (1,2,3,4,5,6,7,8,9));
 
 DELETE FROM usr_user WHERE NOT (scope_id = 1 AND id IN (1,2));
@@ -41,3 +43,23 @@ DELETE FROM athz_domain_actions WHERE domain_id NOT IN (1,2,3,4,5,6,7,8,9,10,11,
 DELETE FROM athz_domain WHERE NOT (scope_id IS null AND id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20));
 
 DELETE FROM athz_group;
+
+DELETE FROM schdl_trigger;
+
+DELETE FROM schdl_trigger_properties;
+
+DELETE FROM job_job;
+
+DELETE FROM job_job_step;
+
+DELETE FROM job_job_step_properties;
+
+DELETE FROM job_job_step_definition;
+
+DELETE FROM job_job_step_definition_properties;
+
+DELETE FROM job_job_target;
+
+DELETE FROM endp_endpoint_info;
+
+DELETE FROM endp_endpoint_info_usage;
