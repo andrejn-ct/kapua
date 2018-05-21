@@ -302,6 +302,24 @@ public class JobServiceSteps extends BaseQATests {
         }
     }
 
+    @When("^I count the schedules in account \"(.+)\"$")
+    public void countSchedulesInAccount(String account) throws Exception {
+
+        Account tmpAcc = accountService.findByName(account);
+        KapuaId scopeId = tmpAcc.getId();
+
+        TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
+
+        try {
+            primeException();
+            stepData.remove("TriggerList");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            stepData.put("TriggerList", trigLst);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @When("^I count the schedules in the current account$")
     public void countSchedulesInCurrentAccount() throws Exception {
 
