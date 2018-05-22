@@ -9,7 +9,7 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@jobschedules
+@serviceevents
 Feature: Job service tests
     Basic workflow of Job creation and deletion. These test scenarios check for integration issues with other services.
 
