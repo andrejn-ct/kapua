@@ -47,6 +47,7 @@ import org.eclipse.kapua.service.scheduler.trigger.TriggerProperty;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerQuery;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerService;
 import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +57,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Assert;
 
 /**
  * Implementation of Gherkin steps used in TagService.feature scenarios.
@@ -238,12 +237,8 @@ public class JobServiceSteps extends BaseQATests {
             throws Exception {
 
         Account lastAcc = (Account) stepData.get("LastAccount");
-        KapuaId scopeId = ROOT_SCOPE_ID;
-        KapuaId parentId = ROOT_SCOPE_ID;
-        if (lastAcc != null) {
-            scopeId = lastAcc.getId();
-            parentId = lastAcc.getScopeId();
-        }
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
+        KapuaId parentId = (lastAcc != null) ? lastAcc.getScopeId() : ROOT_SCOPE_ID;
         Map<String, Object> valueMap = new HashMap<>();
 
         for (TestConfig config : testConfigs) {
@@ -257,15 +252,50 @@ public class JobServiceSteps extends BaseQATests {
         }
     }
 
-    @Given("^I create the schedule \"(.+)\" for the job \"(.+)\" in the current account$")
+    @Given("^I select the schedule \"(.+)\" in the current account$")
+    public void selectScheduleInCurrentAccount(String scheduleName) throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
+        TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+
+        try {
+            primeException();
+            stepData.remove("CurrentSchedule");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            Assert.assertNotEquals("The requested schedule was not found.", 0, trigLst.getSize());
+            stepData.put("CurrentSchedule", trigLst.getFirstItem());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @Given("^I select the schedule \"(.+)\" in account \"(.+)\"$")
+    public void selectScheduleInAccount(String scheduleName, String accountName) throws Exception {
+
+        Account tgtAcc = accountService.findByName(accountName);
+        Assert.assertNotNull("The requested account was not found!", tgtAcc);
+        TriggerQuery trigQuery = triggerFactory.newQuery(tgtAcc.getId());
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+
+        try {
+            primeException();
+            stepData.remove("CurrentSchedule");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            Assert.assertNotEquals("The requested schedule was not found.", 0, trigLst.getSize());
+            stepData.put("CurrentSchedule", trigLst.getFirstItem());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I create the schedule \"(.+)\" for the job \"(.+)\" in the current account$")
     public void createScheduleForJob(String scheduleName, String jobName)
             throws Exception {
 
         Account lastAcc = (Account) stepData.get("LastAccount");
-        KapuaId scopeId = ROOT_SCOPE_ID;
-        if (lastAcc != null) {
-            scopeId = lastAcc.getId();
-        }
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
 
         JobQuery jobQuery = jobFactory.newQuery(scopeId);
         jobQuery.setPredicate(new AttributePredicateImpl<>(JobAttributes.NAME, jobName));
@@ -283,14 +313,30 @@ public class JobServiceSteps extends BaseQATests {
         }
     }
 
-    @Given("^I search for the schedule \"(.+)\" in the current account$")
+    @When("^I search for the schedule \"(.+)\" in the current account$")
     public void queryForScheduleInCurrentAccount(String scheduleName) throws Exception {
 
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
-
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
         trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
+
+        try {
+            primeException();
+            stepData.remove("LastTrigger");
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            stepData.put("LastTrigger", trigLst.getFirstItem());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I search for the schedule \"(.+)\" in account \"(.+)\"$")
+    public void queryForScheduleInAccount(String scheduleName, String accountName) throws Exception {
+
+        Account tgtAcc = accountService.findByName(accountName);
+        TriggerQuery trigQuery = triggerFactory.newQuery(tgtAcc.getId());
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
 
         try {
             primeException();
@@ -307,7 +353,6 @@ public class JobServiceSteps extends BaseQATests {
 
         Account tmpAcc = accountService.findByName(account);
         KapuaId scopeId = tmpAcc.getId();
-
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
 
         try {
@@ -325,7 +370,6 @@ public class JobServiceSteps extends BaseQATests {
 
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
-
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
 
         try {
@@ -333,6 +377,56 @@ public class JobServiceSteps extends BaseQATests {
             stepData.remove("TriggerList");
             TriggerListResult trigLst = triggerService.query(trigQuery);
             stepData.put("TriggerList", trigLst);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete the selected schedule$")
+    public void deleteCurrentSchedule() throws Exception {
+
+        Trigger selectedTrigger = (Trigger) stepData.get("CurrentSchedule");
+        Assert.assertNotNull("No schedule currently selected.", selectedTrigger);
+
+        try {
+            primeException();
+            triggerService.delete(selectedTrigger.getScopeId(), selectedTrigger.getId());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete the schedule \"(.+)\" in the current account$")
+    public void deleteScheduleInCurrentAccount(String scheduleName) throws Exception {
+
+        Account lastAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
+        TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+
+        try {
+            primeException();
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            Assert.assertNotEquals("The requested schedule was not found.", 0, trigLst.getSize());
+            triggerService.delete(trigLst.getFirstItem().getScopeId(), trigLst.getFirstItem().getId());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I delete the schedule \"(.+)\" in account \"(.+)\"$")
+    public void deleteScheduleInAccount(String scheduleName, String accountName) throws Exception {
+
+        Account tmpAcc = accountService.findByName(accountName);
+        Assert.assertNotNull("The requested account was not found.", tmpAcc);
+        TriggerQuery trigQuery = triggerFactory.newQuery(tmpAcc.getId());
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+
+        try {
+            primeException();
+            TriggerListResult trigLst = triggerService.query(trigQuery);
+            Assert.assertNotEquals("The requested schedule was not found.", 0, trigLst.getSize());
+            triggerService.delete(trigLst.getFirstItem().getScopeId(), trigLst.getFirstItem().getId());
         } catch (KapuaException ex) {
             verifyException(ex);
         }
