@@ -52,9 +52,6 @@ Feature: Job service tests
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
 
-    @StartEventBroker
-    Scenario: Start event broker for all scenarios
-
     Scenario: Create a number of jobs and schedules. Regular case.
 
         Given I select account "account-a"
@@ -78,5 +75,55 @@ Feature: Job service tests
         When I count the schedules in account "account-b"
         Then There are exactly 6 schedules
 
-    @StopEventBroker
-    Scenario: Stop event broker for all scenarios
+    Scenario: Create a schedule with a duplicate name
+        The schedule names must be unique in the scope. Creating a schedule with a duplicate name should
+        throw an exception. A similarly named schedule in another account must be successfully created.
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
+        And A job named "test-job-a-2" in the current scope
+        And I create the schedule "test-trigger-a-2-1" for the job "test-job-a-2" in the current account
+        Given I expect the exception "KapuaDuplicateNameException" with the text "test-trigger-a-1-1 already exists"
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-2" in the current account
+        Then An exception was thrown
+        Given I select account "account-b"
+        And A job named "test-job-b-1" in the current scope
+        And I create the schedule "test-trigger-b-1-1" for the job "test-job-b-1" in the current account
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-b-1" in the current account
+
+    Scenario: Delete an existing schedule
+        It  must be possible to regularly delete an existing schedule entity.
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
+        And I create the schedule "test-trigger-a-1-2" for the job "test-job-a-1" in the current account
+        Given I select account "account-b"
+        And A job named "test-job-b-1" in the current scope
+        And I create the schedule "test-trigger-b-1-1" for the job "test-job-b-1" in the current account
+        When I count the schedules in account "account-a"
+        Then There are exactly 2 schedules
+        When I delete the schedule "test-trigger-a-1-2" in account "account-a"
+        And I count the schedules in account "account-a"
+        Then There is exactly 1 schedule
+
+    Scenario: Delete a non existing schedule
+        Try to delete the same schedule twice. When deleting the second time, an exception must be raised.
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
+        And I create the schedule "test-trigger-a-1-2" for the job "test-job-a-1" in the current account
+        Given I select account "account-b"
+        And A job named "test-job-b-1" in the current scope
+        And I create the schedule "test-trigger-b-1-1" for the job "test-job-b-1" in the current account
+        When I count the schedules in account "account-a"
+        Then There are exactly 2 schedules
+        When I select the schedule "test-trigger-a-1-2" in account "account-a"
+        And I delete the selected schedule
+        When I count the schedules in account "account-a"
+        Then There is exactly 1 schedule
+        Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type schedule with id/name"
+        When I delete the selected schedule
+        Then An exception was thrown
