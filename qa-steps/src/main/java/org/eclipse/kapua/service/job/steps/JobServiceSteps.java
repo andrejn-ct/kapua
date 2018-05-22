@@ -324,8 +324,12 @@ public class JobServiceSteps extends BaseQATests {
         try {
             primeException();
             stepData.remove("LastTrigger");
+            stepData.remove("TriggerList");
             TriggerListResult trigLst = triggerService.query(trigQuery);
-            stepData.put("LastTrigger", trigLst.getFirstItem());
+            stepData.put("TriggerList", trigLst);
+            if (!trigLst.isEmpty()) {
+                stepData.put("LastTrigger", trigLst.getFirstItem());
+            }
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -427,6 +431,20 @@ public class JobServiceSteps extends BaseQATests {
             TriggerListResult trigLst = triggerService.query(trigQuery);
             Assert.assertNotEquals("The requested schedule was not found.", 0, trigLst.getSize());
             triggerService.delete(trigLst.getFirstItem().getScopeId(), trigLst.getFirstItem().getId());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I rename the selected schedule to \"(.+)\"$")
+    public void renameSelectedSchedule(String newName) throws Exception {
+
+        Trigger selectedTrigger = (Trigger) stepData.get("CurrentSchedule");
+
+        try {
+            primeException();
+            selectedTrigger.setName(newName);
+            triggerService.update(selectedTrigger);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
