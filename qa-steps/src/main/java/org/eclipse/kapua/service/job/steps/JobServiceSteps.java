@@ -239,7 +239,6 @@ public class JobServiceSteps extends BaseQATests {
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
         KapuaId parentId = (lastAcc != null) ? lastAcc.getScopeId() : ROOT_SCOPE_ID;
-
         Map<String, Object> valueMap = new HashMap<>();
 
         for (TestConfig config : testConfigs) {
@@ -291,7 +290,7 @@ public class JobServiceSteps extends BaseQATests {
         }
     }
 
-    @Given("^I create the schedule \"(.+)\" for the job \"(.+)\" in the current account$")
+    @When("^I create the schedule \"(.+)\" for the job \"(.+)\" in the current account$")
     public void createScheduleForJob(String scheduleName, String jobName)
             throws Exception {
 
