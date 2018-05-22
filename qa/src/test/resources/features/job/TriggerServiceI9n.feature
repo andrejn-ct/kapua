@@ -9,7 +9,7 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@serviceevents
+@jobschedules
 Feature: Job service tests
     Basic workflow of Job creation and deletion. These test scenarios check for integration issues with other services.
 
@@ -126,4 +126,31 @@ Feature: Job service tests
         Then There is exactly 1 schedule
         Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type schedule with id/name"
         When I delete the selected schedule
+        Then An exception was thrown
+
+    Scenario: Rename an existing schedule
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
+        Given I select the schedule "test-trigger-a-1-1" in the current account
+        When I rename the selected schedule to "NewName"
+        Then No exception was thrown
+        When I search for the schedule "NewName" in the current account
+        Then There is exactly 1 schedule
+        When I search for the schedule "test-trigger-a-1-1" in the current account
+        Then There is no such schedule
+
+    Scenario: Rename an inexistent schedule
+        An attempt to update an inexistent should result in an exception. For this purpose, a schedule is
+        first created and deleted. Updating this deleted schedule should throw an exception.
+
+        Given I select account "account-a"
+        And A job named "test-job-a-1" in the current scope
+        And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
+        And I create the schedule "test-trigger-a-1-2" for the job "test-job-a-1" in the current account
+        Given I select the schedule "test-trigger-a-1-2" in the current account
+        Then I delete the selected schedule
+        Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type schedule with id/name"
+        When I rename the selected schedule to "NewName"
         Then An exception was thrown
