@@ -234,7 +234,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     @ListenServiceEvent(fromAddress = "account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            // service bus error. Throw some exception?
+            LOGGER.warn("JobService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("JobService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
