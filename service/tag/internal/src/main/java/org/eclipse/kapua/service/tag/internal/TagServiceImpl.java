@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 @KapuaProvider
 public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Tag, TagCreator, TagService, TagListResult, TagQuery, TagFactory> implements TagService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TagServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
 
@@ -204,9 +204,9 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     @ListenServiceEvent(fromAddress = "account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            // service bus error. Throw some exception?
+            LOGGER.warn("TagService: Service bus error. Received null ServiceEvent");
         }
-        LOG.info("TagService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        LOGGER.info("TagService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteTagByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }

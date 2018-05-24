@@ -278,7 +278,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     @ListenServiceEvent(fromAddress = "account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            // service bus error. Throw some exception?
+            LOGGER.warn("UserService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {

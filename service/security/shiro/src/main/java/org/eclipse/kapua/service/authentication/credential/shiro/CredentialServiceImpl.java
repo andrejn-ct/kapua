@@ -396,7 +396,7 @@ public class CredentialServiceImpl extends AbstractKapuaConfigurableService impl
     @ListenServiceEvent(fromAddress="user")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            //service bus error. Throw some exception?
+            LOGGER.warn("CredentialService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("CredentialService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
