@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 @KapuaProvider
 public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Group, GroupCreator, GroupService, GroupListResult, GroupQuery, GroupFactory> implements GroupService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GroupServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
 
@@ -203,10 +203,10 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
     @ListenServiceEvent(fromAddress="account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            //service bus error. Throw some exception?
+            LOGGER.warn("GroupService: Service bus error. Received null ServiceEvent");
         }
 
-        LOG.info("GroupService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        LOGGER.info("GroupService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteGroupByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
