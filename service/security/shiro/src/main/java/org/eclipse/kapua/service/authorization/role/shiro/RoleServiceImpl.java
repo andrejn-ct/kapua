@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 @KapuaProvider
 public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<Role, RoleCreator, RoleService, RoleListResult, RoleQuery, RoleFactory> implements RoleService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RoleServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoleServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
 
@@ -239,9 +239,10 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             //service bus error. Throw some exception?
+            LOGGER.warn("RoleService: Service bus error. Received null ServiceEvent");
         }
 
-        LOG.info("RoleService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
+        LOGGER.info("RoleService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
             deleteRoleByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
