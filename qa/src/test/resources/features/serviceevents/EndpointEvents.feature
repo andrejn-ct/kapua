@@ -60,10 +60,9 @@ Feature: EndpointInfo service with Service Events
         Given I select account "account-b"
         Given I try to delete account "account-b"
         And I wait for 10 seconds
-        Given I expect the exception "KapuaException" with the text "Persistence Operation"
+        Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type account"
         When I query for endpoints in the current account
         Then An exception was thrown
-#        Then There is no such endpoint
         When I query for endpoints in account "account-a"
         Then There are exactly 3 endpoints
 
