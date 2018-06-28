@@ -39,6 +39,7 @@
         <module>stream</module>
         <module>tag</module>
         <module>user</module>
+        <module>eventlog</module>
 
     </modules>
 

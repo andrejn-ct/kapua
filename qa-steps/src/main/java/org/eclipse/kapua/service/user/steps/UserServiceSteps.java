@@ -50,9 +50,10 @@ import org.eclipse.kapua.service.authorization.steps.TestPermission;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserCreator;
 import org.eclipse.kapua.service.user.UserDomain;
+import org.eclipse.kapua.service.user.UserQuery;
 import org.eclipse.kapua.service.user.UserService;
 import org.eclipse.kapua.service.user.internal.UserFactoryImpl;
-
+import org.eclipse.kapua.service.user.internal.UserQueryImpl;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,8 +268,22 @@ public class UserServiceSteps extends BaseQATests {
         Assert.assertNull("The account still exists", stepData.get("Account"));
     }
 
+    @When("^I delete account \"(.*)\"$")
+    public void deleteAccount(String accountName) throws Exception {
+        Account accountToDelete;
+        primeException();
+        try {
+            accountToDelete = accountService.findByName(accountName);
+            if (accountToDelete != null) {
+                accountService.delete(accountToDelete.getScopeId(), accountToDelete.getId());
+            }
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @When("^I try to delete account \"(.*)\"$")
-    public void deleteAccount(String accountName) throws KapuaException {
+    public void tryToDeleteAccount(String accountName) throws KapuaException {
         Account accountToDelete;
         accountToDelete = accountService.findByName(accountName);
         if (accountToDelete != null) {
@@ -287,6 +302,39 @@ public class UserServiceSteps extends BaseQATests {
             if (userToDelete != null) {
                 userService.delete(userToDelete);
             }
+        } catch (KapuaException e) {
+            verifyException(e);
+        }
+    }
+
+    @When("I count the users in account \"(.+)\"")
+    public void countUsersInAccount(String accountName) throws Exception {
+
+        primeException();
+        try {
+            stepData.remove("Count");
+            Account targetAcc = accountService.findByName(accountName);
+            Assert.assertNotNull("The requested account doesn't exist.", targetAcc);
+            UserQuery usrQuery = new UserQueryImpl(targetAcc.getId());
+            long usrCount = userService.count(usrQuery);
+            stepData.put("Count", usrCount);
+        } catch (KapuaException e) {
+            verifyException(e);
+        }
+    }
+
+    @When("I count the users in the current account")
+    public void countUsersInTheCurrentAccount() throws Exception {
+
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        KapuaId scopeId = (tmpAcc != null) ? tmpAcc.getId() : ROOT_SCOPE_ID;
+
+        primeException();
+        try {
+            stepData.remove("Count");
+            UserQuery usrQuery = new UserQueryImpl(scopeId);
+            long usrCount = userService.count(usrQuery);
+            stepData.put("Count", usrCount);
         } catch (KapuaException e) {
             verifyException(e);
         }
