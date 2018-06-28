@@ -87,7 +87,8 @@ public class BasicSteps extends Assert {
 
     @Then("^I get (\\d+)$")
     public void checkCountResult(int num) {
-        assertEquals(num, (int) stepData.get("Count"));
+//        assertEquals(num, (int) stepData.get("Count"));
+        assertEquals(num, ((Long) stepData.get("Count")).longValue());
     }
 
     @Then("^I get the text \"(.+)\"$")
