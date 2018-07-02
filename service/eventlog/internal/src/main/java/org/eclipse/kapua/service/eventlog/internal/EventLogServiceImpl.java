@@ -13,7 +13,7 @@ package org.eclipse.kapua.service.eventlog.internal;
 
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
+import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableService;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
@@ -29,9 +29,7 @@ import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.eventlog.EventLog;
 import org.eclipse.kapua.service.eventlog.EventLogCreator;
-import org.eclipse.kapua.service.eventlog.EventLogFactory;
 import org.eclipse.kapua.service.eventlog.EventLogListResult;
-import org.eclipse.kapua.service.eventlog.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.EventLogService;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserService;
@@ -42,8 +40,7 @@ import org.slf4j.LoggerFactory;
  * {@link EventLogService} implementation.
  */
 @KapuaProvider
-public class EventLogServiceImpl extends AbstractKapuaConfigurableResourceLimitedService<EventLog, EventLogCreator, EventLogService, EventLogListResult, EventLogQuery, EventLogFactory> implements EventLogService {
-
+public class EventLogServiceImpl extends AbstractKapuaConfigurableService implements EventLogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogServiceImpl.class);
 
     private final KapuaLocator locator = KapuaLocator.getInstance();
@@ -56,7 +53,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableResourceLimite
      * Constructor
      */
     public EventLogServiceImpl() {
-        super(EventLogService.class.getName(), EVENT_LOG_DOMAIN, EventLogEntityManagerFactory.getInstance(), EventLogService.class, EventLogFactory.class);
+        super(EventLogService.class.getName(), EVENT_LOG_DOMAIN, EventLogEntityManagerFactory.getInstance());
     }
 
     @Override

@@ -17,25 +17,6 @@
 
         <Icon resource="OSGI-INF/user-service.png" size="32"/>
 
-        <AD id="infiniteChildEntities"
-            name="infiniteLogEntries"
-            type="Boolean"
-            cardinality="0"
-            required="true"
-            default="true"
-            description="Whether to allow infinite log entries for this account.">
-        </AD>
-
-        <AD id="maxNumberChildEntities"
-            name="maxNumberLogEntries"
-            type="Integer"
-            cardinality="0"
-            required="true"
-            default="0"
-            min="0"
-            description="Maximum number of log entries that are allowed to be created for this account.">
-        </AD>
-
     </OCD>
 
     <Designate pid="org.eclipse.kapua.service.eventlog.EventLogService">
