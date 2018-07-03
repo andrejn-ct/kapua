@@ -170,23 +170,25 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
     private void logReceivedEvent(ServiceEvent kapuaEvent) throws KapuaException {
 
-        //
-        // Retrieve the administrator (for the account id)
-        String adminUsername = SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_USERNAME);
-        User adminUser = userService.findByName(adminUsername);
+        KapuaSecurityUtils.doPrivileged(() -> {
+                //
+                // Retrieve the administrator (for the account id)
+                String adminUsername = SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_USERNAME);
+                User adminUser = userService.findByName(adminUsername);
 
-        //
-        // Prepare the event creator
-        EventLogCreator eventCreator = new EventLogCreatorImpl(adminUser.getScopeId());
-        eventCreator.setSourceName(kapuaEvent.getService());
-        eventCreator.setEventOperation(kapuaEvent.getOperation());
-        eventCreator.setContextId(kapuaEvent.getContextId());
-        eventCreator.setEntityScopeId(kapuaEvent.getScopeId());
-        eventCreator.setEntityId(kapuaEvent.getEntityId());
-        eventCreator.setEventSentOn(kapuaEvent.getTimestamp());
+                //
+                // Prepare the event creator
+                EventLogCreator eventCreator = new EventLogCreatorImpl(adminUser.getScopeId());
+                eventCreator.setSourceName(kapuaEvent.getService());
+                eventCreator.setEventOperation(kapuaEvent.getOperation());
+                eventCreator.setContextId(kapuaEvent.getContextId());
+                eventCreator.setEntityScopeId(kapuaEvent.getScopeId());
+                eventCreator.setEntityId(kapuaEvent.getEntityId());
+                eventCreator.setEventSentOn(kapuaEvent.getTimestamp());
 
-        //
-        // Do insert the event log entry
-        KapuaSecurityUtils.doPrivileged(() -> create(eventCreator));
+                //
+                // Do insert the event log entry
+                create(eventCreator);
+        });
     }
 }
