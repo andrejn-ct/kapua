@@ -134,9 +134,7 @@ public class JobServiceTestSteps extends AbstractKapuaSteps {
 
         // Inject mocked Authorization Service method checkPermission
         AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
-        // TODO: Check why does this line need an explicit cast!
-        Mockito.doNothing().when(mockedAuthorization).checkPermission(
-                (org.eclipse.kapua.service.authorization.permission.Permission) Matchers.any(Permission.class));
+        Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(Permission.class));
         mockLocator.setMockedService(AuthorizationService.class, mockedAuthorization);
 
         // Inject mocked Permission Factory
