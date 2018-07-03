@@ -29,7 +29,6 @@ import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.job.engine.JobEngineService;
 import org.eclipse.kapua.job.engine.jbatch.JobEngineServiceJbatch;
-import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.model.config.metatype.KapuaMetatypeFactory;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
@@ -89,9 +88,9 @@ public class JobServiceTestSteps extends AbstractKapuaSteps {
     private JobService jobService;
 
     // Interstep scratchpads
-    CommonData commonData;
-    JobData jobData;
-    StepData stepData;
+    private CommonData commonData;
+    private JobData jobData;
+    private StepData stepData;
 
     // Default constructor
     @Inject
@@ -116,10 +115,6 @@ public class JobServiceTestSteps extends AbstractKapuaSteps {
             throws Exception {
 
         commonData.scenario = scenario;
-        locator = KapuaLocator.getInstance();
-
-        jobFactory = locator.getFactory(JobFactory.class);
-        jobService = locator.getService(JobService.class);
 
         // Create User Service tables
         enableH2Connection();
