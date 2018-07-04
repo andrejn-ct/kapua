@@ -31,6 +31,7 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
 import org.eclipse.kapua.model.query.predicate.QueryPredicate;
+import org.eclipse.kapua.service.authentication.AuthenticationServicesConstants;
 import org.eclipse.kapua.service.authentication.credential.Credential;
 import org.eclipse.kapua.service.authentication.credential.CredentialCreator;
 import org.eclipse.kapua.service.authentication.credential.CredentialFactory;
@@ -377,9 +378,12 @@ public class CredentialServiceImpl extends AbstractKapuaConfigurableService impl
             LOGGER.warn("CredentialService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("CredentialService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (AuthenticationServicesConstants.USER_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthenticationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteCredentialByUserId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if (AuthenticationServicesConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthenticationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteCredentialByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

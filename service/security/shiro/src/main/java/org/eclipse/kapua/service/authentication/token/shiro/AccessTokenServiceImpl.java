@@ -24,6 +24,7 @@ import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
+import org.eclipse.kapua.service.authentication.AuthenticationServicesConstants;
 import org.eclipse.kapua.service.authentication.token.AccessToken;
 import org.eclipse.kapua.service.authentication.token.AccessTokenCreator;
 import org.eclipse.kapua.service.authentication.token.AccessTokenListResult;
@@ -242,9 +243,12 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
         }
 
         LOGGER.info("AccessTokenService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (AuthenticationServicesConstants.USER_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthenticationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteAccessTokenByUserId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if (AuthenticationServicesConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthenticationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteAccessTokenByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

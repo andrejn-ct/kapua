@@ -39,6 +39,7 @@ import org.eclipse.kapua.service.job.JobListResult;
 import org.eclipse.kapua.service.job.JobPredicates;
 import org.eclipse.kapua.service.job.JobQuery;
 import org.eclipse.kapua.service.job.JobService;
+import org.eclipse.kapua.service.job.JobServiceConstants;
 import org.eclipse.kapua.service.scheduler.trigger.Trigger;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerFactory;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerListResult;
@@ -235,7 +236,9 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
             LOGGER.warn("JobService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("JobService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (JobServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                JobServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteJobsByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

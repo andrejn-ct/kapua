@@ -33,6 +33,7 @@ import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DevicePredicates;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
+import org.eclipse.kapua.service.device.registry.RegistryServiceConstants;
 import org.eclipse.kapua.service.device.registry.common.DeviceValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,11 +179,15 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
             LOGGER.warn("DeviceRegistryService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("DeviceRegistryService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.authorization.group.GroupService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (RegistryServiceConstants.GROUP_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                RegistryServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             removeDevicesFromGroup(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if (RegistryServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                RegistryServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteDeviceByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("org.eclipse.kapua.service.tag.TagService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if (RegistryServiceConstants.TAG_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                RegistryServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             removeTagFromDevices(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

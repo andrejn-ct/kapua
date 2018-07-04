@@ -27,6 +27,7 @@ import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.QueryPredicate;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
+import org.eclipse.kapua.service.device.registry.RegistryServiceConstants;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionCreator;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionFactory;
@@ -45,9 +46,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 @KapuaProvider
-public class DeviceConnectionServiceImpl extends
-        //        AbstractKapuaConfigurableResourceLimitedService<DeviceConnection, DeviceConnectionCreator, DeviceConnectionService, DeviceConnectionListResult, DeviceConnectionQuery, DeviceConnectionFactory>
-        AbstractKapuaConfigurableService
+public class DeviceConnectionServiceImpl extends AbstractKapuaConfigurableService
         implements DeviceConnectionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceConnectionServiceImpl.class);
@@ -62,7 +61,6 @@ public class DeviceConnectionServiceImpl extends
     }
 
     public DeviceConnectionServiceImpl(DeviceEntityManagerFactory deviceEntityManagerFactory) {
-        //        super(DeviceConnectionService.class.getName(), DEVICE_CONNECTION_DOMAIN, deviceEntityManagerFactory, DeviceConnectionService.class, DeviceConnectionFactory.class);
         super(DeviceConnectionService.class.getName(), DEVICE_CONNECTION_DOMAIN, deviceEntityManagerFactory);
     }
 
@@ -209,7 +207,9 @@ public class DeviceConnectionServiceImpl extends
             LOGGER.warn("DeviceConnectionService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("DeviceConnectionService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (RegistryServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                RegistryServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteConnectionByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

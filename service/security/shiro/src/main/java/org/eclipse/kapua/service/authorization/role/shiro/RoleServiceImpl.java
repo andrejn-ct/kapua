@@ -29,6 +29,7 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
+import org.eclipse.kapua.service.authorization.AuthorizationServicesConstants;
 import org.eclipse.kapua.service.authorization.permission.Permission;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.authorization.permission.shiro.PermissionValidator;
@@ -242,9 +243,10 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
             //service bus error. Throw some exception?
             LOGGER.warn("RoleService: Service bus error. Received null ServiceEvent");
         }
-
         LOGGER.info("RoleService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (AuthorizationServicesConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthorizationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteRoleByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
