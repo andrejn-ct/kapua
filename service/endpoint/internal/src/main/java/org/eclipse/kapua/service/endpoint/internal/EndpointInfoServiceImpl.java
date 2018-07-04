@@ -42,6 +42,7 @@ import org.eclipse.kapua.service.endpoint.EndpointInfoListResult;
 import org.eclipse.kapua.service.endpoint.EndpointInfoAttributes;
 import org.eclipse.kapua.service.endpoint.EndpointInfoQuery;
 import org.eclipse.kapua.service.endpoint.EndpointInfoService;
+import org.eclipse.kapua.service.endpoint.EndpointInfoServiceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,7 +267,9 @@ public class EndpointInfoServiceImpl
             LOGGER.warn("EndpointInfoService: received null kapua event from account");
         }
         LOGGER.info("EndpointInfoService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (EndpointInfoServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                EndpointInfoServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteEndpointsByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

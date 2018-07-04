@@ -31,6 +31,7 @@ import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.scheduler.SchedulerDomains;
+import org.eclipse.kapua.service.scheduler.SchedulerServiceConstants;
 import org.eclipse.kapua.service.scheduler.trigger.Trigger;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerAttributes;
 import org.eclipse.kapua.service.scheduler.trigger.TriggerCreator;
@@ -300,7 +301,9 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
         }
         LOGGER.trace("TriggerService: received kapua {} event from {}, context {}",
                 kapuaEvent.getOperation(), kapuaEvent.getService(), kapuaEvent.getContextId());
-        if ("org.eclipse.kapua.service.job.JobService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (SchedulerServiceConstants.JOB_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                SchedulerServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteTriggersByJobId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
