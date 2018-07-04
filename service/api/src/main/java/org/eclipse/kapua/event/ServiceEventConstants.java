@@ -34,6 +34,17 @@ public class ServiceEventConstants {
 
     protected ServiceEventConstants() {}
 
+    /**
+     * Service event operations.
+     *
+     * These are the names of the methods that were invoked and that generated the events. The actual source
+     * service method names are used.
+     *
+     * Each service event object carries the name of the method that generated the event. This enables the event
+     * handler to correctly react to each event based on the exact operation type that was performed.
+     * It is imperative that the string literals are carefully aligned with the source service implementation.
+     * Each mistake here will result in the service event handler silently ignoring the events.
+     */
     public static final String OPERATION_CREATE = "create";
     public static final String OPERATION_UPDATE = "update";
     public static final String OPERATION_DELETE = "delete";
