@@ -322,12 +322,14 @@ public class EndpointInfoServiceImpl
     private void deleteEndpointsByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         EndpointInfoQuery query = new EndpointInfoQueryImpl(accountId);
-        EndpointInfoListResult toDelete = query(query);
 
-        for(EndpointInfo epi : toDelete.getItems()) {
-            if (epi.getScopeId().equals(id)) {
-                delete(epi.getScopeId(), epi.getId());
+        KapuaSecurityUtils.doPrivileged(()-> {
+            EndpointInfoListResult toDelete = query(query);
+            for (EndpointInfo epi : toDelete.getItems()) {
+                if (epi.getScopeId().equals(accountId)) {
+                    delete(epi.getScopeId(), epi.getId());
+                }
             }
-        }
+        });
     }
 }

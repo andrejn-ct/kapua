@@ -258,7 +258,7 @@ public class JobServiceSteps extends BaseQATests {
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();
@@ -277,7 +277,7 @@ public class JobServiceSteps extends BaseQATests {
         Account tgtAcc = accountService.findByName(accountName);
         Assert.assertNotNull("The requested account was not found!", tgtAcc);
         TriggerQuery trigQuery = triggerFactory.newQuery(tgtAcc.getId());
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();
@@ -340,7 +340,7 @@ public class JobServiceSteps extends BaseQATests {
 
         Account tgtAcc = accountService.findByName(accountName);
         TriggerQuery trigQuery = triggerFactory.newQuery(tgtAcc.getId());
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();
@@ -406,7 +406,7 @@ public class JobServiceSteps extends BaseQATests {
         Account lastAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (lastAcc != null) ? lastAcc.getId() : ROOT_SCOPE_ID;
         TriggerQuery trigQuery = triggerFactory.newQuery(scopeId);
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();
@@ -424,7 +424,7 @@ public class JobServiceSteps extends BaseQATests {
         Account tmpAcc = accountService.findByName(accountName);
         Assert.assertNotNull("The requested account was not found.", tmpAcc);
         TriggerQuery trigQuery = triggerFactory.newQuery(tmpAcc.getId());
-        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerPredicates.NAME, scheduleName));
+        trigQuery.setPredicate(new AttributePredicateImpl<>(TriggerAttributes.NAME, scheduleName));
 
         try {
             primeException();

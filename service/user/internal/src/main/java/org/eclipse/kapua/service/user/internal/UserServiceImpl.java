@@ -315,10 +315,12 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
 
     private void deleteUserByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
         UserQuery query = new UserQueryImpl(accountId);
-        UserListResult usersToDelete = query(query);
 
-        for (User u : usersToDelete.getItems()) {
-            delete(u.getScopeId(), u.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            UserListResult usersToDelete = query(query);
+            for (User u : usersToDelete.getItems()) {
+                delete(u.getScopeId(), u.getId());
+            }
+        });
     }
 }
