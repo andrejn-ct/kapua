@@ -18,6 +18,9 @@ import org.eclipse.kapua.KapuaErrorCodes;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
+import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
+import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
@@ -338,10 +341,11 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
                 .and(new AttributePredicateImpl<>(TriggerAttributes.TRIGGER_PROPERTIES_TYPE, KapuaId.class.getName()));
         query.setPredicate(andPredicate);
 
-        TriggerListResult triggersToDelete = query(query);
-
-        for (Trigger td : triggersToDelete.getItems()) {
-            delete(td.getScopeId(), td.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            TriggerListResult triggersToDelete = query(query);
+            for (Trigger td : triggersToDelete.getItems()) {
+                delete(td.getScopeId(), td.getId());
+            }
+        });
     }
 }

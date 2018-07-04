@@ -598,7 +598,7 @@ public class DeviceServiceSteps extends BaseQATests {
 
         Account currAccount = (Account) stepData.get("LastAccount");
         TagQuery tagQuery = tagFactory.newQuery(currAccount.getId());
-        tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName));
+        tagQuery.setPredicate(tagQuery.attributePredicate(TagAttributes.NAME, deviceTagName));
 
         TagListResult tmpList = tagService.query(tagQuery);
 
@@ -611,7 +611,7 @@ public class DeviceServiceSteps extends BaseQATests {
         Account currAccount = (Account) stepData.get("LastAccount");
         Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
         GroupQuery tmpQuery = groupFactory.newQuery(currAccount.getId());
-        tmpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        tmpQuery.setPredicate(tmpQuery.attributePredicate(GroupAttributes.NAME, groupName));
         Group targetGroup = groupService.query(tmpQuery).getFirstItem();
 
         try {
@@ -643,10 +643,10 @@ public class DeviceServiceSteps extends BaseQATests {
 
         Account currAccount = (Account) stepData.get("LastAccount");
         GroupQuery grpQuery = groupFactory.newQuery(currAccount.getId());
-        grpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        grpQuery.setPredicate(grpQuery.attributePredicate(GroupAttributes.NAME, groupName));
         Group targetGroup = groupService.query(grpQuery).getFirstItem();
         DeviceQuery devQuery = deviceFactory.newQuery(currAccount.getId());
-        devQuery.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.GROUP_ID, targetGroup.getId()));
+        devQuery.setPredicate(devQuery.attributePredicate(DeviceAttributes.GROUP_ID, targetGroup.getId()));
 
         stepData.remove("DeviceList");
         DeviceListResult devicesInGroup = deviceRegistryService.query(devQuery);
@@ -659,7 +659,7 @@ public class DeviceServiceSteps extends BaseQATests {
         Account currAccount = (Account) stepData.get("LastAccount");
         Device targetDevice = deviceRegistryService.findByClientId(currAccount.getId(), deviceName);
         GroupQuery grpQuery = groupFactory.newQuery(currAccount.getId());
-        grpQuery.setPredicate(new AttributePredicateImpl<>(GroupAttributes.NAME, groupName));
+        grpQuery.setPredicate(grpQuery.attributePredicate(GroupAttributes.NAME, groupName));
         Group targetGroup = groupService.query(grpQuery).getFirstItem();
 
         Assert.assertNotNull("Group does not exist!", targetGroup);

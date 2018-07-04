@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.device.registry.connection.internal;
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableService;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
@@ -230,14 +231,14 @@ public class DeviceConnectionServiceImpl extends AbstractKapuaConfigurableServic
     private void deleteConnectionByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
         KapuaLocator locator = KapuaLocator.getInstance();
         DeviceConnectionFactory deviceConnectionFactory = locator.getFactory(DeviceConnectionFactory.class);
-
         DeviceConnectionQuery query = deviceConnectionFactory.newQuery(accountId);
 
-        DeviceConnectionListResult deviceConnectionsToDelete = query(query);
-
-        for (DeviceConnection dc : deviceConnectionsToDelete.getItems()) {
-            delete(dc.getScopeId(), dc.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            DeviceConnectionListResult deviceConnectionsToDelete = query(query);
+            for (DeviceConnection dc : deviceConnectionsToDelete.getItems()) {
+                delete(dc.getScopeId(), dc.getId());
+            }
+        });
     }
 
 }
