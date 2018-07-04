@@ -14,19 +14,8 @@ package org.eclipse.kapua.event;
 /**
  * Service Event constants
  *
- * This is a base class that contains the common constants that are used by all service event listeners
- *
- * Each service that listens to service events must extend this class and add a list of constants
- * defining the class names of the event source services.
- *
- * This base class defines all the applicable operation names. This is, these are the names of the methods
- * that were invoked and that generated the events. The actual source service method names are used.
- *
- * Each service event object carries the name of the method that generated the event. This enables the event
- * handler to correctly react to each event based on the exact operation type that was performed.
- * It is imperative that the string literals are carefully aligned with the source service implementation.
- * Each mistake here will result in the service event handler silently ignoring the events.
- *
+ * This is a helper class that contains the common constants that are used by all service event listeners
+ * 
  * @since 1.0
  *
  */
