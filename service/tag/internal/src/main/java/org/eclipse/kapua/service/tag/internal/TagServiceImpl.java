@@ -37,6 +37,7 @@ import org.eclipse.kapua.service.tag.TagFactory;
 import org.eclipse.kapua.service.tag.TagListResult;
 import org.eclipse.kapua.service.tag.TagQuery;
 import org.eclipse.kapua.service.tag.TagService;
+import org.eclipse.kapua.service.tag.TagServiceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +208,9 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
             LOGGER.warn("TagService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("TagService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (TagServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                TagServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteTagByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

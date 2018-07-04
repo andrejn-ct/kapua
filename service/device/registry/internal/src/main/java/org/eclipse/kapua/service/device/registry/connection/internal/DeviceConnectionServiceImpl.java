@@ -26,6 +26,7 @@ import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.device.registry.DeviceDomains;
+import org.eclipse.kapua.service.device.registry.RegistryServiceConstants;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionAttributes;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionCreator;
@@ -53,7 +54,6 @@ public class DeviceConnectionServiceImpl extends AbstractKapuaConfigurableServic
     }
 
     public DeviceConnectionServiceImpl(DeviceEntityManagerFactory deviceEntityManagerFactory) {
-        //        super(DeviceConnectionService.class.getName(), DEVICE_CONNECTION_DOMAIN, deviceEntityManagerFactory, DeviceConnectionService.class, DeviceConnectionFactory.class);
         super(DeviceConnectionService.class.getName(), DeviceDomains.DEVICE_CONNECTION_DOMAIN, deviceEntityManagerFactory);
     }
 
@@ -217,7 +217,9 @@ public class DeviceConnectionServiceImpl extends AbstractKapuaConfigurableServic
             LOGGER.warn("DeviceConnectionService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("DeviceConnectionService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (RegistryServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                RegistryServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteConnectionByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
