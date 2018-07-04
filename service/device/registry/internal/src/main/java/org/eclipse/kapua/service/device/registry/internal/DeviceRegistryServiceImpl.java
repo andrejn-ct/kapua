@@ -18,6 +18,7 @@ import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.KapuaMaxNumberOfItemsReachedException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
@@ -172,12 +173,13 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
         DeviceQuery query = deviceFactory.newQuery(scopeId);
         query.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.GROUP_ID, groupId));
 
-        DeviceListResult devicesToRemove = query(query);
-
-        for (Device d : devicesToRemove.getItems()) {
-            d.setGroupId(null);
-            update(d);
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            DeviceListResult devicesToRemove = query(query);
+            for (Device d : devicesToRemove.getItems()) {
+                d.setGroupId(null);
+                update(d);
+            }
+        });
     }
 
     private void deleteDeviceByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
@@ -185,11 +187,12 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
         DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
         DeviceQuery query = deviceFactory.newQuery(accountId);
 
-        DeviceListResult devicesToDelete = query(query);
-
-        for (Device d : devicesToDelete.getItems()) {
-            delete(d.getScopeId(), d.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            DeviceListResult devicesToDelete = query(query);
+            for (Device d : devicesToDelete.getItems()) {
+                delete(d.getScopeId(), d.getId());
+            }
+        });
     }
 
     private void removeTagFromDevices(KapuaId scopeId, KapuaId tagId)
@@ -199,12 +202,13 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
         DeviceQuery query = deviceFactory.newQuery(scopeId);
         query.setPredicate(new AttributePredicateImpl<>(DeviceAttributes.TAG_IDS, tagId));
 
-        DeviceListResult devicesToUpdate = query(query);
-
-        for (Device d : devicesToUpdate.getItems()) {
-            Device tmpDev = stripTagIdFromDevice(d, tagId);
-            update(tmpDev);
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            DeviceListResult devicesToUpdate = query(query);
+            for (Device d : devicesToUpdate.getItems()) {
+                Device tmpDev = stripTagIdFromDevice(d, tagId);
+                update(tmpDev);
+            }
+        });
     }
 
     private Device stripTagIdFromDevice(Device dev, KapuaId tagId) {
