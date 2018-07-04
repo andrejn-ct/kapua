@@ -43,6 +43,7 @@ import org.eclipse.kapua.service.user.UserListResult;
 import org.eclipse.kapua.service.user.UserAttributes;
 import org.eclipse.kapua.service.user.UserQuery;
 import org.eclipse.kapua.service.user.UserService;
+import org.eclipse.kapua.service.user.UserServiceConstants;
 import org.eclipse.kapua.service.user.UserStatus;
 import org.eclipse.kapua.service.user.UserType;
 import org.slf4j.Logger;
@@ -281,7 +282,9 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
             LOGGER.warn("UserService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (UserServiceConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                UserServiceConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteUserByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }

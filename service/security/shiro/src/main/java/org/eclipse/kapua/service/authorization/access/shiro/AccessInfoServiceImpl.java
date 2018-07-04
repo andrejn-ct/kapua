@@ -27,6 +27,7 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.service.authorization.AuthorizationDomains;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
+import org.eclipse.kapua.service.authorization.AuthorizationServicesConstants;
 import org.eclipse.kapua.service.authorization.access.AccessInfo;
 import org.eclipse.kapua.service.authorization.access.AccessInfoAttributes;
 import org.eclipse.kapua.service.authorization.access.AccessInfoCreator;
@@ -234,9 +235,12 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
             LOGGER.warn("AccessInfoService: Service bus error. Received null ServiceEvent");
         }
         LOGGER.info("AccessInfoService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.user.UserService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (AuthorizationServicesConstants.USER_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthorizationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteAccessInfoByUserId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
-        } else if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+        } else if (AuthorizationServicesConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthorizationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteAccessInfoByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
