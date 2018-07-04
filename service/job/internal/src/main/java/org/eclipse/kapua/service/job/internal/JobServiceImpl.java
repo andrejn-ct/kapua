@@ -251,11 +251,13 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     private void deleteJobsByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         JobQuery query = new JobQueryImpl(accountId);
-        JobListResult jobsToDelete = query(query);
 
-        for (Job j : jobsToDelete.getItems()) {
-            delete(j.getScopeId(), j.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            JobListResult jobsToDelete = query(query);
+            for (Job j : jobsToDelete.getItems()) {
+                delete(j.getScopeId(), j.getId());
+            }
+        });
     }
 
 }

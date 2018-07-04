@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.authorization.access.shiro;
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.jpa.AbstractEntityManagerFactory;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
@@ -251,11 +252,12 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
         AccessInfoQuery query = accessInfoFactory.newQuery(scopeId);
         query.setPredicate(query.attributePredicate(AccessInfoAttributes.USER_ID, userId));
 
-        AccessInfoListResult accessInfosToDelete = query(query);
-
-        for (AccessInfo at : accessInfosToDelete.getItems()) {
-            delete(at.getScopeId(), at.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            AccessInfoListResult accessInfosToDelete = query(query);
+            for (AccessInfo at : accessInfosToDelete.getItems()) {
+                delete(at.getScopeId(), at.getId());
+            }
+        });
     }
 
     private void deleteAccessInfoByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
@@ -263,10 +265,11 @@ public class AccessInfoServiceImpl extends AbstractKapuaService implements Acces
         AccessInfoFactory accessInfoFactory = KapuaLocator.getInstance().getFactory(AccessInfoFactory.class);
         AccessInfoQuery query = accessInfoFactory.newQuery(accountId);
 
-        AccessInfoListResult accessInfosToDelete = query(query);
-
-        for (AccessInfo at : accessInfosToDelete.getItems()) {
-            delete(at.getScopeId(), at.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            AccessInfoListResult accessInfosToDelete = query(query);
+            for (AccessInfo at : accessInfosToDelete.getItems()) {
+                delete(at.getScopeId(), at.getId());
+            }
+        });
     }
 }
