@@ -29,6 +29,7 @@ import org.eclipse.kapua.model.query.KapuaQuery;
 import org.eclipse.kapua.model.query.predicate.AttributePredicate.Operator;
 import org.eclipse.kapua.service.authorization.AuthorizationDomains;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
+import org.eclipse.kapua.service.authorization.AuthorizationServicesConstants;
 import org.eclipse.kapua.service.authorization.group.Group;
 import org.eclipse.kapua.service.authorization.group.GroupAttributes;
 import org.eclipse.kapua.service.authorization.group.GroupCreator;
@@ -206,9 +207,10 @@ public class GroupServiceImpl extends AbstractKapuaConfigurableResourceLimitedSe
         if (kapuaEvent == null) {
             LOGGER.warn("GroupService: Service bus error. Received null ServiceEvent");
         }
-
         LOGGER.info("GroupService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
-        if ("org.eclipse.kapua.service.account.AccountService".equals(kapuaEvent.getService()) && "delete".equals(kapuaEvent.getOperation())) {
+
+        if (AuthorizationServicesConstants.ACCOUNT_SERVICE_NAME.equals(kapuaEvent.getService()) &&
+                AuthorizationServicesConstants.OPERATION_DELETE.equals(kapuaEvent.getOperation())) {
             deleteGroupByAccountId(kapuaEvent.getScopeId(), kapuaEvent.getEntityId());
         }
     }
