@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.authentication.token.shiro;
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
@@ -259,21 +260,23 @@ public class AccessTokenServiceImpl extends AbstractKapuaService implements Acce
         AccessTokenQuery query = new AccessTokenQueryImpl(scopeId);
         query.setPredicate(new AttributePredicateImpl<>(AccessTokenPredicates.USER_ID, userId));
 
-        AccessTokenListResult accessTokensToDelete = query(query);
-
-        for (AccessToken at : accessTokensToDelete.getItems()) {
-            delete(at.getScopeId(), at.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            AccessTokenListResult accessTokensToDelete = query(query);
+            for (AccessToken at : accessTokensToDelete.getItems()) {
+                delete(at.getScopeId(), at.getId());
+            }
+        });
     }
 
     private void deleteAccessTokenByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         AccessTokenQuery query = new AccessTokenQueryImpl(accountId);
 
-        AccessTokenListResult accessTokensToDelete = query(query);
-
-        for (AccessToken at : accessTokensToDelete.getItems()) {
-            delete(at.getScopeId(), at.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            AccessTokenListResult accessTokensToDelete = query(query);
+            for (AccessToken at : accessTokensToDelete.getItems()) {
+                delete(at.getScopeId(), at.getId());
+            }
+        });
     }
 }

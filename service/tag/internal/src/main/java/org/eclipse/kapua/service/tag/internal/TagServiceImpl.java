@@ -18,6 +18,7 @@ import org.eclipse.kapua.KapuaIllegalArgumentException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
 import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.RaiseServiceEvent;
@@ -221,10 +222,12 @@ public class TagServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
 
         TagFactory tagFactory = KapuaLocator.getInstance().getFactory(TagFactory.class);
         TagQuery query = tagFactory.newQuery(accountId);
-        TagListResult tagsToDelete = query(query);
 
-        for (Tag tag : tagsToDelete.getItems()) {
-            delete(tag.getScopeId(), tag.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            TagListResult tagsToDelete = query(query);
+            for (Tag tag : tagsToDelete.getItems()) {
+                delete(tag.getScopeId(), tag.getId());
+            }
+        });
     }
 }

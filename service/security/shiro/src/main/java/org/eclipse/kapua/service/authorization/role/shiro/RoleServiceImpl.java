@@ -18,6 +18,7 @@ import org.eclipse.kapua.KapuaIllegalArgumentException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
 import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
+import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
@@ -257,10 +258,12 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     private void deleteRoleByAccountId(KapuaId scopeId, KapuaId accountId) throws KapuaException {
 
         RoleQuery query = new RoleQueryImpl(accountId);
-        RoleListResult rolesToDelete = query(query);
 
-        for (Role r : rolesToDelete.getItems()) {
-            delete(r.getScopeId(), r.getId());
-        }
+        KapuaSecurityUtils.doPrivileged(()-> {
+            RoleListResult rolesToDelete = query(query);
+            for (Role r : rolesToDelete.getItems()) {
+                delete(r.getScopeId(), r.getId());
+            }
+        });
     }
 }
