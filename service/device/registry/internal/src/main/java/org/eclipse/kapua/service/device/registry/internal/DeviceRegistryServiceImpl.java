@@ -20,6 +20,7 @@ import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResource
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.id.KapuaId;
@@ -150,6 +151,7 @@ public class DeviceRegistryServiceImpl extends AbstractKapuaConfigurableResource
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("DeviceRegistryService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("DeviceRegistryService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
 
