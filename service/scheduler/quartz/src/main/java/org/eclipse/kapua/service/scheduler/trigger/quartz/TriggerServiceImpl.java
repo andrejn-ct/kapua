@@ -22,6 +22,7 @@ import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -296,8 +297,8 @@ public class TriggerServiceImpl extends AbstractKapuaConfigurableResourceLimited
     @ListenServiceEvent(fromAddress = "job")
     public void onKapuaJobEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            LOGGER.warn("TriggerService: received null kapua event from job");
-            return;
+            LOGGER.warn("TriggerService: Service bus error. Received null ServiceEvent.");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.trace("TriggerService: received kapua {} event from {}, context {}",
                 kapuaEvent.getOperation(), kapuaEvent.getService(), kapuaEvent.getContextId());
