@@ -22,6 +22,7 @@ import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -240,8 +241,8 @@ public class RoleServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     @ListenServiceEvent(fromAddress="account")
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
-            //service bus error. Throw some exception?
             LOGGER.warn("RoleService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("RoleService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
 
