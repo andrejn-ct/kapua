@@ -24,6 +24,7 @@ import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.commons.util.KapuaExceptionUtils;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -399,6 +400,7 @@ public class CredentialServiceImpl extends AbstractKapuaConfigurableService impl
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("CredentialService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("CredentialService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
 

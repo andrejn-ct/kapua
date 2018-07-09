@@ -28,6 +28,7 @@ import org.eclipse.kapua.commons.util.CommonsValidationRegex;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -280,6 +281,7 @@ public class UserServiceImpl extends AbstractKapuaConfigurableResourceLimitedSer
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("UserService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("UserService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
 

@@ -20,6 +20,7 @@ import org.eclipse.kapua.commons.model.query.predicate.AndPredicateImpl;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.job.engine.JobEngineService;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.RaiseServiceEvent;
@@ -235,6 +236,7 @@ public class JobServiceImpl extends AbstractKapuaConfigurableResourceLimitedServ
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("JobService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("JobService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
 
