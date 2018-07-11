@@ -13,6 +13,7 @@ package org.eclipse.kapua.service.eventlog;
 
 import org.eclipse.kapua.model.KapuaEntity;
 import org.eclipse.kapua.model.id.KapuaId;
+import org.eclipse.kapua.model.id.KapuaIdAdapter;
 import org.eclipse.kapua.model.xml.DateXmlAdapter;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -70,6 +71,7 @@ public interface EventLog extends KapuaEntity {
      * @return
      */
     @XmlElement(name = "entityScopeId")
+    @XmlJavaTypeAdapter(KapuaIdAdapter.class)
     KapuaId getEntityScopeId();
 
     /**
@@ -85,6 +87,7 @@ public interface EventLog extends KapuaEntity {
      * @return
      */
     @XmlElement(name = "entityId")
+    @XmlJavaTypeAdapter(KapuaIdAdapter.class)
     KapuaId getEntityId();
 
     /**
