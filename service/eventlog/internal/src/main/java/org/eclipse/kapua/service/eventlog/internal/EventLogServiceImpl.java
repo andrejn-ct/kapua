@@ -20,6 +20,7 @@ import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
 import org.eclipse.kapua.event.ListenServiceEvent;
 import org.eclipse.kapua.event.ServiceEvent;
+import org.eclipse.kapua.event.ServiceEventBusException;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
@@ -60,12 +61,12 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
     public EventLog create(EventLogCreator eventLogCreator) throws KapuaException {
         //
         // Argument Validation
-        ArgumentValidator.notNull(eventLogCreator.getScopeId().getId(), "eventLogCreator.scopeId");
+        ArgumentValidator.notNull(eventLogCreator.getScopeId(), "eventLogCreator.scopeId");
         ArgumentValidator.notEmptyOrNull(eventLogCreator.getSourceName(), "eventLogCreator.sourceName");
         ArgumentValidator.notEmptyOrNull(eventLogCreator.getContextId(), "eventLogCreator.contextId");
         ArgumentValidator.notEmptyOrNull(eventLogCreator.getEventOperation(), "eventLogCreator.eventOperation");
-        ArgumentValidator.notNull(eventLogCreator.getEntityScopeId().getId(), "eventLogCreator.entityScopeId");
-        ArgumentValidator.notNull(eventLogCreator.getEntityId().getId(), "eventLogCreator.entityId");
+        ArgumentValidator.notNull(eventLogCreator.getEntityScopeId(), "eventLogCreator.entityScopeId");
+        ArgumentValidator.notNull(eventLogCreator.getEntityId(), "eventLogCreator.entityId");
         ArgumentValidator.notNull(eventLogCreator.getEventSentOn(), "eventLogCreator.eventSentOn");
 
         //
@@ -93,7 +94,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
         // Check existence
         EventLog eventLog = find(scopeId, eventLogId);
         if (eventLog == null) {
-            throw new KapuaEntityNotFoundException(eventLog.TYPE, eventLogId);
+            throw new KapuaEntityNotFoundException(EventLog.TYPE, eventLogId);
         }
 
         //
@@ -157,6 +158,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
     public void onKapuaEvent(ServiceEvent kapuaEvent) throws KapuaException {
         if (kapuaEvent == null) {
             LOGGER.warn("EventLogService: Service bus error. Received null ServiceEvent");
+            throw new ServiceEventBusException("Service bus error. Received null ServiceEvent.");
         }
         LOGGER.info("EventLogService: received kapua event from {}, operation {}", kapuaEvent.getService(), kapuaEvent.getOperation());
         logReceivedEvent(kapuaEvent);
