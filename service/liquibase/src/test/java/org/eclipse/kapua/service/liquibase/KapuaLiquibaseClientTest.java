@@ -34,7 +34,7 @@ public class KapuaLiquibaseClientTest {
 
     @Before
     public void start() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL", "", "");
+        connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "");
     }
 
     @After
@@ -50,10 +50,10 @@ public class KapuaLiquibaseClientTest {
         System.setProperty("LIQUIBASE_ENABLED", "true");
 
         // When
-        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "", "").update();
+        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "").update();
 
         // Then
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL", "", "");
+        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "");
         ResultSet sqlResults = connection.prepareStatement("SHOW TABLES").executeQuery();
         List<String> tables = new LinkedList<>();
         while (sqlResults.next()) {
@@ -68,11 +68,11 @@ public class KapuaLiquibaseClientTest {
         System.setProperty("LIQUIBASE_ENABLED", "true");
 
         // When
-        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "", "").update();
-        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "", "").update();
+        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "").update();
+        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "").update();
 
         // Then
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL", "", "");
+        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "");
         ResultSet sqlResults = connection.prepareStatement("SHOW TABLES").executeQuery();
         List<String> tables = new LinkedList<>();
         while (sqlResults.next()) {
@@ -84,12 +84,12 @@ public class KapuaLiquibaseClientTest {
     @Test
     public void shouldSkipDatabaseUpdate() throws Exception {
         // Given
-        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL", "", "");
+        Connection connection = DriverManager.getConnection("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "");
         connection.prepareStatement("DROP TABLE IF EXISTS DATABASECHANGELOG").execute();
         System.setProperty("LIQUIBASE_ENABLED", "false");
 
         // When
-        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "", "").update();
+        new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "").update();
 
         // Then
         ResultSet sqlResults = connection.prepareStatement("SHOW TABLES").executeQuery();
@@ -103,7 +103,7 @@ public class KapuaLiquibaseClientTest {
 
         // When
         try {
-            new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL", "", "", Optional.of("foo")).update();
+            new KapuaLiquibaseClient("jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1", "", "", Optional.of("foo")).update();
         } catch (Exception e) {
             // Then
             Assertions.assertThat(e).hasMessageContaining("Schema \"FOO\" not found");

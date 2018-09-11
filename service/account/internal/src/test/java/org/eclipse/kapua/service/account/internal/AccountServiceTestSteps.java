@@ -182,7 +182,7 @@ public class AccountServiceTestSteps extends AbstractKapuaSteps {
         exceptionMessage = "";
         exceptionCaught = false;
 
-        // Create User Service tables
+        // Create User Service tables"jdbc:h2:mem:kapua;MODE=MySQL;DB_CLOSE_DELAY=-1"
         enableH2Connection();
         SystemSetting config = SystemSetting.getInstance();
         String schema = MoreObjects.firstNonNull(config.getString(SystemSettingKey.DB_SCHEMA_ENV), config.getString(SystemSettingKey.DB_SCHEMA));
