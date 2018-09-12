@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/JobEventsI9n",
                 "json:target/JobEventsI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true)
 public class RunJobServiceEventsTest {
 }

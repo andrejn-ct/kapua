@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/EndpointEventsI9n",
                 "json:target/EndpointEventsI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true)
 public class RunEndpointInfoServiceEventsTest {
 }

@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
                   "html:target/cucumber/DeviceBrokerIpUndefinedI9n",
                   "json:target/DeviceBrokerIpUndefinedI9n_cucumber.json"
                  },
+        strict = true,
         monochrome = true )
 @CucumberProperty(key="broker.ip", value="")
 @CucumberProperty(key="kapua.config.url", value="")

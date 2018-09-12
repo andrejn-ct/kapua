@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/JobServiceI9n",
                 "json:target/JobServiceI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true )
 @CucumberProperty(key="org.eclipse.kapua.qa.broker.extraStartupDelay", value="5")
 public class RunJobI9nTest {}

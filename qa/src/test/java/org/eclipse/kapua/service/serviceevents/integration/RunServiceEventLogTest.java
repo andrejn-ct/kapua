@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/EventLogsI9n",
                 "json:target/EventLogsI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true)
 public class RunServiceEventLogTest {
 }

@@ -27,5 +27,6 @@ import org.junit.runner.RunWith;
                   "html:target/cucumber/AccountServiceI9n",
                   "json:target/AccountServiceI9n_cucumber.json"
                  },
+        strict = true,
         monochrome=true)
 public class RunAccountServiceI9nTest {}

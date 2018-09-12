@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
         plugin = {"pretty",
                 "html:target/cucumber/DatastoreRestI9n",
                 "json:target/DatastoreRestI9n_cucumber.json" },
+        strict = true,
         monochrome = true)
 @CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
 @CucumberProperty(key="org.eclipse.kapua.qa.datastore.extraStartupDelay", value="25")

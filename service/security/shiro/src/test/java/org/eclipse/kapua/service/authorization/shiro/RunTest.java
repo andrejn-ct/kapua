@@ -23,8 +23,10 @@ import cucumber.api.CucumberOptions;
         plugin = { "pretty",
                 "html:target/cucumber",
                 "json:target/cucumber.json" },
+        strict = true,
         monochrome = true)
 @CucumberProperty(key="commons.db.schema", value="kapuadb")
 @CucumberProperty(key="commons.db.schema.update", value="true")
+
 public class RunTest {
 }

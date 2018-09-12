@@ -28,5 +28,6 @@ import cucumber.api.CucumberOptions;
                   "html:target/cucumber/UserServiceI9n",
                   "json:target/UserServiceI9n_cucumber.json"
                  },
+        strict = true,
         monochrome=true)
 public class RunUserServiceI9nTest {}

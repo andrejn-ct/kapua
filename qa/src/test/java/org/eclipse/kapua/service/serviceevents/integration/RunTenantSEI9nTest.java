@@ -30,5 +30,6 @@ import org.junit.runner.RunWith;
                   "html:target/cucumber/TenantSEI9n",
                   "json:target/TenantSEI9n_cucumber.json"
                  },
+        strict = true,
         monochrome=true)
 public class RunTenantSEI9nTest {}
