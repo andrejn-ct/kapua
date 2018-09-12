@@ -35,11 +35,15 @@ import org.eclipse.kapua.service.eventlog.EventLogListResult;
 import org.eclipse.kapua.service.eventlog.EventLogAttributes;
 import org.eclipse.kapua.service.eventlog.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.EventLogService;
+import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of Gherkin steps used in TagService.feature scenarios.
@@ -93,6 +97,26 @@ public class EventLogServiceSteps extends BaseQATests {
 /**
  * Implementation of cucumber scenario steps
  */
+
+    @When("^I query for all event logs$")
+    public void queryForAllEventLogs() throws Exception {
+
+        EventLogQuery tmpQuery = eventLogFactory.newQuery(ROOT_SCOPE_ID);
+
+        try {
+            primeException();
+            stepData.remove("EventLog");
+            stepData.remove("EventLogList");
+            EventLogListResult el = eventLogService.query(tmpQuery);
+            stepData.put("EventLogList", el);
+            if (!el.isEmpty()) {
+                stepData.put("EventLog", el.getFirstItem());
+            }
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     @When("^I query for events for account \"(.+)\"$")
     public void queryForEventsInAccount(String account) throws Exception {
 
@@ -150,5 +174,22 @@ public class EventLogServiceSteps extends BaseQATests {
 
         EventLogListResult el = (EventLogListResult) stepData.get("EventLogList");
         Assert.assertEquals("Wrong number of event logs!", num, el.getSize());
+    }
+
+    @When("^I configure the event logging service$")
+    public void setEventLoggerServiceConfig(List<TestConfig> testConfigs)
+            throws Exception {
+
+        Map<String, Object> valueMap = new HashMap<>();
+        for (TestConfig config : testConfigs) {
+            config.addConfigToMap(valueMap);
+        }
+
+        primeException();
+        try {
+            eventLogService.setConfigValues(ROOT_SCOPE_ID, ROOT_SCOPE_ID, valueMap);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
     }
 }

@@ -67,5 +67,67 @@ Feature: Tests for service event logging
         When I query for events for the current account
         Then There are exactly 3 event log entries
 
+    Scenario: Event logging is disabled
+        No log entries should be created even in case of service events being triggered.
+
+        Given I select account "account-a"
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-a-1 | Kapua User A 1 | kapua_a_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-2 | Kapua User A 2 | kapua_a_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-3 | Kapua User A 3 | kapua_a_3@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        When I count the users in account "account-a"
+        Then I get 3
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | boolean | eventLoggingEnabled    | false |
+        When I delete account "account-a"
+        And I wait 5 seconds
+        When I count the users in the current account
+        Then I get 0
+        When I query for events for the current account
+        Then There are exactly 0 event log entries
+
+    Scenario: Toggling event logging at run time
+        The test is conducted in two phases. First event logging is enabled by default. At this time, an
+        account is deleted, resulting in the deletion of 3 users. 3 service events should be logged.
+        In the second phase event logging is disabled. Another account with 3 users is deleted, but no additional
+        events must be logged.
+
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | boolean | eventLoggingEnabled    | true  |
+        Given I select account "account-a"
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-a-1 | Kapua User A 1 | kapua_a_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-2 | Kapua User A 2 | kapua_a_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-3 | Kapua User A 3 | kapua_a_3@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        Given I select account "account-b"
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-b-1 | Kapua User B 1 | kapua_b_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-b-2 | Kapua User B 2 | kapua_b_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-b-3 | Kapua User B 3 | kapua_b_3@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        Given I select account "account-a"
+        When I count the users in account "account-a"
+        Then I get 3
+        When I delete account "account-a"
+        And I wait 5 seconds
+        When I count the users in the current account
+        Then I get 0
+        When I query for events for the current account
+        Then There are exactly 3 event log entries
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | boolean | eventLoggingEnabled    | false |
+        Given I select account "account-b"
+        When I delete account "account-b"
+        And I wait 5 seconds
+        When I count the users in the current account
+        Then I get 0
+        When I query for events for the current account
+        Then There are exactly 0 event log entries
+
     @StopEventBroker
     Scenario: Stop event broker for all scenarios
