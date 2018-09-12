@@ -20,7 +20,8 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = "classpath:features/account/AccountExpirationI9n.feature",
         glue = {"org.eclipse.kapua.qa.steps",
-                "org.eclipse.kapua.service.user.steps"
+                "org.eclipse.kapua.service.user.steps",
+                "org.eclipse.kapua.service.authentication.steps"
                },
         plugin = {"pretty", 
                   "html:target/cucumber/AccountServiceI9n",
