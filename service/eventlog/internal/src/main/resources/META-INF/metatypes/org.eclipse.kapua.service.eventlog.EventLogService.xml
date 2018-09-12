@@ -17,6 +17,25 @@
 
         <Icon resource="OSGI-INF/user-service.png" size="32"/>
 
+        <AD id="eventLoggingEnabled"
+            name="eventLoggingEnabled"
+            type="Boolean"
+            cardinality="0"
+            required="false"
+            default="true"
+            description="Whether to log service events.">
+        </AD>
+
+        <AD id="eventLogTimeToLive"
+            name="eventLogTimeToLive"
+            type="Integer"
+            cardinality="0"
+            required="false"
+            default="7"
+            min="1"
+            description="Event log entry lifetime in days.">
+        </AD>
+
     </OCD>
 
     <Designate pid="org.eclipse.kapua.service.eventlog.EventLogService">
