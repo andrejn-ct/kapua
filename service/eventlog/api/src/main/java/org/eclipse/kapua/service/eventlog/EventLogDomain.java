@@ -37,11 +37,6 @@ public class EventLogDomain extends AbstractDomain implements Domain {
     }
 
     @Override
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    @Override
     public Set<Actions> getActions() {
         return actions;
     }

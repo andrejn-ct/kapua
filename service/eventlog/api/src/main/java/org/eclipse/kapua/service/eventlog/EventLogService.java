@@ -14,7 +14,6 @@ package org.eclipse.kapua.service.eventlog;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
-import org.eclipse.kapua.service.KapuaDomainService;
 import org.eclipse.kapua.service.KapuaEntityService;
 import org.eclipse.kapua.service.config.KapuaConfigurableService;
 
@@ -26,15 +25,7 @@ import org.eclipse.kapua.service.config.KapuaConfigurableService;
  * @since 1.0
  */
 public interface EventLogService extends KapuaEntityService<EventLog, EventLogCreator>,
-        KapuaDomainService<EventLogDomain>,
         KapuaConfigurableService {
-
-    EventLogDomain EVENT_LOG_DOMAIN = new EventLogDomain();
-
-    @Override
-    default EventLogDomain getServiceDomain() {
-        return EVENT_LOG_DOMAIN;
-    }
 
     /**
      * Creates a new event log entry as specified in the EventLogCreator.<br>
