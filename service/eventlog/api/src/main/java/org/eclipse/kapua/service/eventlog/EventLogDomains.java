@@ -11,14 +11,9 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.eventlog;
 
-import org.eclipse.kapua.model.KapuaEntityPredicates;
+public class EventLogDomains {
 
-public interface EventLogPredicates extends KapuaEntityPredicates {
+    private EventLogDomains() { }
 
-    String SOURCE_NAME = "sourceName";
-    String ENTITY_SCOPE_ID = "entityScopeId";
-    String ENTITY_ID = "entityId";
-    String CONTEXT_ID = "contextId";
-    String EVENT_OPERATION = "eventOperation";
-    String EVENT_SENT_ON = "eventSentOn";
+    public static final EventLogDomain EVENT_LOG_DOMAIN = new EventLogDomain();
 }

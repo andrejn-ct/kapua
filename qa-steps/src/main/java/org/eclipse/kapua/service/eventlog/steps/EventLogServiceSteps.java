@@ -32,7 +32,7 @@ import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.eventlog.EventLogFactory;
 import org.eclipse.kapua.service.eventlog.EventLogListResult;
-import org.eclipse.kapua.service.eventlog.EventLogPredicates;
+import org.eclipse.kapua.service.eventlog.EventLogAttributes;
 import org.eclipse.kapua.service.eventlog.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.EventLogService;
 import org.junit.Assert;
@@ -119,7 +119,7 @@ public class EventLogServiceSteps extends BaseQATests {
         Account tmpAcc = (Account) stepData.get("LastAccount");
         KapuaId scopeId = (tmpAcc != null) ? tmpAcc.getId() : ROOT_SCOPE_ID;
         EventLogQuery tmpQuery = eventLogFactory.newQuery(ROOT_SCOPE_ID);
-        tmpQuery.setPredicate(new AttributePredicateImpl<>(EventLogPredicates.ENTITY_SCOPE_ID, scopeId));
+        tmpQuery.setPredicate(new AttributePredicateImpl<>(EventLogAttributes.ENTITY_SCOPE_ID, scopeId));
 
         try {
             primeException();

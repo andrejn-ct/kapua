@@ -30,6 +30,7 @@ import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.eventlog.EventLog;
 import org.eclipse.kapua.service.eventlog.EventLogCreator;
+import org.eclipse.kapua.service.eventlog.EventLogDomains;
 import org.eclipse.kapua.service.eventlog.EventLogListResult;
 import org.eclipse.kapua.service.eventlog.EventLogService;
 import org.eclipse.kapua.service.user.User;
@@ -54,7 +55,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
      * Constructor
      */
     public EventLogServiceImpl() {
-        super(EventLogService.class.getName(), EVENT_LOG_DOMAIN, EventLogEntityManagerFactory.getInstance());
+        super(EventLogService.class.getName(), EventLogDomains.EVENT_LOG_DOMAIN, EventLogEntityManagerFactory.getInstance());
     }
 
     @Override
@@ -71,7 +72,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Check Access
-        authorizationService.checkPermission(permissionFactory.newPermission(EVENT_LOG_DOMAIN, Actions.write, eventLogCreator.getScopeId()));
+        authorizationService.checkPermission(permissionFactory.newPermission(EventLogDomains.EVENT_LOG_DOMAIN, Actions.write, eventLogCreator.getScopeId()));
 
         //
         // Do create
@@ -88,7 +89,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Check Access
-        authorizationService.checkPermission(permissionFactory.newPermission(EVENT_LOG_DOMAIN, Actions.delete, scopeId));
+        authorizationService.checkPermission(permissionFactory.newPermission(EventLogDomains.EVENT_LOG_DOMAIN, Actions.delete, scopeId));
 
         //
         // Check existence
@@ -111,7 +112,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Check Access
-        authorizationService.checkPermission(permissionFactory.newPermission(EVENT_LOG_DOMAIN, Actions.read, scopeId));
+        authorizationService.checkPermission(permissionFactory.newPermission(EventLogDomains.EVENT_LOG_DOMAIN, Actions.read, scopeId));
 
         //
         // Do the find
@@ -127,7 +128,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Check Access
-        authorizationService.checkPermission(permissionFactory.newPermission(EVENT_LOG_DOMAIN, Actions.read, query.getScopeId()));
+        authorizationService.checkPermission(permissionFactory.newPermission(EventLogDomains.EVENT_LOG_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do query
@@ -143,7 +144,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Check Access
-        authorizationService.checkPermission(permissionFactory.newPermission(EVENT_LOG_DOMAIN, Actions.read, query.getScopeId()));
+        authorizationService.checkPermission(permissionFactory.newPermission(EventLogDomains.EVENT_LOG_DOMAIN, Actions.read, query.getScopeId()));
 
         //
         // Do count
