@@ -31,6 +31,7 @@ import cucumber.api.CucumberOptions;
                 "html:target/cucumber/ConnectionI9n",
                 "json:target/ConnectionI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true )
 @CucumberProperty(key="org.eclipse.kapua.qa.broker.extraStartupDelay", value="5")
 public class RunConnectionI9nTest {}

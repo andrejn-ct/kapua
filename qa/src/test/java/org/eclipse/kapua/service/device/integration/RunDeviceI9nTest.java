@@ -30,5 +30,6 @@ import cucumber.api.CucumberOptions;
                   "html:target/cucumber/DeviceI9n",
                   "json:target/DeviceI9n_cucumber.json"
                  },
+        strict = true,
         monochrome = true )
 public class RunDeviceI9nTest {}

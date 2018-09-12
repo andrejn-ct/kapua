@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
         plugin = {"pretty",
                 "html:target/cucumber/DatastoreNewIndex",
                 "json:target/DatastoreNewIndex_cucumber.json" },
+        strict = true,
         monochrome = true)
 @CucumberProperty(key="datastore.client.class", value="org.eclipse.kapua.service.datastore.client.rest.RestDatastoreClient")
 @CucumberProperty(key="broker.ip", value="192.168.33.10")

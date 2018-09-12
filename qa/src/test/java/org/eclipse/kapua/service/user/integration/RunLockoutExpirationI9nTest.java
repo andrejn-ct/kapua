@@ -27,5 +27,6 @@ import org.junit.runner.RunWith;
                   "html:target/cucumber/LockoutExpirationI9n",
                   "json:target/LockoutExpirationI9n_cucumber.json"
                  },
+        strict = true,
         monochrome=true)
 public class RunLockoutExpirationI9nTest {}

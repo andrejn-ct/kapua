@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/BrokerACLDeviceManageI9n",
                 "json:target/BrokerACLDeviceManageI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true )
 @CucumberProperty(key="org.eclipse.kapua.qa.broker.extraStartupDelay", value="3")
 @CucumberProperty(key="broker.ip", value="192.168.33.10")

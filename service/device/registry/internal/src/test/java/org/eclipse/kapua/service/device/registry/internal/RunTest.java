@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
         plugin = { "pretty",
                 "html:target/cucumber",
                 "json:target/cucumber.json" },
+        strict = true,
         monochrome = true)
 @CucumberProperty(key="locator.class.impl", value="org.eclipse.kapua.test.MockedLocator")
 @CucumberProperty(key="commons.db.schema", value="kapuadb")

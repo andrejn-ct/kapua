@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/TagService",
                 "json:target/TagService_cucumber.json"
         },
+        strict = true,
         monochrome = true)
 public class RunTagServiceTest {
 }

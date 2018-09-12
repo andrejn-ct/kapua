@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber/AuthenticationI9n",
                 "json:target/AuthenticationI9n_cucumber.json"
         },
+        strict = true,
         monochrome = true)
 public class RunAthtServiceEventsTest {
 }
