@@ -38,6 +38,8 @@ import org.eclipse.kapua.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 /**
  * {@link EventLogService} implementation.
  */
@@ -178,6 +180,15 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
                 // Retrieve the administrator (for the account id)
                 String adminUsername = SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_USERNAME);
                 User adminUser = userService.findByName(adminUsername);
+
+                //
+                // Check whether event logging is active
+                Map<String, Object> eventLoggerConfig = getConfigValues(adminUser.getScopeId());
+                boolean logEnabled = (boolean) eventLoggerConfig.get("eventLoggingEnabled");
+                // If logging is disabled just return without doing anything
+                if (!logEnabled) {
+                    return;
+                }
 
                 //
                 // Prepare the event creator
