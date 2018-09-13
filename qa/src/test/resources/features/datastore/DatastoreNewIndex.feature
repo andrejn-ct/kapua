@@ -158,11 +158,11 @@ Feature: Datastore tests
     And I login as user with name "kapua-sys" and password "kapua-password"
     Given Dataservice config enabled "true", dataTTL 30, rxByteLimit 0, dataIndexBy "DEVICE_TIMESTAMP"
     And System property "datastore.index.window" with value "week"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -173,11 +173,11 @@ Feature: Datastore tests
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 5     |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
