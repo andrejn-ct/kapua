@@ -19,22 +19,22 @@ Feature: Account expiration features
     account.
 
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 20     |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | tomorrow       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -53,22 +53,22 @@ Feature: Account expiration features
   Do not set the expiration date of an account. Such an account should never expire.
 
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 20     |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities |  10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -87,22 +87,22 @@ Feature: Account expiration features
     Set the expiration date of the account in the past. Te account should be expired and should
     not be possible to log in with it.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | yesterday      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -122,22 +122,22 @@ Feature: Account expiration features
   Set the expiration date of the account to the current date. Te account should be expired and should
   not be possible to log in with it.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 30    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | today          |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 10    |
-    And I configure user service
+    And I configure the user service
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
@@ -156,14 +156,14 @@ Feature: Account expiration features
     Scenario: Child account expires before parent
     Create a chain of accounts. Each child account expires before its parent.
       When I login as user with name "kapua-sys" and password "kapua-password"
-      And I configure account service
+      And I configure the account service
         | type    | name                   | value |
         | boolean | infiniteChildEntities  | true  |
         | integer | maxNumberChildEntities | 50    |
       Given Account
         | name      | scopeId | expirationDate |
         | account-a | 1       | 20/7/2018      |
-      And I configure account service
+      And I configure the account service
         | type    | name                   | value |
         | boolean | infiniteChildEntities  | true  |
         | integer | maxNumberChildEntities | 40    |
@@ -171,7 +171,7 @@ Feature: Account expiration features
       And Account
         | name      | expirationDate |
         | account-b | 19/7/2018      |
-      And I configure account service
+      And I configure the account service
         | type    | name                   | value |
         | boolean | infiniteChildEntities  | true  |
         | integer | maxNumberChildEntities | 40    |
@@ -184,14 +184,14 @@ Feature: Account expiration features
   Scenario: Both the parent and child accounts have the same expiration date
   Create a chain of accounts. All accounts have the same expiration dates. This should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -199,7 +199,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -212,14 +212,14 @@ Feature: Account expiration features
   Scenario: Both the parent and child accounts do not expire
   Create a chain of accounts. All accounts have null expiration dates. This should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId |
       | account-a | 1       |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -227,7 +227,7 @@ Feature: Account expiration features
     And Account
       | name      |
       | account-b |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -241,14 +241,14 @@ Feature: Account expiration features
   Create a chain of two accounts. An attempt to create an account with an expiration date past the
   parents should be impossible.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -263,14 +263,14 @@ Feature: Account expiration features
   Create a chain of two accounts. An attempt to create a child account with a null expiration date.
   This should not be possible.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -285,14 +285,14 @@ Feature: Account expiration features
   Create a chain of accounts. Modify the expiration date of the parent so that it is still later than
   the child expiration date. Regular case. Should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -300,7 +300,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -316,14 +316,14 @@ Feature: Account expiration features
   Scenario: Delete parent expiration
   Create a chain of accounts. Set the expiration date of the parent to null. Regular case. Should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -331,7 +331,7 @@ Feature: Account expiration features
     And Account
       | name      |expirationDate |
       | account-b |19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -348,14 +348,14 @@ Feature: Account expiration features
   Create a chain of accounts. Modify the expiration date of the parent so that it expires before childs.
   Should not be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -363,7 +363,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -381,14 +381,14 @@ Feature: Account expiration features
   Create a chain of accounts. Modify the expiration date of the middle child so that it is still before the
   parents expiration date. Regular case. Should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -396,7 +396,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -413,14 +413,14 @@ Feature: Account expiration features
   Create a chain of accounts. Modify the expiration date of the last child so that it is still before the
   parents expiration date. Regular case. Should be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -428,7 +428,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -445,14 +445,14 @@ Feature: Account expiration features
   Create a chain of accounts. Modify the expiration date of the middle child so that it expires after its parent.
   Should not be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -460,7 +460,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -478,14 +478,14 @@ Feature: Account expiration features
   Create a chain of accounts. Set the expiration date of the middle child to null.
   Should not be allowed.
     When I login as user with name "kapua-sys" and password "kapua-password"
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 50    |
     Given Account
       | name      | scopeId | expirationDate |
       | account-a | 1       | 20/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
@@ -493,7 +493,7 @@ Feature: Account expiration features
     And Account
       | name      | expirationDate |
       | account-b | 19/7/2018      |
-    And I configure account service
+    And I configure the account service
       | type    | name                   | value |
       | boolean | infiniteChildEntities  | true  |
       | integer | maxNumberChildEntities | 40    |
