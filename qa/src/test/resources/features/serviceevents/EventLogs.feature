@@ -129,5 +129,42 @@ Feature: Tests for service event logging
         When I query for events for the current account
         Then There are exactly 0 event log entries
 
+    Scenario: Event log entry lifetime
+        This test exercises the event log purging functionality. A number of events are created at different
+        times (with different ages). Next, the log entry time to live is manipulated and entries purged several times.
+        The number of existing log entries must decrease in line with the purging of gradually obsoleted entries.
+
+        Given I prepare 10 events 15 days old
+        And I prepare 10 events 20 days old
+        And I prepare 10 events 25 days old
+
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | integer | eventLogTimeToLive     | 30    |
+        When I purge obsolete event log entries
+        And I query for all event logs
+        Then There are exactly 30 event log entries
+
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | integer | eventLogTimeToLive     | 22    |
+        When I purge obsolete event log entries
+        And I query for all event logs
+        Then There are exactly 20 event log entries
+
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | integer | eventLogTimeToLive     | 17    |
+        When I purge obsolete event log entries
+        And I query for all event logs
+        Then There are exactly 10 event log entries
+
+        Given I configure the event logging service
+            | type    | name                   | value |
+            | integer | eventLogTimeToLive     | 7    |
+        When I purge obsolete event log entries
+        And I query for all event logs
+        Then There are exactly 0 event log entries
+
     @StopEventBroker
     Scenario: Stop event broker for all scenarios

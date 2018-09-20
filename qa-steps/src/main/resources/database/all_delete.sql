@@ -63,3 +63,5 @@ DELETE FROM job_job_target;
 DELETE FROM endp_endpoint_info;
 
 DELETE FROM endp_endpoint_info_usage;
+
+DELETE FROM evt_eventlog;

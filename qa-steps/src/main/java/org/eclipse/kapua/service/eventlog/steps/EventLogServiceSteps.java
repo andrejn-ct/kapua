@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.eventlog.steps;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
@@ -30,12 +31,14 @@ import org.eclipse.kapua.service.StepData;
 import org.eclipse.kapua.service.TestJAXBContextProvider;
 import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
+import org.eclipse.kapua.service.eventlog.EventLogCreator;
 import org.eclipse.kapua.service.eventlog.EventLogFactory;
 import org.eclipse.kapua.service.eventlog.EventLogListResult;
 import org.eclipse.kapua.service.eventlog.EventLogAttributes;
 import org.eclipse.kapua.service.eventlog.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.EventLogService;
 import org.eclipse.kapua.service.user.steps.TestConfig;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +100,32 @@ public class EventLogServiceSteps extends BaseQATests {
 /**
  * Implementation of cucumber scenario steps
  */
+
+    @Given("^I prepare (\\d+) events? (\\d+) days? old$")
+    public void createEvents(int count, int age) throws Exception {
+
+        EventLogCreator tmpCr = prepareBasicEventLogCreator(KAPUA_SYS_ID);
+        tmpCr.setEventSentOn(DateTime.now().minusDays(age).toDate());
+
+        try {
+            primeException();
+            for (int i = 0; i < count; i++) {
+                eventLogService.create(tmpCr);
+            }
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I purge obsolete event log entries$")
+    public void purgeEvents() throws Exception {
+
+        try {
+            eventLogService.purge();
+        }catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
 
     @When("^I query for all event logs$")
     public void queryForAllEventLogs() throws Exception {
@@ -185,11 +214,28 @@ public class EventLogServiceSteps extends BaseQATests {
             config.addConfigToMap(valueMap);
         }
 
-        primeException();
         try {
-            eventLogService.setConfigValues(ROOT_SCOPE_ID, ROOT_SCOPE_ID, valueMap);
+            primeException();
+            eventLogService.setConfigValues(KAPUA_SYS_ID, KAPUA_SYS_ID, valueMap);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
+    }
+
+    // *******************
+    // * Private Helpers *
+    // *******************
+
+    private EventLogCreator prepareBasicEventLogCreator(KapuaId id) {
+
+        EventLogCreator tmpCr = eventLogFactory.newCreator(id);
+        tmpCr.setEntityId(getRandomKapuaId());
+        tmpCr.setEntityScopeId(getRandomKapuaId());
+        tmpCr.setEventSentOn(DateTime.now().toDate());
+        tmpCr.setEventOperation("random");
+        tmpCr.setSourceName("random.service");
+        tmpCr.setContextId("random.ctx");
+
+        return tmpCr;
     }
 }

@@ -15,6 +15,7 @@ package org.eclipse.kapua.qa.steps;
 import cucumber.api.Scenario;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.model.id.KapuaId;
@@ -24,6 +25,9 @@ import org.eclipse.kapua.service.account.Account;
 public class BaseQATests {
 
     public static final KapuaEid ROOT_SCOPE_ID = new KapuaEid(BigInteger.ONE);
+    public static final KapuaEid KAPUA_SYS_ID = new KapuaEid(BigInteger.ONE);
+
+    protected static Random random = new Random();
 
     /**
      * Inter step data scratchpad.
@@ -47,6 +51,20 @@ public class BaseQATests {
 
         Account tmpAcc = (Account) stepData.get("LastAccount");
         return (tmpAcc == null) ? ROOT_SCOPE_ID : ((tmpAcc.getId() != null) ? tmpAcc.getId() : ROOT_SCOPE_ID);
+    }
+
+    /**
+     * Generate a random Kapua ID. Make sure that the ID is positive.
+     *
+     * @return A random KapuaID
+     */
+    public KapuaId getRandomKapuaId() {
+
+        long rnd = -1L;
+        while (rnd <= 0) {
+            rnd = random.nextLong();
+        }
+        return new KapuaEid(BigInteger.valueOf(rnd));
     }
 
     public void primeException() {
