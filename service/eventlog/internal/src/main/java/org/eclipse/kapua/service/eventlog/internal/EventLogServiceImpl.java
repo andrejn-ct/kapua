@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.eventlog.internal;
 import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableService;
+import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
 import org.eclipse.kapua.commons.setting.system.SystemSettingKey;
@@ -26,18 +27,23 @@ import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.model.domain.Actions;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.model.query.KapuaQuery;
+import org.eclipse.kapua.model.query.predicate.AttributePredicate;
 import org.eclipse.kapua.service.authorization.AuthorizationService;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.eventlog.EventLog;
+import org.eclipse.kapua.service.eventlog.EventLogAttributes;
 import org.eclipse.kapua.service.eventlog.EventLogCreator;
 import org.eclipse.kapua.service.eventlog.EventLogDomains;
 import org.eclipse.kapua.service.eventlog.EventLogListResult;
+import org.eclipse.kapua.service.eventlog.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.EventLogService;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -153,6 +159,36 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
         return entityManagerSession.onResult(em -> EventLogDAO.count(em, query));
     }
 
+    @Override
+    public void purge() throws KapuaException {
+
+        //
+        // Retrieve the administrator (for the account id)
+        User adminUser = getSystemAdministrator();
+
+        //
+        // Retrieve the configured log entry lifetime
+        Map<String, Object> logConfig = getConfigValues(adminUser.getScopeId());
+        int daysToLive = (int) logConfig.get("eventLogTimeToLive");
+        ArgumentValidator.notNull(daysToLive, "logeEntry.timeToLive");
+
+        //
+        // Calculate the time threshold for deleting logs
+        Date threshold = DateTime.now().minusDays(daysToLive).toDate();
+
+        //
+        // Query for the records that need to be deleted
+        EventLogQuery query = new EventLogQueryImpl(adminUser.getScopeId());
+        query.setPredicate(new AttributePredicateImpl<>(EventLogAttributes.EVENT_SENT_ON, threshold, AttributePredicate.Operator.LESS_THAN));
+        EventLogListResult obsoleteRecords = query(query);
+
+        //
+        // Delete the obsolete records
+        for(EventLog logEntry : obsoleteRecords.getItems()) {
+            delete(logEntry.getScopeId(), logEntry.getId());
+        }
+    }
+
     @ListenServiceEvent(fromAddress = "account")
     @ListenServiceEvent(fromAddress = "user")
     @ListenServiceEvent(fromAddress = "tag")
@@ -173,13 +209,23 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
     //
     // -----------------------------------------------------------------------------------------
 
+    private User getSystemAdministrator() throws KapuaException {
+
+        return KapuaSecurityUtils.doPrivileged(() -> {
+            //
+            // Retrieve the administrator (for the account id)
+            String adminUsername = SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_USERNAME);
+            User adminUser = userService.findByName(adminUsername);
+            return adminUser;
+        });
+    }
+
     private void logReceivedEvent(ServiceEvent kapuaEvent) throws KapuaException {
 
         KapuaSecurityUtils.doPrivileged(() -> {
                 //
                 // Retrieve the administrator (for the account id)
-                String adminUsername = SystemSetting.getInstance().getString(SystemSettingKey.SYS_ADMIN_USERNAME);
-                User adminUser = userService.findByName(adminUsername);
+                User adminUser = getSystemAdministrator();
 
                 //
                 // Check whether event logging is active

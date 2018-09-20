@@ -77,4 +77,13 @@ public interface EventLogService extends KapuaEntityService<EventLog, EventLogCr
      */
     @Override
     long count(KapuaQuery<EventLog> query) throws KapuaException;
+
+    /**
+     * Purge obsolete EventLog entries
+     *
+     * @param
+     * @return
+     * @throws KapuaException
+     */
+    void purge() throws KapuaException;
 }
