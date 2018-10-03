@@ -109,7 +109,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
         //
         // Do  delete
         KapuaSecurityUtils.doPrivileged(() ->
-                entityManagerSession.onTransactedAction(em -> EventLogDAO.delete(em, eventLogId)));
+                entityManagerSession.onTransactedAction(em -> EventLogDAO.delete(em, scopeId, eventLogId)));
     }
 
     @Override
