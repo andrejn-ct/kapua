@@ -56,11 +56,11 @@ public class EventLogDAO extends ServiceDAO {
      * @param em
      * @param eventLogId
      * @throws KapuaEntityNotFoundException
-     *             If {@link User} is not found.
+     *             If {@link EventLog} is not found.
      */
-    public static void delete(EntityManager em, KapuaId eventLogId)
+    public static void delete(EntityManager em, KapuaId scopeId, KapuaId eventLogId)
             throws KapuaEntityNotFoundException {
-        ServiceDAO.delete(em, EventLogImpl.class, eventLogId);
+        ServiceDAO.delete(em, EventLogImpl.class, scopeId, eventLogId);
     }
 
     /**
