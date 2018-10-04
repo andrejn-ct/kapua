@@ -61,8 +61,8 @@
         <api>org.eclipse.kapua.service.endpoint.EndpointInfoService</api>
         <api>org.eclipse.kapua.service.endpoint.EndpointInfoFactory</api>
 
-        <api>org.eclipse.kapua.service.eventlog.EventLogService</api>
-        <api>org.eclipse.kapua.service.eventlog.EventLogFactory</api>
+        <api>org.eclipse.kapua.service.eventlog.logger.EventLogService</api>
+        <api>org.eclipse.kapua.service.eventlog.logger.EventLogFactory</api>
 
         <api>org.eclipse.kapua.service.certificate.CertificateService</api>
         <api>org.eclipse.kapua.service.certificate.CertificateFactory</api>
