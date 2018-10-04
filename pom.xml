@@ -513,12 +513,12 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.kapua</groupId>
-                <artifactId>kapua-eventlog-api</artifactId>
+                <artifactId>kapua-eventlog-logger-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.kapua</groupId>
-                <artifactId>kapua-eventlog-internal</artifactId>
+                <artifactId>kapua-eventlog-logger-internal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

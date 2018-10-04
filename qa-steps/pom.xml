@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-api</artifactId>
+            <artifactId>kapua-eventlog-logger-api</artifactId>
         </dependency>
 
         <!-- Internal dependencies -->
@@ -144,7 +144,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-internal</artifactId>
+            <artifactId>kapua-eventlog-logger-internal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
