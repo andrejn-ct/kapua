@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.eventlog.manager.internal;
 
-import org.eclipse.kapua.service.eventlog.logger.EventLogService;
+import org.eclipse.kapua.eventlog.housekeeper.EventLogHouseKeeper;
 import org.eclipse.kapua.service.eventlog.manager.EventLogManager;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.locator.KapuaLocator;
@@ -29,20 +29,23 @@ public class EventLogManagerImpl implements EventLogManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogManagerImpl.class);
 
     private static KapuaLocator locator = KapuaLocator.getInstance();
-    private static EventLogService eventLogService = locator.getService(EventLogService.class);
+    private static EventLogHouseKeeper eventLogHouseKeeper = locator.getService(EventLogHouseKeeper.class);
 
     public EventLogManagerImpl() {}
 
     @Override
     public void schedulePurge() throws KapuaException {
+        eventLogHouseKeeper.schedulePurge();
     }
 
     @Override
     public void unschedulePurge() throws KapuaException {
+        eventLogHouseKeeper.unschedulePurge();
     }
 
     @Override
-    public void purgeLog() throws KapuaException {
+    public void purgeLogs() throws KapuaException {
+        eventLogHouseKeeper.purgeLogs();
     }
 
 }

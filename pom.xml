@@ -533,6 +533,16 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.kapua</groupId>
+                <artifactId>kapua-eventlog-housekeeper-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.kapua</groupId>
+                <artifactId>kapua-eventlog-housekeeper-internal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.kapua</groupId>
                 <artifactId>kapua-endpoint-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1345,6 +1355,7 @@
         <module>rest-api</module>
         <module>job-engine</module>
         <module>broker</module>
+        <module>eventlog-housekeeper</module>
 
         <!-- Client -->
         <module>client</module>

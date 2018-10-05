@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.eventlog.manager;
+package org.eclipse.kapua.eventlog.housekeeper;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.service.KapuaService;
@@ -20,7 +20,7 @@ import org.eclipse.kapua.service.KapuaService;
  *
  * @since 1.0
  */
-public interface EventLogManager extends KapuaService {
+public interface EventLogHouseKeeper extends KapuaService {
 
     /**
      * Schedules the Event Log purge action as a Kapua Job.<br>

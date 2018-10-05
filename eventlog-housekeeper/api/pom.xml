@@ -16,42 +16,18 @@
 
     <parent>
         <groupId>org.eclipse.kapua</groupId>
-        <artifactId>kapua-eventlog-manager</artifactId>
+        <artifactId>kapua-eventlog-housekeeper</artifactId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kapua-eventlog-manager-internal</artifactId>
+    <artifactId>kapua-eventlog-housekeeper-api</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>
-        <!-- Implemented service interfaces -->
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-manager-api</artifactId>
+            <artifactId>kapua-service-api</artifactId>
         </dependency>
-
-        <!-- Required service interfaces -->
-        <dependency>
-            <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-housekeeper-api</artifactId>
-        </dependency>
-
-        <!-- Internal dependencies -->
-        <dependency>
-            <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-guice</artifactId>
-        </dependency>
-
-        <!-- External dependencies -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
