@@ -1,0 +1,48 @@
+/*******************************************************************************
+ * Copyright (c) 2018 Eurotech and/or its affiliates and others
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Eurotech - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.kapua.service.eventlog.manager.internal;
+
+import org.eclipse.kapua.service.eventlog.logger.EventLogService;
+import org.eclipse.kapua.service.eventlog.manager.EventLogManager;
+import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.locator.KapuaLocator;
+import org.eclipse.kapua.locator.KapuaProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * (@link EventLogManager) implementation.
+ */
+@KapuaProvider
+public class EventLogManagerImpl implements EventLogManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventLogManagerImpl.class);
+
+    private static KapuaLocator locator = KapuaLocator.getInstance();
+    private static EventLogService eventLogService = locator.getService(EventLogService.class);
+
+    public EventLogManagerImpl() {}
+
+    @Override
+    public void schedulePurge() throws KapuaException {
+    }
+
+    @Override
+    public void unschedulePurge() throws KapuaException {
+    }
+
+    @Override
+    public void purgeLog() throws KapuaException {
+    }
+
+}
