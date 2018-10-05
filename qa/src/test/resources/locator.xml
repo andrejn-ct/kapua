@@ -63,6 +63,8 @@
 
         <api>org.eclipse.kapua.service.eventlog.logger.EventLogService</api>
         <api>org.eclipse.kapua.service.eventlog.logger.EventLogFactory</api>
+        <api>org.eclipse.kapua.service.eventlog.manager.EventLogManager</api>
+        <api>org.eclipse.kapua.eventlog.housekeeper.EventLogHouseKeeper</api>
 
         <api>org.eclipse.kapua.service.certificate.CertificateService</api>
         <api>org.eclipse.kapua.service.certificate.CertificateFactory</api>
@@ -130,5 +132,6 @@
         <package>org.eclipse.kapua.transport</package>
         <package>org.eclipse.kapua.message</package>
         <package>org.eclipse.kapua.job</package>
+        <package>org.eclipse.kapua.eventlog.housekeeper</package>
     </packages>
 </locator-config>

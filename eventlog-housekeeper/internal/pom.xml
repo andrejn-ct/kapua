@@ -16,24 +16,24 @@
 
     <parent>
         <groupId>org.eclipse.kapua</groupId>
-        <artifactId>kapua-eventlog-manager</artifactId>
+        <artifactId>kapua-eventlog-housekeeper</artifactId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kapua-eventlog-manager-internal</artifactId>
+    <artifactId>kapua-eventlog-housekeeper-internal</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>
         <!-- Implemented service interfaces -->
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-manager-api</artifactId>
+            <artifactId>kapua-eventlog-housekeeper-api</artifactId>
         </dependency>
 
         <!-- Required service interfaces -->
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
-            <artifactId>kapua-eventlog-housekeeper-api</artifactId>
+            <artifactId>kapua-eventlog-logger-api</artifactId>
         </dependency>
 
         <!-- Internal dependencies -->

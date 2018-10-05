@@ -37,6 +37,7 @@ import org.eclipse.kapua.service.eventlog.logger.EventLogListResult;
 import org.eclipse.kapua.service.eventlog.logger.EventLogAttributes;
 import org.eclipse.kapua.service.eventlog.logger.EventLogQuery;
 import org.eclipse.kapua.service.eventlog.logger.EventLogService;
+import org.eclipse.kapua.service.eventlog.manager.EventLogManager;
 import org.eclipse.kapua.service.user.steps.TestConfig;
 import org.joda.time.DateTime;
 import org.junit.Assert;
@@ -59,6 +60,7 @@ public class EventLogServiceSteps extends BaseQATests {
 
     private static EventLogService eventLogService;
     private static EventLogFactory eventLogFactory;
+    private static EventLogManager eventLogManager;
     private static AccountService accountService;
 
     @Inject
@@ -81,6 +83,7 @@ public class EventLogServiceSteps extends BaseQATests {
         KapuaLocator locator = KapuaLocator.getInstance();
         eventLogService = locator.getService(EventLogService.class);
         eventLogFactory = locator.getFactory(EventLogFactory.class);
+        eventLogManager = locator.getService(EventLogManager.class);
         accountService = locator.getService(AccountService.class);
 
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
@@ -121,7 +124,7 @@ public class EventLogServiceSteps extends BaseQATests {
     public void purgeEvents() throws Exception {
 
         try {
-            eventLogService.purge();
+            eventLogManager.purgeLogs();
         }catch (KapuaException ex) {
             verifyException(ex);
         }

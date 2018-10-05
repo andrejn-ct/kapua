@@ -68,6 +68,14 @@
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-eventlog-logger-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-eventlog-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-eventlog-housekeeper-api</artifactId>
+        </dependency>
 
         <!-- Internal dependencies -->
         <dependency>
@@ -145,6 +153,14 @@
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
             <artifactId>kapua-eventlog-logger-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-eventlog-manager-internal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.kapua</groupId>
+            <artifactId>kapua-eventlog-housekeeper-internal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.kapua</groupId>
