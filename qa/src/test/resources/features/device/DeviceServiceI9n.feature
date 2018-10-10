@@ -276,7 +276,6 @@ Scenario: Creating new device and tagging it with specific Tag
     And I tag device with "KuraDevice" tag
     When I search for device with tag "KuraDevice"
     Then I find device "device_1"
-    And I untag device with "KuraDevice" tag
     And I logout
 
 Scenario: Creating new device, tagging it with specific Tag and then deleting this Tag
@@ -311,8 +310,8 @@ Scenario: Creating new device, tagging it with specific Tag and then deleting th
     And I tag device with "KuraDevice2" tag
     When I search for device with tag "KuraDevice2"
     Then I find device "device_1"
-    And I untag device with "KuraDevice2" tag
-    And I verify that tag "KuraDevice2" is deleted
+    When I remove the tag "KuraDevice2" from the current device
+    Then The device "device_1" does not have the tag "KuraDevice2"
     And I logout
 
   Scenario: Stop broker after all scenarios
