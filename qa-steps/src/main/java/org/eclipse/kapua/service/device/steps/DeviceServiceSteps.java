@@ -468,6 +468,7 @@ public class DeviceServiceSteps extends BaseQATests {
             deviceRegistryService.update(device);
             stepData.put("Tag", tag);
             stepData.put("Tags", tags);
+            stepData.put("Device", device);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -508,19 +509,24 @@ public class DeviceServiceSteps extends BaseQATests {
         KapuaQuery<Tag> tagQuery = new TagFactoryImpl().newQuery(lastAcc.getId());
         tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName, AttributePredicate.Operator.EQUAL));
 
+        stepData.remove("Device");
+        stepData.remove("DeviceList");
+
         TagListResult tagQueryResult = tagService.query(tagQuery);
         Tag tag = tagQueryResult.getFirstItem();
         deviceQuery.setPredicate(AttributePredicateImpl.attributeIsEqualTo(DeviceAttributes.TAG_IDS, tag.getId()));
         DeviceListResult deviceList = deviceRegistryService.query(deviceQuery);
 
         stepData.put("DeviceList", deviceList);
+        if (!deviceList.isEmpty()) {
+            stepData.put("Device", deviceList.getFirstItem());
+        }
     }
 
     @Then("^I find device \"([^\"]*)\"$")
     public void iFindDeviceWithTag(String deviceName) {
 
-        DeviceListResult deviceList = (DeviceListResult) stepData.get("DeviceList");
-        Device device = deviceList.getFirstItem();
+        Device device = (Device) stepData.get("Device");
 
         Assert.assertNotNull(device);
         Assert.assertEquals(deviceName, device.getClientId());
@@ -557,11 +563,19 @@ public class DeviceServiceSteps extends BaseQATests {
             Device tmpDevice = deviceRegistryService.findByClientId(tmpAccId, deviceName);
             Assert.assertNotNull("Requested device not found", tmpDevice);
 
-            Set<KapuaId> tagList = tmpDevice.getTagIds();
-            for(KapuaId tmpId : tagList) {
-                Tag tmpTag = tagService.find(tmpDevice.getScopeId(), tmpId);
-                Assert.assertNotEquals("The device still has the obsolete tag", tagName.trim(), tmpTag.getName());
-            }
+            TagQuery tmpQuery = new TagQueryImpl(tmpDevice.getScopeId());
+            tmpQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, tagName));
+            Tag tmpTag = tagService.query(tmpQuery).getFirstItem();
+            Assert.assertNotNull("Requested tag not found", tmpTag);
+
+            Assert.assertFalse("The device is still tagged with the obsolete tag",
+                    tmpDevice.getTagIds().contains(tmpTag.getId()));
+
+//            Set<KapuaId> tagList = tmpDevice.getTagIds();
+//            for(KapuaId tmpId : tagList) {
+//                Tag tmpTag = tagService.find(tmpDevice.getScopeId(), tmpId);
+//                Assert.assertNotEquals("The device still has the obsolete tag", tagName.trim(), tmpTag.getName());
+//            }
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -582,16 +596,26 @@ public class DeviceServiceSteps extends BaseQATests {
         }
     }
 
-    @And("^I untag device with \"([^\"]*)\" tag$")
-    public void iDeleteTag(String deviceTagName) throws Throwable {
+    @And("^I remove the tag \"([^\"]*)\" from the current device$")
+    public void removeTagFromDevice(String deviceTagName) throws Exception {
 
-        Device device = ((DeviceListResult) stepData.get("DeviceList")).getFirstItem();
-        Set<KapuaId> tags = new HashSet<>();
+        Device device = (Device) stepData.get("Device");
+        Set<KapuaId> tagIds = device.getTagIds();
+        Assert.assertNotNull("The current device has no tags", tagIds);
+        Assert.assertNotEquals("The current device has no tags", 0, tagIds.size());
+        TagQuery tagQuery = tagFactory.newQuery(device.getScopeId());
+        tagQuery.setPredicate(new AttributePredicateImpl<>(TagAttributes.NAME, deviceTagName));
 
-        device.setTagIds(tags);
-        Device updatedDevice = deviceRegistryService.update(device);
-        stepData.put("Device", updatedDevice);
-        Assert.assertEquals(device.getTagIds().isEmpty(), true);
+        try {
+            Tag tmpTag = tagService.query(tagQuery).getFirstItem();
+            Assert.assertNotNull("The requested tag was not found", tmpTag);
+            tagIds.remove(tmpTag.getId());
+            device.setTagIds(tagIds);
+            device = deviceRegistryService.update(device);
+            stepData.put("Device", device);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
     }
 
     @And("^I verify that tag \"([^\"]*)\" is deleted$")
