@@ -67,11 +67,12 @@ public class EventLogDAO extends ServiceDAO {
      * Finds the event log item by event log identifier
      *
      * @param em
+     * @param scopeId
      * @param eventLogId
      * @return
      */
-    public static EventLog find(EntityManager em, KapuaId eventLogId) {
-        return em.find(EventLogImpl.class, eventLogId);
+    public static EventLog find(EntityManager em, KapuaId scopeId, KapuaId eventLogId) {
+        return ServiceDAO.find(em, EventLogImpl.class, scopeId, eventLogId);
     }
 
     /**

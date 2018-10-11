@@ -118,7 +118,7 @@ public class EventLogServiceImpl extends AbstractKapuaConfigurableService implem
 
         //
         // Do the find
-        return entityManagerSession.onResult(em -> EventLogDAO.find(em, eventLogId));
+        return entityManagerSession.onResult(em -> EventLogDAO.find(em, scopeId, eventLogId));
     }
 
     @Override
