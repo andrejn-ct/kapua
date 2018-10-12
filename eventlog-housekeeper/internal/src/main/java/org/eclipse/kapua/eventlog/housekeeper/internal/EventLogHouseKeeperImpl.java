@@ -66,27 +66,38 @@ public class EventLogHouseKeeperImpl implements EventLogHouseKeeper {
         // Retrieve the administrator (for the account id)
         User adminUser = getSystemAdministrator();
 
-        //
-        // Retrieve the configured log entry lifetime
-        Map<String, Object> logConfig = eventLogService.getConfigValues(adminUser.getScopeId());
-        int daysToLive = (int) logConfig.get("eventLogTimeToLive");
-        ArgumentValidator.notNull(daysToLive, "logeEntry.timeToLive");
+        KapuaSecurityUtils.doPrivileged(() -> {
+            //
+            // Retrieve the configured log entry lifetime
+            Map<String, Object> logConfig = eventLogService.getConfigValues(adminUser.getScopeId());
+            int daysToLive = (int) logConfig.get("eventLogTimeToLive");
+            ArgumentValidator.notNull(daysToLive, "logeEntry.timeToLive");
 
-        //
-        // Calculate the time threshold for deleting logs
-        Date threshold = DateTime.now().minusDays(daysToLive).toDate();
+            //
+            // Calculate the time threshold for deleting logs
+            Date threshold = DateTime.now().minusDays(daysToLive).toDate();
 
-        //
-        // Query for the records that need to be deleted
-        EventLogQuery query = eventLogFactory.newQuery(adminUser.getScopeId());
-        query.setPredicate(new AttributePredicateImpl<>(EventLogAttributes.EVENT_SENT_ON, threshold, AttributePredicate.Operator.LESS_THAN));
-        EventLogListResult obsoleteRecords = eventLogService.query(query);
+            while (true) {
+                //
+                // Query for the records that need to be deleted
+                EventLogQuery query = eventLogFactory.newQuery(adminUser.getScopeId());
+                query.setLimit(1000);
+                query.setPredicate(new AttributePredicateImpl<>(EventLogAttributes.EVENT_SENT_ON, threshold, AttributePredicate.Operator.LESS_THAN));
+                EventLogListResult obsoleteRecords = eventLogService.query(query);
 
-        //
-        // Delete the obsolete records
-        for(EventLog logEntry : obsoleteRecords.getItems()) {
-            eventLogService.delete(logEntry.getScopeId(), logEntry.getId());
-        }
+                //
+                // Check whether there are still records to be deleted
+                if (obsoleteRecords.isEmpty()) {
+                    break;
+                }
+
+                //
+                // Delete the obsolete records
+                for (EventLog logEntry : obsoleteRecords.getItems()) {
+                    eventLogService.delete(logEntry.getScopeId(), logEntry.getId());
+                }
+            }
+        });
     }
 
     // -----------------------------------------------------------------------------------------
