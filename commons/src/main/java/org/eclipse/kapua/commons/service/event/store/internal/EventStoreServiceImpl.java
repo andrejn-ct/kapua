@@ -21,7 +21,7 @@ import org.eclipse.kapua.commons.service.event.store.api.EventStoreRecordListRes
 import org.eclipse.kapua.commons.service.event.store.api.EventStoreService;
 import org.eclipse.kapua.commons.service.internal.AbstractKapuaService;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
-import org.eclipse.kapua.event.RaiseServiceEvent;
+//import org.eclipse.kapua.event.RaiseServiceEvent;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.model.domain.Actions;
 import org.eclipse.kapua.model.id.KapuaId;
@@ -53,7 +53,7 @@ public class EventStoreServiceImpl extends AbstractKapuaService implements Event
     }
 
     @Override
-    @RaiseServiceEvent
+//    @RaiseServiceEvent
     public EventStoreRecord create(EventStoreRecordCreator kapuaEventCreator)
             throws KapuaException {
 
@@ -61,7 +61,7 @@ public class EventStoreServiceImpl extends AbstractKapuaService implements Event
     }
 
     @Override
-    @RaiseServiceEvent
+//    @RaiseServiceEvent
     public EventStoreRecord update(EventStoreRecord kapuaEvent)
             throws KapuaException {
         //
@@ -86,7 +86,7 @@ public class EventStoreServiceImpl extends AbstractKapuaService implements Event
     }
 
     @Override
-    @RaiseServiceEvent
+//    @RaiseServiceEvent
     public void delete(KapuaId scopeId, KapuaId kapuaEventId)
             throws KapuaException {
 
