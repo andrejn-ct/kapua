@@ -14,8 +14,10 @@ Feature: Job service with Service Events
     Basic workflow of Job creation and deletion, where Service Events are triggered on
     delete action on Job service.
 
-    Background: Creation of account and user with credentials
-        Create a set of accounts and users with all the required service configurations.
+    Scenario: Start event broker for all scenarios
+        Given Start Event Broker
+
+    Scenario: Job is deleted, the job schedules must be deleted too
 
         Given I login as user with name "kapua-sys" and password "kapua-password"
         And I configure the account service
@@ -53,11 +55,6 @@ Feature: Job service with Service Events
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
 
-    @StartEventBroker
-    Scenario: Start event broker for all scenarios
-
-    Scenario: Job is deleted, the job schedules must be deleted too
-
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And A job named "test-job-a-2" in the current scope
@@ -75,5 +72,5 @@ Feature: Job service with Service Events
         When I count the schedules in the current account
         Then There is exactly 1 schedule
 
-    @StopEventBroker
     Scenario: Stop event broker for all scenarios
+        Given Stop Event Broker

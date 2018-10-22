@@ -14,8 +14,12 @@ Feature: Tests for service event logging
     Basic tests for the logging of service events. The functionality of the EventLog service
     is tested.
 
-    Background: Creation of account and user with credentials
-        Create a set of accounts and users with all the required service configurations.
+    Scenario: Start event broker for all scenarios
+        Given Start Event Broker
+
+    Scenario: Account is deleted, the account users are deleted too and the events are logged
+        Create an account with a number of users. Deleting the account must trigger the deletion of
+        all the account users. Each deleted user should generate a service event log entry.
 
         Given I login as user with name "kapua-sys" and password "kapua-password"
         And I configure the account service
@@ -45,13 +49,6 @@ Feature: Tests for service event logging
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
 
-    @StartEventBroker
-    Scenario: Start event broker for all scenarios
-
-    Scenario: Account is deleted, the account users are deleted too and the events are logged
-        Create an account with a number of users. Deleting the account must trigger the deletion of
-        all the account users. Each deleted user should generate a service event log entry.
-
         Given I select account "account-a"
         Given The generic users
             | name      | displayName    | email               | phoneNumber     | status  | userType |
@@ -69,6 +66,34 @@ Feature: Tests for service event logging
 
     Scenario: Event logging is disabled
         No log entries should be created even in case of service events being triggered.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
 
         Given I select account "account-a"
         Given The generic users
@@ -93,6 +118,34 @@ Feature: Tests for service event logging
         account is deleted, resulting in the deletion of 3 users. 3 service events should be logged.
         In the second phase event logging is disabled. Another account with 3 users is deleted, but no additional
         events must be logged.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
 
         Given I configure the event logging service
             | type    | name                   | value |
@@ -134,6 +187,34 @@ Feature: Tests for service event logging
         times (with different ages). Next, the log entry time to live is manipulated and entries purged several times.
         The number of existing log entries must decrease in line with the purging of gradually obsoleted entries.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I prepare 10 events 15 days old
         And I prepare 10 events 20 days old
         And I prepare 10 events 25 days old
@@ -166,5 +247,5 @@ Feature: Tests for service event logging
         And I query for all event logs
         Then There are exactly 0 event log entries
 
-    @StopEventBroker
     Scenario: Stop event broker for all scenarios
+        Given Stop Event Broker
