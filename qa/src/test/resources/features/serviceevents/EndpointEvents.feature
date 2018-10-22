@@ -14,8 +14,10 @@ Feature: EndpointInfo service with Service Events
     Basic workflow of Endpoint Info creation and deletion, where Service Events are triggered on
     account deletion.
 
-    Background: Creation of account and user with credentials
-        Create a set of accounts and users with all the required service configurations.
+    Scenario: Start event broker for all scenarios
+        Given Start Event Broker
+
+    Scenario: Account is deleted, all endpoint info items for the account must be deleted too
 
         Given I login as user with name "kapua-sys" and password "kapua-password"
         And I configure the account service
@@ -36,11 +38,6 @@ Feature: EndpointInfo service with Service Events
             | type    | name                   | value |
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
-
-    @StartEventBroker
-    Scenario: Start event broker for all scenarios
-
-    Scenario: Account is deleted, all endpoint info items for the account must be deleted too
 
         Given I select account "account-a"
         And The following endpoints for the current account
@@ -68,6 +65,26 @@ Feature: EndpointInfo service with Service Events
 
     Scenario: A subaccount with no endpoints is deleted. The parent account endpoints must remain
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I select account "account-a"
         And The following endpoints for the current account
             | schema  | url    | port  |
@@ -93,5 +110,5 @@ Feature: EndpointInfo service with Service Events
         When I query for endpoints in account "account-b"
         Then There are exactly 2 endpoints
 
-    @StopEventBroker
     Scenario: Stop event broker for all scenarios
+        Given Stop Event Broker
