@@ -36,6 +36,15 @@
             description="Event log entry lifetime in days.">
         </AD>
 
+        <AD id="deletionBatchSize"
+            name="deletionBatchSize"
+            type="Integer"
+            cardinality="0"
+            required="false"
+            default="1000"
+            min="1"
+            description="The number of events to be deleted in one batch.">
+        </AD>
     </OCD>
 
     <Designate pid="org.eclipse.kapua.service.eventlog.logger.EventLogService">

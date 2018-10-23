@@ -72,7 +72,8 @@ public class EventLogHouseKeeperImpl implements EventLogHouseKeeper {
             Map<String, Object> logConfig = eventLogService.getConfigValues(adminUser.getScopeId());
             int daysToLive = (int) logConfig.get("eventLogTimeToLive");
             ArgumentValidator.notNull(daysToLive, "logeEntry.timeToLive");
-
+            int batchSize = (int) logConfig.get("deletionBatchSize");
+            ArgumentValidator.notNull(batchSize, "logeEntry.batchSize");
             //
             // Calculate the time threshold for deleting logs
             Date threshold = DateTime.now().minusDays(daysToLive).toDate();
@@ -81,7 +82,7 @@ public class EventLogHouseKeeperImpl implements EventLogHouseKeeper {
                 //
                 // Query for the records that need to be deleted
                 EventLogQuery query = eventLogFactory.newQuery(adminUser.getScopeId());
-                query.setLimit(1000);
+                query.setLimit(batchSize);
                 query.setPredicate(new AttributePredicateImpl<>(EventLogAttributes.EVENT_SENT_ON, threshold, AttributePredicate.Operator.LESS_THAN));
                 EventLogListResult obsoleteRecords = eventLogService.query(query);
 
