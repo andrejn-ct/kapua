@@ -12,7 +12,15 @@
 @serviceevents
 Feature: Authentication Service
 
-    Background:
+    Scenario: Start event broker for all scenarios
+
+        Given Start Event Broker
+
+    Scenario: Delete a user and all the credentials for the user should be deleted
+    Provide a number of accounts and users. Set each user with a set of credentials.
+    After deleting a user, the user credentials must be deleted too.
+    The credentials for the remaining users must remain.
+
         Given I login as user with name "kapua-sys" and password "kapua-password"
         And I configure the account service
             | type    | name                   | value |
@@ -74,14 +82,6 @@ Feature: Authentication Service
             | kapua-b-1 | ToManySecrets123# | true    |
             | kapua-b-2 | ToManySecrets123# | true    |
 
-    @StartEventBroker
-    Scenario: Start event broker for all scenarios
-
-    Scenario: Delete a user and all the credentials for the user should be deleted
-    Provide a number of accounts and users. Set each user with a set of credentials.
-    After deleting a user, the user credentials must be deleted too.
-    The credentials for the remaining users must remain.
-
         When I query for all the credentials in account "account-a"
         Then I find 2 credentials
         When I query for all the credentials in account "account-b"
@@ -102,6 +102,67 @@ Feature: Authentication Service
     After deleting an account, the user credentials must be deleted too.
     The credentials for the remaining accounts must remain.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-a-1 | Kapua User A 1 | kapua_a_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-2 | Kapua User A 2 | kapua_a_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-a-1 | ToManySecrets123# | true    |
+            | kapua-a-2 | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                   | value |
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-b-1 | Kapua User B 1 | kapua_b_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-b-2 | Kapua User B 2 | kapua_b_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-b-1 | ToManySecrets123# | true    |
+            | kapua-b-2 | ToManySecrets123# | true    |
+
         When I query for all the credentials in account "account-a"
         Then I find 2 credentials
         When I query for all the credentials in account "account-b"
@@ -120,6 +181,67 @@ Feature: Authentication Service
     Provide a number of accounts and users. Create a number of access tokens for the users in the accounts.
     After deleting an account, all the access tokens must be deleted too.
     Access tokens for other accounts must remain.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-a-1 | Kapua User A 1 | kapua_a_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-2 | Kapua User A 2 | kapua_a_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-a-1 | ToManySecrets123# | true    |
+            | kapua-a-2 | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                   | value |
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-b-1 | Kapua User B 1 | kapua_b_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-b-2 | Kapua User B 2 | kapua_b_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-b-1 | ToManySecrets123# | true    |
+            | kapua-b-2 | ToManySecrets123# | true    |
 
         Given The access token "token-a-1-1" for user "kapua-a-1" in scope "account-a"
         And The access token "token-a-1-2" for user "kapua-a-1" in scope "account-a"
@@ -153,6 +275,67 @@ Feature: Authentication Service
     After deleting a user, all the user access tokens must be deleted too.
     Access tokens for other users must remain.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-a-1 | Kapua User A 1 | kapua_a_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-a-2 | Kapua User A 2 | kapua_a_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-a-1 | ToManySecrets123# | true    |
+            | kapua-a-2 | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the credential service
+            | type    | name                   | value |
+            | type    | name                       | value |
+            | boolean | lockoutPolicy.enabled      | false |
+            | integer | lockoutPolicy.maxFailures  | 1     |
+            | integer | lockoutPolicy.resetAfter   | 300   |
+            | integer | lockoutPolicy.lockDuration | 1     |
+        Given The generic users
+            | name      | displayName    | email               | phoneNumber     | status  | userType |
+            | kapua-b-1 | Kapua User B 1 | kapua_b_1@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+            | kapua-b-2 | Kapua User B 2 | kapua_b_2@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name      | password          | enabled |
+            | kapua-b-1 | ToManySecrets123# | true    |
+            | kapua-b-2 | ToManySecrets123# | true    |
+
         Given The access token "token-a-1-1" for user "kapua-a-1" in scope "account-a"
         And The access token "token-a-1-2" for user "kapua-a-1" in scope "account-a"
         And The access token "token-a-1-3" for user "kapua-a-1" in scope "account-a"
@@ -182,5 +365,6 @@ Feature: Authentication Service
         When I query for all access tokens in account "account-b"
         Then I find 5 tokens
 
-    @StopEventBroker
     Scenario: Stop event broker for all scenarios
+
+        Given Stop Event Broker

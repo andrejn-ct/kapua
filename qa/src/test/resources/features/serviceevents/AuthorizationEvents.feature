@@ -82,13 +82,83 @@ Feature: Authorization Service
             | kapua-b | ToManySecrets123# | true    |
         And I wait for 5 seconds
 
-    @StartEventBroker
     Scenario: Start event broker for all scenarios
+
+        Given Start Event Broker
 
     Scenario: Delete a user and all the access info items for this user have to be deleted too
     Provide a number of accounts and users. Create a number of access info items for the users in the accounts.
     After deleting a user, all the user access info items must be deleted too.
     Access info items for other users must remain.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+        And I wait for 5 seconds
 
         Given I create an empty access info entity for user "kapua-a" in scope "account-a"
         And I create an empty access info entity for user "kapua-a" in scope "account-a"
@@ -147,6 +217,75 @@ Feature: Authorization Service
         is deleted, all the account roles must be deleted too.
         Roles for other accounts must remain.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+        And I wait for 5 seconds
+
         Given The following roles in scope "account-a"
         |name      |actions              |
         |role-a-1  |write, read, connect |
@@ -174,6 +313,75 @@ Feature: Authorization Service
         is deleted, all the account groups must be deleted too.
         Groups for other accounts must remain.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+        And I wait for 5 seconds
+
         Given I select account "account-a"
         And The following groups in scope "account-a"
         |name        |
@@ -199,6 +407,75 @@ Feature: Authorization Service
     Provide a number of accounts, users, groups and devices. Assign the devices to the various groups. When
     a group is deleted, all the devices that are assigned to that group must be removed from that group.
     All other devices should remain unaffected.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+        And I wait for 5 seconds
 
         Given The following groups in scope "account-a"
             |name        |
@@ -250,6 +527,75 @@ Feature: Authorization Service
     After deleting an account, all the account access info items must be deleted too.
     Access info items for other accounts must remain.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User A
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-a | ToManySecrets123# | true    |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the user service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the role service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the group service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 5     |
+        And I configure the device service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And User B
+            | name    | displayName  | email             | phoneNumber     | status  | userType |
+            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
+        And Credentials
+            | name    | password          | enabled |
+            | kapua-b | ToManySecrets123# | true    |
+        And I wait for 5 seconds
+
         Given I create an empty access info entity for user "kapua-a" in scope "account-a"
         And I create an empty access info entity for user "kapua-a" in scope "account-a"
         And I create an empty access info entity for user "kapua-a" in scope "account-a"
@@ -276,5 +622,6 @@ Feature: Authorization Service
         When I query for the access info entities in the last scope
         Then I find no such access info item
 
-    @StopEventBroker
     Scenario: Stop event broker for all scenarios
+
+        Given Stop Event Broker
