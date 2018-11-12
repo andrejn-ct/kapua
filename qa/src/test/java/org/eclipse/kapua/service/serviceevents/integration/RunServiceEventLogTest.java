@@ -17,8 +17,10 @@ import org.junit.runner.RunWith;
 
 @RunWith(CucumberWithProperties.class)
 @CucumberOptions(
-        features = "classpath:features/serviceevents/EventLogs.feature",
+//        features = "classpath:features/serviceevents/EventLogs.feature",
+        features = "classpath:features/serviceevents/JobEvents.feature",
         glue = {"org.eclipse.kapua.qa.steps",
+                "org.eclipse.kapua.service.job.steps",
                 "org.eclipse.kapua.service.user.steps",
                 "org.eclipse.kapua.service.authentication.steps",
                 "org.eclipse.kapua.service.eventlog.steps"
