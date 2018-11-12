@@ -15,25 +15,18 @@ Feature: Tag Service
   used to attach tags to Devices, but could be used to tag eny kapua entity, like
   User for example.
 
-  Background:
-    Given I login as user with name "kapua-sys" and password "kapua-password"
-      And I configure the tag service
-        | type    | name                       | value |
-        | boolean | infiniteChildEntities      | true  |
-        | integer | maxNumberChildEntities     | 5     |
-
-  @StartDatastore
-  Scenario: Start datastore for all scenarios
-
-  @StartEventBroker
   Scenario: Start event broker for all scenarios
-
-  @StartBroker
-  Scenario: Start broker for all scenarios
+    Given Start Event Broker
 
   Scenario: Creating tag
     Create a tag entry, with specified name. Name is only tag specific attribute.
     Once created search for it and is should been created.
+
+    Given I login as user with name "kapua-sys" and password "kapua-password"
+    And I configure the tag service
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
 
     Given Tag with name "tagName"
     When Tag with name "tagName" is searched
@@ -44,16 +37,16 @@ Feature: Tag Service
     Create a tag entry, with specified name. Name is only tag specific attribute.
     Once created search and find it, then delete it.
 
+    Given I login as user with name "kapua-sys" and password "kapua-password"
+    And I configure the tag service
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
+
     Given Tag with name "tagName2"
     When Tag with name "tagName2" is searched
     Then Tag with name "tagName2" is found and deleted
       And I logout
 
-  @StopBroker
-  Scenario: Stop broker after all scenarios
-
-  @StopEventBroker
   Scenario: Stop event broker for all scenarios
-
-  @StopDatastore
-  Scenario: Stop datastore after all scenarios
+    Given Stop Event Broker

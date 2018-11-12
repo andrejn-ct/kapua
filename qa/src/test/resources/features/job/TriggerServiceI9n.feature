@@ -13,8 +13,10 @@
 Feature: Job service tests
     Basic workflow of Job creation and deletion. These test scenarios check for integration issues with other services.
 
-    Background: Creation of account and user with credentials
-        Create a set of accounts and users with all the required service configurations.
+    Scenario: Start event broker for all scenarios
+        Given Start Event Broker
+
+    Scenario: Create a number of jobs and schedules. Regular case.
 
         Given I login as user with name "kapua-sys" and password "kapua-password"
         And I configure the account service
@@ -52,8 +54,6 @@ Feature: Job service tests
             | boolean | infiniteChildEntities  | true  |
             | integer | maxNumberChildEntities | 0     |
 
-    Scenario: Create a number of jobs and schedules. Regular case.
-
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
@@ -79,6 +79,42 @@ Feature: Job service tests
         The schedule names must be unique in the scope. Creating a schedule with a duplicate name should
         throw an exception. A similarly named schedule in another account must be successfully created.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
@@ -95,6 +131,42 @@ Feature: Job service tests
     Scenario: Delete an existing schedule
         It  must be possible to regularly delete an existing schedule entity.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
@@ -110,6 +182,42 @@ Feature: Job service tests
 
     Scenario: Delete a non existing schedule
         Try to delete the same schedule twice. When deleting the second time, an exception must be raised.
+
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
 
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
@@ -130,6 +238,42 @@ Feature: Job service tests
 
     Scenario: Rename an existing schedule
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
@@ -145,6 +289,42 @@ Feature: Job service tests
         An attempt to update an inexistent should result in an exception. For this purpose, a schedule is
         first created and deleted. Updating this deleted schedule should throw an exception.
 
+        Given I login as user with name "kapua-sys" and password "kapua-password"
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-a | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given Account
+            | name      | scopeId |
+            | account-b | 1       |
+        And I configure the account service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        And I configure the job service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+        Given I configure the scheduler service
+            | type    | name                   | value |
+            | boolean | infiniteChildEntities  | true  |
+            | integer | maxNumberChildEntities | 0     |
+
         Given I select account "account-a"
         And A job named "test-job-a-1" in the current scope
         And I create the schedule "test-trigger-a-1-1" for the job "test-job-a-1" in the current account
@@ -154,3 +334,6 @@ Feature: Job service tests
         Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type schedule with id/name"
         When I rename the selected schedule to "NewName"
         Then An exception was thrown
+
+    Scenario: Stop event broker for all scenarios
+        Given Stop Event Broker
