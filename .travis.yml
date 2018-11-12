@@ -78,7 +78,15 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
     - stage: test
       script:
+        - ./travis.sh $M2_HOME/bin/mvn -B -Dcommons.db.schema=kapuadb -Dcommons.settings.hotswap=true -Dcucumber.options="--tags @jobschedules" -Dgroups='!org.eclipse.kapua.test.junit.JUnitTests' verify
+        - bash <(curl -s https://codecov.io/bash)
+    - stage: test
+      script:
         - ./travis.sh $M2_HOME/bin/mvn -B -Dcommons.db.schema=kapuadb -Dcommons.settings.hotswap=true -Dcucumber.options="--tags @rest" -Dgroups='!org.eclipse.kapua.test.junit.JUnitTests' verify
+        - bash <(curl -s https://codecov.io/bash)
+    - stage: test
+      script:
+        - ./travis.sh $M2_HOME/bin/mvn -B -Dcommons.db.schema=kapuadb -Dcommons.settings.hotswap=true -Dcucumber.options="--tags @serviceevents" -Dgroups='!org.eclipse.kapua.test.junit.JUnitTests' verify
         - bash <(curl -s https://codecov.io/bash)
     - stage: test
       script:
