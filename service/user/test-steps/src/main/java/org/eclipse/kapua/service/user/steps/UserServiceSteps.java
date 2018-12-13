@@ -670,6 +670,13 @@ public class UserServiceSteps extends TestBase {
         }
     }
 
+    @Given("^Move User compact id from step data \"(.*)\" to \"(.*)\"$")
+    public void moveUserCompactIdStepData(String keyFrom, String keyTo) {
+
+        ComparableUser comparableUser = (ComparableUser) stepData.get(keyFrom);
+        stepData.put(keyTo, comparableUser.getUser().getId().toCompactId());
+    }
+
     @When("^I configure user service$")
     public void setUserServiceConfig(List<CucConfig> cucConfigs)
             throws Exception {
