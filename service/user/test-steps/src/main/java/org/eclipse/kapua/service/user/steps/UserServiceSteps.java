@@ -41,7 +41,6 @@ import org.eclipse.kapua.qa.common.DBHelper;
 import org.eclipse.kapua.qa.common.StepData;
 import org.eclipse.kapua.qa.common.TestBase;
 import org.eclipse.kapua.service.account.Account;
-import org.eclipse.kapua.service.account.AccountCreator;
 import org.eclipse.kapua.service.account.AccountFactory;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.authentication.AuthenticationService;
@@ -514,17 +513,6 @@ public class UserServiceSteps extends TestBase {
         assertNotNull("Metadata should be retrieved.", metadata);
     }
 
-    @Given("^Account$")
-    public void givenAccount(List<CucAccount> accountList) throws Exception {
-        CucAccount cucAccount = accountList.get(0);
-        // If accountId is not set in account list, use last created Account for scope id
-        if (cucAccount.getScopeId() == null) {
-            cucAccount.setScopeId(((Account) stepData.get("LastAccount")).getId().getId());
-        }
-
-        stepData.put("LastAccount", createAccount(cucAccount));
-    }
-
     @Given("^Credentials$")
     public void givenCredentials(List<CucCredentials> credentialsList) throws Exception {
         CucCredentials cucCredentials = credentialsList.get(0);
@@ -766,53 +754,6 @@ public class UserServiceSteps extends TestBase {
     // *******************
     // * Private Helpers *
     // *******************
-    /**
-     * Create account in privileged mode as kapua-sys user.
-     * Account is created in scope specified by scopeId in cucAccount parameter.
-     * This is not accountId, but account under which it is created. AccountId itself
-     * is created automatically.
-     *
-     * @param cucAccount basic data about account
-     * @return Kapua Account object
-     */
-    private Account createAccount(CucAccount cucAccount) throws Exception {
-        List<Account> accountList = new ArrayList<>();
-        KapuaSecurityUtils.doPrivileged(() -> {
-            primeException();
-            try {
-                Account account = accountService.create(accountCreatorCreator(cucAccount.getName(),
-                        cucAccount.getScopeId(), cucAccount.getExpirationDate()));
-                accountList.add(account);
-            } catch (KapuaException ke) {
-                verifyException(ke);
-            }
-
-            return null;
-        });
-
-        return accountList.size() == 1 ? accountList.get(0) : null;
-    }
-
-    /**
-     * Create account creator.
-     *
-     * @param name    account name
-     * @param scopeId acount scope id
-     * @return
-     */
-    private AccountCreator accountCreatorCreator(String name, BigInteger scopeId, Date expiration) {
-        AccountCreator accountCreator;
-
-        accountCreator = accountFactory.newCreator(new KapuaEid(scopeId), name);
-        if (expiration != null) {
-            accountCreator.setExpirationDate(expiration);
-        }
-        accountCreator.setOrganizationName("ACME Inc.");
-        accountCreator.setOrganizationEmail("some@one.com");
-
-        return accountCreator;
-    }
-
     /**
      * Extract list of users form step parameter table and create those users in
      * kapua.
