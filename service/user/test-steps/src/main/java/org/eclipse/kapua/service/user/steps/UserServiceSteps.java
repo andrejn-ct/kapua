@@ -17,7 +17,6 @@ import com.google.inject.Injector;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -79,12 +78,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -584,42 +578,6 @@ public class UserServiceSteps extends TestBase {
         }
     }
 
-    @When("^I select account \"(.*)\"$")
-    public void selectAccount(String accountName) throws KapuaException {
-        Account tmpAccount;
-        tmpAccount = accountService.findByName(accountName);
-        if (tmpAccount != null) {
-            stepData.put("LastAccount", tmpAccount);
-        } else {
-            stepData.remove("LastAccount");
-        }
-    }
-
-    @When("I change the current account expiration date to \"(.+)\"")
-    public void changeCurrentAccountExpirationDate(String newExpiration) throws Exception {
-
-        Account currAcc = (Account) stepData.get("LastAccount");
-        Date newDate = parseDateString(newExpiration);
-
-        try {
-            primeException();
-            currAcc.setExpirationDate(newDate);
-            Account tmpAcc = accountService.update(currAcc);
-            stepData.put("LastAccount", tmpAcc);
-        } catch (KapuaException e) {
-            verifyException(e);
-        }
-    }
-
-    @When("^I try to delete account \"(.*)\"$")
-    public void deleteAccount(String accountName) throws KapuaException {
-        Account accountToDelete;
-        accountToDelete = accountService.findByName(accountName);
-        if (accountToDelete != null) {
-            accountService.delete(accountToDelete.getScopeId(), accountToDelete.getId());
-        }
-    }
-
     @Then("^I try to delete user \"(.*)\"$")
     public void thenDeleteUser(String userName) throws Exception {
 
@@ -744,11 +702,6 @@ public class UserServiceSteps extends TestBase {
     @Then("^I logout$")
     public void logout() throws KapuaException {
         authenticationService.logout();
-    }
-
-    @And("^Using kapua-sys account$")
-    public void usingSysAccount() {
-        stepData.put("LastAccount", null);
     }
 
     // *******************
@@ -973,39 +926,6 @@ public class UserServiceSteps extends TestBase {
             assertEquals(cucUser.getStatus(), user.getStatus());
         }
         return true;
-    }
-
-    private Date parseDateString(String date) {
-        DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
-        Date expDate = null;
-        Instant now = Instant.now();
-
-        if (date == null) {
-            return null;
-        }
-        // Special keywords for date
-        switch (date.trim().toLowerCase()) {
-            case "yesterday":
-                expDate = Date.from(now.minus(Duration.ofDays(1)));
-                break;
-            case "today":
-                expDate = Date.from(now);
-                break;
-            case "tomorrow":
-                expDate = Date.from(now.plus(Duration.ofDays(1)));
-                break;
-            case "null":
-                break;
-        }
-
-        // Not one of the special cases. Just parse the date.
-        try {
-            expDate = df.parse(date.trim().toLowerCase());
-        } catch (ParseException | NullPointerException e) {
-            // skip, leave date null
-        }
-
-        return expDate;
     }
 
     // *****************

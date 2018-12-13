@@ -209,6 +209,11 @@ public class AccountServiceSteps extends TestBase {
         stepData.put("LastAccount", createAccount(cucAccount));
     }
 
+    @Given("^Using kapua-sys account$")
+    public void usingSysAccount() {
+        stepData.put("LastAccount", null);
+    }
+
     @When("^I create a generic account with name \"(.*)\"$")
     public void createGenericAccount(String name)
             throws Exception {
@@ -431,6 +436,33 @@ public class AccountServiceSteps extends TestBase {
 //            verifyException(ex);
 //        }
 //    }
+
+    @When("^I select account \"(.*)\"$")
+    public void selectAccount(String accountName) throws KapuaException {
+        Account tmpAccount;
+        tmpAccount = accountService.findByName(accountName);
+        if (tmpAccount != null) {
+            stepData.put("LastAccount", tmpAccount);
+        } else {
+            stepData.remove("LastAccount");
+        }
+    }
+
+    @When("I change the current account expiration date to \"(.+)\"")
+    public void changeCurrentAccountExpirationDate(String newExpiration) throws Exception {
+
+        Account currAcc = (Account) stepData.get("LastAccount");
+        Date newDate = parseDateString(newExpiration);
+
+        try {
+            primeException();
+            currAcc.setExpirationDate(newDate);
+            Account tmpAcc = accountService.update(currAcc);
+            stepData.put("LastAccount", tmpAcc);
+        } catch (KapuaException e) {
+            verifyException(e);
+        }
+    }
 
     @When("^I delete account \"(.*)\"$")
     public void deleteAccountWithName(String name)
