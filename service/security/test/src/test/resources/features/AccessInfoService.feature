@@ -9,7 +9,7 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@security
+@securityCRUD
 Feature: Access Info Service CRUD tests
 
   Scenario: Simple create
@@ -17,9 +17,17 @@ Feature: Access Info Service CRUD tests
   match the creator parameters.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
+    When I configure the role service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     When I create the access info entity
     Then No exception was thrown
     And An access info entity was created
@@ -30,6 +38,10 @@ Feature: Access Info Service CRUD tests
   supplied too. The entry must match the creator parameters.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -46,6 +58,10 @@ Feature: Access Info Service CRUD tests
   an access role are supplied. The entry must match the creator parameters.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -65,6 +81,10 @@ Feature: Access Info Service CRUD tests
   Such an attempt must result in an exception.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -79,6 +99,10 @@ Feature: Access Info Service CRUD tests
   based on its ID.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -93,6 +117,10 @@ Feature: Access Info Service CRUD tests
   based on the entity user ID.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -106,6 +134,10 @@ Feature: Access Info Service CRUD tests
   must be returned. No exception must be thrown.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -121,6 +153,10 @@ Feature: Access Info Service CRUD tests
   It must be possible to delete an existing entity from the database.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -135,6 +171,10 @@ Feature: Access Info Service CRUD tests
   It must be possible to delete an existing entity from the database.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -150,6 +190,10 @@ Feature: Access Info Service CRUD tests
   in an exception.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -164,6 +208,10 @@ Feature: Access Info Service CRUD tests
   in an exception.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -178,6 +226,10 @@ Feature: Access Info Service CRUD tests
   scopes.
 
     Given Scope ID 10
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -203,6 +255,10 @@ Feature: Access Info Service CRUD tests
   to a specific user.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |
@@ -226,6 +282,10 @@ Feature: Access Info Service CRUD tests
   No exceptions should be thrown.
 
     Given Scope ID 1
+    When I configure the user service for the account with the id 42
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
     And I have the following user
       | name     | displayName  | email              | phoneNumber     |
       | kapua-u1 | Kapua User 1 | kapua_u1@kapua.com | +386 31 323 555 |

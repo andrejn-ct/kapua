@@ -189,8 +189,6 @@ public class UserServiceSteps extends TestBase {
         userService = locator.getService(UserService.class);
         userFactory = locator.getFactory(UserFactory.class);
         authenticationService = locator.getService(AuthenticationService.class);
-//        accountService = locator.getService(AccountService.class);
-//        accountFactory = locator.getFactory(AccountFactory.class);
         credentialService = locator.getService(CredentialService.class);
         accessInfoService = locator.getService(AccessInfoService.class);
         accessInfoFactory = locator.getFactory(AccessInfoFactory.class);
@@ -475,11 +473,13 @@ public class UserServiceSteps extends TestBase {
 
     @Given("^I have the following (?:user|users)$")
     public void haveUsers(List<CucUser> userList) throws Exception {
+
         Set<ComparableUser> iHaveUsers = new HashSet<>();
         User lastUser = null;
         stepData.remove("UserList");
+
+        primeException();
         try {
-            primeException();
             for (CucUser userItem : userList) {
                 String name = userItem.getName();
                 String displayName = userItem.getDisplayName();
