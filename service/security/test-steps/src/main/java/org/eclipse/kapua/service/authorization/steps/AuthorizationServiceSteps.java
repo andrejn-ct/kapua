@@ -24,7 +24,6 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 import org.apache.shiro.SecurityUtils;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.metatype.KapuaMetatypeFactoryImpl;
-import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
@@ -112,15 +111,13 @@ import org.eclipse.kapua.service.authorization.role.shiro.RolePermissionImpl;
 import org.eclipse.kapua.service.authorization.role.shiro.RolePermissionServiceImpl;
 import org.eclipse.kapua.service.authorization.role.shiro.RoleServiceImpl;
 import org.eclipse.kapua.service.authorization.shiro.AuthorizationEntityManagerFactory;
+import org.eclipse.kapua.service.authorization.shiro.AuthorizationServiceImpl;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.test.MockedLocator;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -174,22 +171,13 @@ public class AuthorizationServiceSteps extends TestBase {
             @Override
             protected void configure() {
 
-                // Inject mocked Authorization Service method checkPermission
-                AuthorizationService mockedAuthorization = Mockito.mock(AuthorizationService.class);
-                try {
-                    Mockito.doNothing().when(mockedAuthorization).checkPermission(Matchers.any(Permission.class));
-                } catch (KapuaException e) {
-                    // skip
-                }
-                bind(AuthorizationService.class).toInstance(mockedAuthorization);
-                // Inject mocked Permission Factory
-//                bind(PermissionFactory.class).toInstance(Mockito.mock(PermissionFactory.class));
-
                 // Set KapuaMetatypeFactory for Metatype configuration
                 bind(KapuaMetatypeFactory.class).toInstance(new KapuaMetatypeFactoryImpl());
 
                 // Inject actual account related services
                 bind(AuthorizationEntityManagerFactory.class).toInstance(AuthorizationEntityManagerFactory.getInstance());
+
+                bind(AuthorizationService.class).toInstance(new AuthorizationServiceImpl());
                 bind(AccessInfoService.class).toInstance(new AccessInfoServiceImpl());
                 bind(AccessInfoFactory.class).toInstance(new AccessInfoFactoryImpl());
                 bind(AccessPermissionService.class).toInstance(new AccessPermissionServiceImpl());
@@ -286,7 +274,6 @@ public class AuthorizationServiceSteps extends TestBase {
             scopeId = tmpAccount.getId();
             parentScopeId = tmpAccount.getScopeId();
         } else {
-
             scopeId = SYS_SCOPE_ID;
             parentScopeId = SYS_SCOPE_ID;
         }
@@ -311,9 +298,9 @@ public class AuthorizationServiceSteps extends TestBase {
     @When("^I configure the role service for the account with the id (\\d+)$")
     public void setRoleServiceConfig(int accountId, List<CucConfig> cucConfigs)
             throws Exception {
+
         Map<String, Object> valueMap = new HashMap<>();
-        KapuaId accId = new KapuaEid(BigInteger.valueOf(accountId));
-        KapuaId scopeId = SYS_SCOPE_ID;
+        KapuaId accId = getKapuaId(accountId);
 
         for (CucConfig config : cucConfigs) {
             config.addConfigToMap(valueMap);
@@ -321,7 +308,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         primeException();
         try {
-            roleService.setConfigValues(accId, scopeId, valueMap);
+            roleService.setConfigValues(accId, SYS_SCOPE_ID, valueMap);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -331,10 +318,12 @@ public class AuthorizationServiceSteps extends TestBase {
     public void createAListOfRoles(List<CucRole> roles)
             throws Exception {
 
+        Domain domain = (Domain) stepData.get("Domain");
         RoleCreator roleCreator = null;
         Set<Permission> permissions;
         Role role = null;
 
+        stepData.remove("Permissions");
         stepData.remove("RoleCreator");
         stepData.remove("Role");
 
@@ -344,7 +333,7 @@ public class AuthorizationServiceSteps extends TestBase {
             permissions = new HashSet<>();
             if ((tmpRole.getActions() != null) && (tmpRole.getActions().size() > 0)) {
                 for (Actions tmpAct : tmpRole.getActions()) {
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, tmpAct, tmpRole.getScopeId()));
+                    permissions.add(permissionFactory.newPermission(domain.getDomain(), tmpAct, tmpRole.getScopeId()));
                 }
             }
             roleCreator = roleFactory.newCreator(tmpRole.getScopeId());
@@ -352,13 +341,13 @@ public class AuthorizationServiceSteps extends TestBase {
             roleCreator.setPermissions(permissions);
             try {
                 role = roleService.create(roleCreator);
+                stepData.put("Permissions", permissions);
+                stepData.put("RoleCreator", roleCreator);
+                stepData.put("Role", role);
             } catch (KapuaException ex) {
                 verifyException(ex);
             }
         }
-
-        stepData.put("RoleCreator", roleCreator);
-        stepData.put("Role", role);
     }
 
     @Given("^I create the following role permission(?:|s)$")
@@ -366,10 +355,8 @@ public class AuthorizationServiceSteps extends TestBase {
             throws Exception {
 
         Role role = (Role) stepData.get("Role");
+        Domain domain = (Domain) stepData.get("Domain");
         RolePermission rolePermission = null;
-
-        TestDomain tmpDom = new TestDomain();
-        tmpDom.setName("test_domain");
 
         stepData.remove("RolePermission");
 
@@ -379,11 +366,11 @@ public class AuthorizationServiceSteps extends TestBase {
             assertNotNull(tmpCPerm.getScopeId());
             assertNotNull(tmpCPerm.getAction());
 
-            tmpDom.setScopeId(tmpCPerm.getScopeId());
+            domain.setScopeId(tmpCPerm.getScopeId());
 
             RolePermissionCreator rolePermissionCreator = rolePermissionFactory.newCreator(tmpCPerm.getScopeId());
             rolePermissionCreator.setRoleId(role.getId());
-            rolePermissionCreator.setPermission(permissionFactory.newPermission(tmpDom, tmpCPerm.getAction(), tmpCPerm.getTargetScopeId()));
+            rolePermissionCreator.setPermission(permissionFactory.newPermission(domain.getDomain(), tmpCPerm.getAction(), tmpCPerm.getTargetScopeId()));
 
             try {
                 rolePermission = rolePermissionService.create(rolePermissionCreator);
@@ -401,16 +388,14 @@ public class AuthorizationServiceSteps extends TestBase {
 
         Role role = (Role) stepData.get("Role");
         role.setName(name);
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         try {
             primeException();
-            role = roleService.update(role);
+            roleService.update(role);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
-
-        stepData.put("Role", role);
     }
 
     @When("^I examine the permissions for the last role$")
@@ -517,7 +502,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         primeException();
         try {
-            long count = roleService.count(tmpQuery);
+            Long count = roleService.count(tmpQuery);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -535,7 +520,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         primeException();
         try {
-            long count = rolePermissionService.count(tmpQuery);
+            Long count = rolePermissionService.count(tmpQuery);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -559,7 +544,7 @@ public class AuthorizationServiceSteps extends TestBase {
             RoleListResult roleList = roleService.query(tmpQuery);
             stepData.put("RoleList", roleList);
             stepData.put("RoleFound", roleList.getFirstItem());
-            stepData.put("Count", roleList.getSize());
+            stepData.put("Count", Long.valueOf(roleList.getSize()));
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -643,7 +628,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         assertNotNull(role);
         assertNotNull(roleFound);
-        assertEquals(role.getScopeId(), roleFound.getScopeId());
+        assertEquals(role.getId(), roleFound.getId());
         assertEquals(role.getScopeId(), roleFound.getScopeId());
         assertEquals(role.getName(), roleFound.getName());
         assertEquals(role.getCreatedBy(), roleFound.getCreatedBy());
@@ -660,7 +645,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         assertNotNull(rolePermission);
         assertNotNull(rolePermissionFound);
-        assertEquals(rolePermission.getScopeId(), rolePermissionFound.getScopeId());
+        assertEquals(rolePermission.getId(), rolePermissionFound.getId());
         assertEquals(rolePermission.getScopeId(), rolePermissionFound.getScopeId());
         assertEquals(rolePermission.getCreatedBy(), rolePermissionFound.getCreatedBy());
         assertEquals(rolePermission.getCreatedOn(), rolePermissionFound.getCreatedOn());
@@ -674,9 +659,9 @@ public class AuthorizationServiceSteps extends TestBase {
 
         assertNotNull(role);
         assertNotNull(roleFound);
+        assertEquals(role.getId(), roleFound.getId());
         assertEquals(role.getScopeId(), roleFound.getScopeId());
-        assertEquals(role.getScopeId(), roleFound.getScopeId());
-        assertEquals(role.getName(), roleFound.getName());
+        assertNotEquals(role.getName(), roleFound.getName());
         assertEquals(role.getCreatedBy(), roleFound.getCreatedBy());
         assertEquals(role.getCreatedOn(), roleFound.getCreatedOn());
         assertEquals(role.getModifiedBy(), roleFound.getModifiedBy());
@@ -803,14 +788,30 @@ public class AuthorizationServiceSteps extends TestBase {
 
             try {
                 domain = domainRegistryService.create(domainCreator);
+                stepData.put("Domain", domain);
+                if (domain != null) {
+                    stepData.put("DomainId", domain.getId());
+                }
             } catch (KapuaException ex) {
                 verifyException(ex);
             }
         }
+    }
 
-        stepData.put("DomainCreator", domainCreator);
-        stepData.put("Domain", domain);
-        stepData.put("DomainId", domain.getId());
+    @Given("^I select the domain \"(.+)\"$")
+    public void selectExistingDomain(String name)
+            throws Exception {
+
+        DomainQuery query = domainFactory.newQuery(KapuaId.ANY);
+        query.setPredicate(new AttributePredicateImpl<>(DomainAttributes.NAME, name));
+
+        try {
+            primeException();
+            DomainListResult domains = domainRegistryService.query(query);
+            stepData.put("Domain", domains.getFirstItem());
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
     }
 
     @When("^I search for the last created domain$")
@@ -864,7 +865,7 @@ public class AuthorizationServiceSteps extends TestBase {
         try {
             primeException();
             DomainQuery query = domainFactory.newQuery(null);
-            long count = domainRegistryService.count(query);
+            Long count = domainRegistryService.count(query);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -885,7 +886,7 @@ public class AuthorizationServiceSteps extends TestBase {
             primeException();
             DomainListResult domainList = domainRegistryService.query(query);
             stepData.put("DomainList", domainList);
-            stepData.put("Count", domainList.getSize());
+            stepData.put("Count", Long.valueOf(domainList.getSize()));
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -894,7 +895,7 @@ public class AuthorizationServiceSteps extends TestBase {
     @Then("^This is the initial count$")
     public void setInitialCount() {
 
-        long startCount = (long) stepData.get("Count");
+        Long startCount = (Long) stepData.get("Count");
         stepData.put("InitialCount", startCount);
     }
 
@@ -999,12 +1000,12 @@ public class AuthorizationServiceSteps extends TestBase {
     }
 
     @Then("^(\\d+) more domains (?:was|were) created$")
-    public void checkIncreasedCountResult(int cnt) {
+    public void checkIncreasedCountResult(Long cnt) {
 
-        long count = (long) stepData.get("Count");
-        long initialCount = (long) stepData.get("InitialCount");
+        Long count = (Long) stepData.get("Count");
+        Long initialCount = (Long) stepData.get("InitialCount");
 
-        assertEquals(cnt, count - initialCount);
+        assertEquals(cnt.longValue(), count.longValue() - initialCount.longValue());
     }
 
     @When("^I configure the group service$")
@@ -1020,7 +1021,6 @@ public class AuthorizationServiceSteps extends TestBase {
             scopeId = tmpAccount.getId();
             parentScopeId = tmpAccount.getScopeId();
         } else {
-
             scopeId = SYS_SCOPE_ID;
             parentScopeId = SYS_SCOPE_ID;
         }
@@ -1049,7 +1049,7 @@ public class AuthorizationServiceSteps extends TestBase {
         stepData.remove("Count");
         primeException();
         try {
-            long count = groupService.count(groupFactory.newQuery(SYS_SCOPE_ID));
+            Long count = groupService.count(groupFactory.newQuery(SYS_SCOPE_ID));
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1073,14 +1073,13 @@ public class AuthorizationServiceSteps extends TestBase {
 
             try {
                 group = groupService.create(groupCreator);
+                stepData.put("GroupCreator", groupCreator);
+                stepData.put("Group", group);
+                stepData.put("GroupId", group.getId());
             } catch (KapuaException ex) {
                 verifyException(ex);
             }
         }
-
-        stepData.put("GroupCreator", groupCreator);
-        stepData.put("Group", group);
-        stepData.put("GroupId", group.getId());
     }
 
     @When("^I update the group name to \"(.+)\"$")
@@ -1167,7 +1166,7 @@ public class AuthorizationServiceSteps extends TestBase {
 
         primeException();
         try {
-            long count = groupService.count(tmpQuery);
+            Long count = groupService.count(tmpQuery);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1191,7 +1190,7 @@ public class AuthorizationServiceSteps extends TestBase {
             GroupListResult groupList = groupService.query(tmpQuery);
             stepData.put("GroupList", groupList);
             stepData.put("Group", groupList.getFirstItem());
-            stepData.put("Count", groupList.getSize());
+            stepData.put("Count", Long.valueOf(groupList.getSize()));
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -1283,22 +1282,25 @@ public class AuthorizationServiceSteps extends TestBase {
         Set<Permission> permissions = new HashSet<>();
         KapuaId currId = (KapuaId) stepData.get("LastAccountId");
 
+        // Get the current domain
+        Domain curDomain = (Domain) stepData.get("Domain");
+
         for (String perm : tmpList) {
             switch (perm.trim()) {
                 case "read":
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, Actions.read, currId));
+                    permissions.add(permissionFactory.newPermission(curDomain.getDomain(), Actions.read, currId));
                     break;
                 case "write":
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, Actions.write, currId));
+                    permissions.add(permissionFactory.newPermission(curDomain.getDomain(), Actions.write, currId));
                     break;
                 case "delete":
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, Actions.delete, currId));
+                    permissions.add(permissionFactory.newPermission(curDomain.getDomain(), Actions.delete, currId));
                     break;
                 case "connect":
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, Actions.connect, currId));
+                    permissions.add(permissionFactory.newPermission(curDomain.getDomain(), Actions.connect, currId));
                     break;
                 case "execute":
-                    permissions.add(permissionFactory.newPermission(TEST_DOMAIN, Actions.execute, currId));
+                    permissions.add(permissionFactory.newPermission(curDomain.getDomain(), Actions.execute, currId));
                     break;
             }
         }
@@ -1513,7 +1515,7 @@ public class AuthorizationServiceSteps extends TestBase {
         try {
             primeException();
             stepData.remove("Count");
-            long count = accessRoleService.count(tmpQuery);
+            Long count = accessRoleService.count(tmpQuery);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1559,7 +1561,7 @@ public class AuthorizationServiceSteps extends TestBase {
         try {
             primeException();
             stepData.remove("Count");
-            long count = accessInfoService.count(tmpQuery);
+            Long count = accessInfoService.count(tmpQuery);
             stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1583,7 +1585,7 @@ public class AuthorizationServiceSteps extends TestBase {
             AccessInfoListResult accessList = accessInfoService.query(tmpQuery);
             stepData.put("AccessList", accessList);
             if (accessList != null) {
-                stepData.put("Count", accessList.getSize());
+                stepData.put("Count", Long.valueOf(accessList.getSize()));
             }
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1606,6 +1608,7 @@ public class AuthorizationServiceSteps extends TestBase {
             AccessPermission accessPermission = null;
             stepData.remove("AccessPermissionCreator");
             stepData.remove("AccessPermission");
+            stepData.remove("LastAccessPermission");
             for (Permission tmpPerm : permissions) {
                 accessPermissionCreator.setPermission(tmpPerm);
                 accessPermission = accessPermissionService.create(accessPermissionCreator);
@@ -1613,6 +1616,7 @@ public class AuthorizationServiceSteps extends TestBase {
             stepData.put("AccessPermissionCreator", accessPermissionCreator);
             if (accessPermission != null) {
                 stepData.put("AccessPermission", accessPermission);
+                stepData.put("LastAccessPermission", accessPermission);
             }
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -1657,9 +1661,9 @@ public class AuthorizationServiceSteps extends TestBase {
 
         try {
             primeException();
-            stepData.remove("IntValue");
-            long count = accessPermissionService.count(tmpQuery);
-            stepData.put("IntValue", count);
+            stepData.remove("Count");
+            Long count = accessPermissionService.count(tmpQuery);
+            stepData.put("Count", count);
         } catch (KapuaException ex) {
             verifyException(ex);
         }
