@@ -61,3 +61,17 @@ DROP TABLE IF EXISTS ATHZ_DOMAIN;
 DROP TABLE IF EXISTS ATHZ_GROUP;
 
 DROP TABLE IF EXISTS TAG_TAG;
+
+DROP TABLE IF EXISTS job_job;
+
+DROP TABLE IF EXISTS job_job_execution;
+
+DROP TABLE IF EXISTS job_job_step;
+
+DROP TABLE IF EXISTS job_job_step_definition;
+
+DROP TABLE IF EXISTS job_job_step_definition_properties;
+
+DROP TABLE IF EXISTS job_job_step_properties;
+
+DROP TABLE IF EXISTS job_job_target;
