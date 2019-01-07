@@ -21,10 +21,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_1"
     When I create a new job entity from the existing creator
     Then No exception was thrown
@@ -40,10 +36,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A null scope
     And A regular job creator with the name "TestJob_1"
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "scopeId"
@@ -58,10 +50,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     And A job creator with a null name
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "name"
     When I create a new job entity from the existing creator
@@ -75,10 +63,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A job creator with an empty name
     When I create a new job entity from the existing creator
     Then No exception was thrown
@@ -93,10 +77,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_2"
     Then I create a new job entity from the existing creator
     Given I expect the exception "KapuaDuplicateNameException" with the text "An entity with the same name TestJob_2 already exists."
@@ -111,10 +91,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_3"
     When I create a new job entity from the existing creator
     When I search for the job in the database
@@ -131,10 +107,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_4"
     And I create a new job entity from the existing creator
     And I delete the job
@@ -150,10 +122,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_5"
     Then I create a new job entity from the existing creator
     When I change the job name to "SomeRandomNewName"
@@ -169,10 +137,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_6"
     Then I create a new job entity from the existing creator
     When I change the job description to "SomeRandomNewDescription"
@@ -188,10 +152,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_7"
     Then I create a new job entity from the existing creator
     When I change the job XML definition to "SomeRandomNewDefinition"
@@ -230,10 +190,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given A regular job creator with the name "TestJob_8"
     Then I create a new job entity from the existing creator
     And I delete the job
@@ -249,10 +205,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given I create 10 job items
     When I count the jobs in the database
     Then I count 10
@@ -265,10 +217,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given I create 10 job items
     Given Scope with ID 20
     When I count the jobs in the database
@@ -291,10 +239,6 @@ Feature: Job service CRUD tests
       | type    | name                       | value |
       | boolean | infiniteChildEntities      | true  |
       | integer | maxNumberChildEntities     | 5     |
-      | boolean | lockoutPolicy.enabled      | false |
-      | integer | lockoutPolicy.maxFailures  | 3     |
-      | integer | lockoutPolicy.resetAfter   | 300   |
-      | integer | lockoutPolicy.lockDuration | 3     |
     Given I create 10 job items with the name "TestJobA"
     And I create 15 job items with the name "TestJobB"
     And I create 20 job items with the name "TestJobC"
