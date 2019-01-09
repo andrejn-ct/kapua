@@ -9,7 +9,8 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@default
+@unit
+@deviceRegistry
 Feature: Device Registry Service
     The Device registry Service is responsible for CRUD operations for devices in the Kapua
     database.
@@ -18,10 +19,6 @@ Scenario: Create a single device
     Create a single test device. The resulting device must have a unique ID assigned
     by the creation process.
 
-    When I configure
-        | type    | name                       | value | scopeId | parentScopeId |
-        | boolean | infiniteChildEntities      | true  |    1    |       1       |
-        | integer | maxNumberChildEntities     | 5     |    1    |       1       |
     Given A device named "test_device"
     Then The device has a non-null ID
 
@@ -98,20 +95,20 @@ Scenario: Count devices in a specific scope
     To this end several devices are created in 3 different scopes. When
     counted, only the number of devices in the specified scope must be returned.
 
-    When I configure
-        | type    | name                       | value | scopeId | parentScopeId |
-        | boolean | infiniteChildEntities      | true  |    5    |       1       |
-        | integer | maxNumberChildEntities     | 50    |    5    |       1       |
+    When I configure the device registry service
+        | type    | name                       | value | scopeId |
+        | boolean | infiniteChildEntities      | true  |    5    |
+        | integer | maxNumberChildEntities     | 50    |    5    |
     Given I create 20 randomly named devices in scope 5
-    When I configure
-        | type    | name                       | value | scopeId | parentScopeId |
-        | boolean | infiniteChildEntities      | true  |    6    |       1       |
-        | integer | maxNumberChildEntities     | 5     |    6    |       1       |
+    When I configure the device registry service
+        | type    | name                       | value | scopeId |
+        | boolean | infiniteChildEntities      | true  |    6    |
+        | integer | maxNumberChildEntities     | 5     |    6    |
     Given I create 30 randomly named devices in scope 6
-    When I configure
-        | type    | name                       | value | scopeId | parentScopeId |
-        | boolean | infiniteChildEntities      | true  |    7    |       1       |
-        | integer | maxNumberChildEntities     | 5     |    7    |       1       |
+    When I configure the device registry service
+        | type    | name                       | value | scopeId |
+        | boolean | infiniteChildEntities      | true  |    7    |
+        | integer | maxNumberChildEntities     | 5     |    7    |
     Given I create 45 randomly named devices in scope 7
     When I count the devices in scope 6
     Then There are 30 devices
@@ -152,7 +149,7 @@ Scenario: Update a non existing device
     Given A device named "TestDevice"
     And I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type device with id/name"
     When I update a device with an invalid ID
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Delete an existing device from the registry
     It must be possible to delete a device from theregistry. To this
@@ -169,7 +166,7 @@ Scenario: Try to delete a non existing device from the registry
 
     Given I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type DeviceImpl with id/name"
     When I delete a device with random IDs
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Device factory sanity checks
     The Account factory must instantiate and return valid items. For this test it is enough
