@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@default
+@unit
+@deviceRegistry
+@deviceConnection
 Feature: Device Registry Connection tests
     The Device Registry Connection service is responsible for performing CRUD operations
     regarding device connections on the Kapua database.
@@ -19,7 +21,8 @@ Scenario: Regular connection
     must match the creator parameters. The connection status must also be
     implicitly set to CONNECTED.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -33,14 +36,15 @@ Scenario: Device connection update
     It must be possible to change the data of an existing device connection database
     entry.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
     When I modify the connection details to
         | clientIp    | serverIp   | protocol | allowUserChange   |
         | 127.0.0.109 | 127.0.0.25 | udp      | true              |
-    Then There was no exception
+    Then No exception was thrown
     And The connection details match
         | clientIp    | serverIp   | protocol | allowUserChange   |
         | 127.0.0.109 | 127.0.0.25 | udp      | true              |
@@ -50,18 +54,19 @@ Scenario: Try to modify the connection client ID
     Attempts to change the client ID must be silently ignored. No exceptions must
     be thrown.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
     When I try to modify the connection client Id to "testClient2"
-    Then There was no exception
+    Then No exception was thrown
     And The connection client ID remains unchanged
 
 Scenario: Count connections in scope
     It must be possible to count all the connections in a given scope.
 
-    Given A scope with id 1
+    Given Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -71,14 +76,14 @@ Scenario: Count connections in scope
         | testClient5 | 127.0.0.105 | 127.0.0.10 | tcp      | true              |
         | testClient6 | 127.0.0.106 | 127.0.0.10 | tcp      | true              |
         | testClient7 | 127.0.0.107 | 127.0.0.10 | tcp      | true              |
-    Then There was no exception
+    Then No exception was thrown
     And I count 7 connections in scope 1
 
 Scenario: Count connections in empty scope
     Counting connections for an empty (nonexisting) scope must not raise any exception.
     A regular result (in this case 0) must be returned.
 
-    Given A scope with id 1
+    Given Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -94,19 +99,21 @@ Scenario: Try to change an existing connection ID
     It must not be possible to change the ID of an existing connection. Trying to
     do so must result in an exception being thrown.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
     And I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type deviceConnection with id/name"
     When I try to modify the connection Id
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Find a connection by its IDs
     It must be possible to find a specific connection in the database based on
     its scope and entity IDs.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -119,7 +126,8 @@ Scenario: I try to find a non-existing connection
     Searching for a non existing connection must not raise any exception. A null
     reference must be returned instead.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -130,7 +138,8 @@ Scenario: Find a connection by its client ID
     It must be possible to find a specific connection in the database based on its
     scope and client IDs.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -146,7 +155,8 @@ Scenario: Search for a non existent client ID
     Searching for a non existing connection must not raise any exception. A null
     reference must be returned instead.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -157,7 +167,8 @@ Scenario: Search for a non existent client ID
     Then No connection was found
 
 Scenario: The Client ID is case sensitive
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -171,7 +182,8 @@ Scenario: The Client ID is case sensitive
 Scenario: Delete a connection from the database
     It must be possible to delete a specific entry fron the connection database.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connections
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
@@ -187,19 +199,21 @@ Scenario: Delete a non existing connection
     Trying to delete a non existent connection should result in an exception
     being thrown.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connection
         | clientId    | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient1 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |
     And I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type deviceConnection with id/name"
     When I try to delete a random connection ID
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Generic connection query
     It must be possible to query for connections in the database based on various
     parameters.
 
-    Given User 1 in scope 1
+    Given The User ID 1
+    And Scope with ID 1
     And I have the following connections
         | clientId     | clientIp    | serverIp   | protocol | allowUserChange   |
         | testClient01 | 127.0.0.101 | 127.0.0.10 | tcp      | true              |

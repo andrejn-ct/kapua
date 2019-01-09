@@ -48,9 +48,9 @@ import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
+import org.eclipse.kapua.service.device.registry.internal.DeviceEntityManagerFactory;
 import org.eclipse.kapua.service.device.registry.internal.DeviceFactoryImpl;
 import org.eclipse.kapua.service.device.registry.internal.DeviceRegistryServiceImpl;
-import org.eclipse.kapua.service.user.internal.UserEntityManagerFactory;
 import org.eclipse.kapua.test.MockedLocator;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -131,9 +131,9 @@ public class DeviceRegistryServiceSteps extends TestBase {
                 // Set KapuaMetatypeFactory for Metatype configuration
                 bind(KapuaMetatypeFactory.class).toInstance(new KapuaMetatypeFactoryImpl());
 
-                // Inject actual user service related services
-                UserEntityManagerFactory userEntityManagerFactory = UserEntityManagerFactory.getInstance();
-                bind(UserEntityManagerFactory.class).toInstance(userEntityManagerFactory);
+                // Inject actual Device registry service related services
+                DeviceEntityManagerFactory deviceEntityManagerFactory = DeviceEntityManagerFactory.instance();
+                bind(DeviceEntityManagerFactory.class).toInstance(deviceEntityManagerFactory);
                 bind(DeviceRegistryService.class).toInstance(new DeviceRegistryServiceImpl());
                 bind(DeviceFactory.class).toInstance(new DeviceFactoryImpl());
             }

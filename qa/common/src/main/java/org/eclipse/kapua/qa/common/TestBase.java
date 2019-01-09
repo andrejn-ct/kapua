@@ -107,6 +107,17 @@ public class TestBase extends Assert {
         }
     }
 
+    public KapuaId getCurrentUserId() {
+
+        if (stepData.contains("LastUserId")) {
+            return (KapuaId) stepData.get("LastUserId");
+        } else if (stepData.get("LastUser") != null) {
+            return ((Account)stepData.get("LastUser")).getId();
+        } else {
+            return SYS_USER_ID;
+        }
+    }
+
     public boolean isUnitTest() {
         return testType.equals("unit");
     }
