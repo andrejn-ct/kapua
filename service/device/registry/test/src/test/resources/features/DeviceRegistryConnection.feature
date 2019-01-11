@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2017 Eurotech and/or its affiliates and others
+# Copyright (c) 2017, 2019 Eurotech and/or its affiliates and others
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -17,7 +17,7 @@ Feature: Device Registry Connection tests
     regarding device connections on the Kapua database.
 
 Scenario: Regular connection
-    It must be possible to create a device connection entry in the database. The centry
+    It must be possible to create a device connection entry in the database. The entry
     must match the creator parameters. The connection status must also be
     implicitly set to CONNECTED.
 

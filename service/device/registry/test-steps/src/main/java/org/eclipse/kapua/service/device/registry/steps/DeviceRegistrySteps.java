@@ -25,7 +25,6 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 import org.apache.shiro.SecurityUtils;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.metatype.KapuaMetatypeFactoryImpl;
-import org.eclipse.kapua.commons.model.id.IdGenerator;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicateImpl;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
@@ -48,6 +47,7 @@ import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
+import org.eclipse.kapua.service.device.registry.common.DeviceValidation;
 import org.eclipse.kapua.service.device.registry.internal.DeviceEntityManagerFactory;
 import org.eclipse.kapua.service.device.registry.internal.DeviceFactoryImpl;
 import org.eclipse.kapua.service.device.registry.internal.DeviceRegistryServiceImpl;
@@ -73,20 +73,20 @@ import java.util.Map;
  *
  */
 @ScenarioScoped
-public class DeviceRegistryServiceSteps extends TestBase {
+public class DeviceRegistrySteps extends TestBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceRegistryServiceSteps.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceRegistrySteps.class);
 
-    public static final String TEST_DEVICE_NAME = "test_name";
-    public static final String TEST_BIOS_VERSION_1 = "bios_version_1";
-    public static final String TEST_BIOS_VERSION_2 = "bios_version_2";
-    public static final String TEST_BIOS_VERSION_3 = "bios_version_3";
+    private static final String TEST_DEVICE_NAME = "test_name";
+    private static final String TEST_BIOS_VERSION_1 = "bios_version_1";
+    private static final String TEST_BIOS_VERSION_2 = "bios_version_2";
+    private static final String TEST_BIOS_VERSION_3 = "bios_version_3";
 
     // Strings for client ID character set and length checks
-    public static String simpleClientId = "simpleClientIdWith64Chars_12345678901234567890123456789012345678";
-    public static String fullClientId = "fullClientIdWith64Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓";
-    public static String simpleClientIdTooLong = "simpleClientIdWith65Chars_123456789012345678901234567890123456789";
-    public static String fullClientIdTooLong = "fullClientIdWith65Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔";
+    private static String simpleClientId = "simpleClientIdWith64Chars_12345678901234567890123456789012345678";
+    private static String fullClientId = "fullClientIdWith64Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓";
+    private static String simpleClientIdTooLong = "simpleClientIdWith65Chars_123456789012345678901234567890123456789";
+    private static String fullClientIdTooLong = "fullClientIdWith65Chars_✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔✕✁✂✃✄✅✆✇✈✉✊✋✌✍✎✏✐✑✒✓✔";
 
     // Various device registry related service references
     private DeviceRegistryService deviceRegistryService;
@@ -94,7 +94,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
     // Default constructor
     @Inject
-    public DeviceRegistryServiceSteps(StepData stepData, DBHelper dbHelper) {
+    public DeviceRegistrySteps(StepData stepData, DBHelper dbHelper) {
 
         this.stepData = stepData;
         this.database = dbHelper;
@@ -228,19 +228,89 @@ public class DeviceRegistryServiceSteps extends TestBase {
         }
     }
 
-    @Given("^A default device creator$")
+    @Given("^A regular device creator$")
     public void prepareDefaultDeviceCreator() {
 
-        DeviceCreator deviceCreator = prepareRegularDeviceCreator(SYS_SCOPE_ID, "device_1");
-        assertNotNull(deviceCreator);
+        DeviceCreator deviceCreator = prepareRegularDeviceCreator(getCurrentScopeId(), "device_1");
         stepData.put("DeviceCreator", deviceCreator);
+    }
+
+    @Given("^A null device creator$")
+    public void createANullDeviceCreator() {
+
+        stepData.put("DeviceCreator", null);
+    }
+
+    @When("^I set the creator scope ID to null$")
+    public void setDeviceCreatorScopeToNull() {
+
+        DeviceCreator deviceCreator = (DeviceCreator) stepData.get("DeviceCreator");
+        deviceCreator.setScopeId(null);
+        stepData.put("DeviceCreator", deviceCreator);
+    }
+
+    @When("^I set the creator client ID to null$")
+    public void setDeviceCreatorClientToNull() {
+
+        DeviceCreator deviceCreator = (DeviceCreator) stepData.get("DeviceCreator");
+        deviceCreator.setClientId(null);
+        stepData.put("DeviceCreator", deviceCreator);
+    }
+
+    @Given("^A regular device$")
+    public void createRegularDevice() {
+
+        Device device = prepareRegularDevice(getCurrentParentId(), getKapuaId());
+        stepData.put("Device", device);
+    }
+
+    @Given("^A null device$")
+    public void createANullDevice() {
+
+        stepData.put("Device", null);
+    }
+
+    @When("^I set the device scope ID to null$")
+    public void setDeviceScopeToNull() {
+
+        Device device = (Device) stepData.get("Device");
+        device.setScopeId(null);
+        stepData.put("Device", device);
+    }
+
+    @When("^I set the device ID to null$")
+    public void setDeviceIdToNull() {
+
+        Device device = (Device) stepData.get("Device");
+        device.setId(null);
+        stepData.put("Device", device);
+    }
+
+    @Given("^A regular query$")
+    public void createRegularQuery() {
+
+        DeviceQuery query = deviceFactory.newQuery(getCurrentScopeId());
+        stepData.put("DeviceQuery", query);
+    }
+
+    @Given("^A query with a null Scope ID$")
+    public void createQueryWithNullScopeId() {
+
+        DeviceQuery query = deviceFactory.newQuery(null);
+        stepData.put("DeviceQuery", query);
+    }
+
+    @Given("^A null query$")
+    public void createNullQuery() {
+
+        stepData.put("DeviceQuery", null);
     }
 
     @Given("^A device named \"(.*)\"$")
     public void createNamedDevice(String name)
             throws Exception {
 
-        DeviceCreator deviceCreator = prepareRegularDeviceCreator(SYS_SCOPE_ID, name);
+        DeviceCreator deviceCreator = prepareRegularDeviceCreator(getCurrentScopeId(), name);
         stepData.put("DeviceCreator", deviceCreator);
 
         primeException();
@@ -259,7 +329,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
     public void createNamedDeviceWithBiosVersion(String version, String name)
             throws Exception {
 
-        DeviceCreator deviceCreator = prepareRegularDeviceCreator(SYS_SCOPE_ID, name);
+        DeviceCreator deviceCreator = prepareRegularDeviceCreator(getCurrentScopeId(), name);
         deviceCreator.setBiosVersion(version);
         stepData.put("DeviceCreator", deviceCreator);
 
@@ -284,7 +354,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
         primeException();
         try {
             for (int i = 0; i < number; i++) {
-                tmpDevCr = deviceFactory.newCreator(SYS_SCOPE_ID, "test_" + String.valueOf(random.nextInt()));
+                tmpDevCr = deviceFactory.newCreator(getCurrentScopeId(), "test_" + String.valueOf(random.nextInt()));
                 tmpDevCr.setBiosVersion(version);
                 deviceRegistryService.create(tmpDevCr);
             }
@@ -341,7 +411,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
         primeException();
         try {
             stepData.remove("Device");
-            Device device = deviceRegistryService.find(SYS_SCOPE_ID, deviceId);
+            Device device = deviceRegistryService.find(getCurrentScopeId(), deviceId);
             stepData.put("Device", device);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -355,7 +425,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
         primeException();
         try {
             stepData.remove("Device");
-            Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, clientId);
+            Device device = deviceRegistryService.findByClientId(getCurrentScopeId(), clientId);
             stepData.put("Device", device);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -369,7 +439,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
         primeException();
         try {
             stepData.remove("Device");
-            Device device = deviceRegistryService.find(SYS_SCOPE_ID, getKapuaId());
+            Device device = deviceRegistryService.find(getCurrentScopeId(), getKapuaId());
             stepData.put("Device", device);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -383,7 +453,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
         primeException();
         try {
             stepData.remove("Device");
-            Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, String.valueOf(random.nextLong()));
+            Device device = deviceRegistryService.findByClientId(getCurrentScopeId(), String.valueOf(random.nextLong()));
             stepData.put("Device", device);
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -394,7 +464,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
     public void queryForDevicesBasedOnBiosVersion(String version)
             throws Exception {
 
-        DeviceQuery tmpQuery = deviceFactory.newQuery(SYS_SCOPE_ID);
+        DeviceQuery tmpQuery = deviceFactory.newQuery(getCurrentScopeId());
         // Search for the known bios version string
         tmpQuery.setPredicate(AttributePredicateImpl.attributeIsEqualTo("biosVersion", version));
 
@@ -412,7 +482,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
     public void queryForDevicesWithDifferentBiosVersion(String version)
             throws Exception {
 
-        DeviceQuery tmpQuery = deviceFactory.newQuery(SYS_SCOPE_ID);
+        DeviceQuery tmpQuery = deviceFactory.newQuery(getCurrentScopeId());
         // Search for the known bios version string
         tmpQuery.setPredicate(AttributePredicateImpl.attributeIsNotEqualTo("biosVersion", version));
 
@@ -430,7 +500,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
     public void queryForDevicesBasedOnClientId(String id)
             throws Exception {
 
-        DeviceQuery tmpQuery = deviceFactory.newQuery(SYS_SCOPE_ID);
+        DeviceQuery tmpQuery = deviceFactory.newQuery(getCurrentScopeId());
         // Search for the known bios version string
         tmpQuery.setPredicate(AttributePredicateImpl.attributeIsEqualTo("clientId", id));
 
@@ -474,7 +544,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
     public void countDevicesWithBIOSVersion(String version)
             throws Exception {
 
-        DeviceQuery tmpQuery = deviceFactory.newQuery(SYS_SCOPE_ID);
+        DeviceQuery tmpQuery = deviceFactory.newQuery(getCurrentScopeId());
         tmpQuery.setPredicate(AttributePredicateImpl.attributeIsEqualTo("biosVersion", version));
 
         primeException();
@@ -540,8 +610,8 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         primeException();
         try {
-            Device tmpDev = deviceRegistryService.findByClientId(SYS_SCOPE_ID, clientId);
-            deviceRegistryService.delete(SYS_SCOPE_ID, tmpDev.getId());
+            Device tmpDev = deviceRegistryService.findByClientId(getCurrentScopeId(), clientId);
+            deviceRegistryService.delete(getCurrentScopeId(), tmpDev.getId());
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -578,7 +648,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         primeException();
         try {
-            Device tmpDev = deviceRegistryService.find(SYS_SCOPE_ID, device.getId());
+            Device tmpDev = deviceRegistryService.find(getCurrentScopeId(), device.getId());
             assertEquals(device.getClientId(), tmpDev.getClientId());
         } catch (KapuaException ex) {
             verifyException(ex);
@@ -593,14 +663,14 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         primeException();
         try {
-            Device tmpDev = deviceRegistryService.findByClientId(SYS_SCOPE_ID, device.getClientId());
+            Device tmpDev = deviceRegistryService.findByClientId(getCurrentScopeId(), device.getClientId());
             assertEquals(device.getId(), tmpDev.getId());
         } catch (KapuaException ex) {
             verifyException(ex);
         }
     }
 
-    @Then("^Named device registry searches are case sesntitive$")
+    @Then("^Named device registry searches are case sensitive$")
     public void checkCaseSensitivnessOfRegistrySearches()
             throws Exception {
 
@@ -608,9 +678,9 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         primeException();
         try {
-            assertNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId().toLowerCase()));
-            assertNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId().toUpperCase()));
-            assertNotNull(deviceRegistryService.findByClientId(SYS_SCOPE_ID, deviceCreator.getClientId()));
+            assertNull(deviceRegistryService.findByClientId(getCurrentScopeId(), deviceCreator.getClientId().toLowerCase()));
+            assertNull(deviceRegistryService.findByClientId(getCurrentScopeId(), deviceCreator.getClientId().toUpperCase()));
+            assertNotNull(deviceRegistryService.findByClientId(getCurrentScopeId(), deviceCreator.getClientId()));
         } catch (KapuaException ex) {
             verifyException(ex);
         }
@@ -704,13 +774,6 @@ public class DeviceRegistryServiceSteps extends TestBase {
         assertEquals(number, deviceList.getSize());
     }
 
-    @Then("^There (?:are|is) (\\d+) devices?$")
-    public void checkNumberOfDevices(int number) {
-
-        Long count = (Long) stepData.get("Count");
-        assertEquals((long)number, count.longValue());
-    }
-
     @Then("^The client ID was not changed$")
     public void checkDeviceClientIdForChanges()
             throws Exception {
@@ -720,7 +783,7 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         primeException();
         try {
-            Device tmpDevice = deviceRegistryService.find(SYS_SCOPE_ID, device.getId());
+            Device tmpDevice = deviceRegistryService.find(getCurrentScopeId(), device.getId());
             assertNotEquals(device.getClientId(), tmpDevice.getClientId());
             assertEquals(stringValue, tmpDevice.getClientId());
         } catch (KapuaException ex) {
@@ -731,14 +794,20 @@ public class DeviceRegistryServiceSteps extends TestBase {
     @Then("^There is no device with the client ID \"(.+)\"$")
     public void checkWhetherNamedDeviceStillExists(String clientId)
             throws KapuaException {
-        Device tmpDevice = deviceRegistryService.findByClientId(SYS_SCOPE_ID, clientId);
+        Device tmpDevice = deviceRegistryService.findByClientId(getCurrentScopeId(), clientId);
         assertNull(tmpDevice);
     }
 
     @Then("^There is no such device$")
-    public void deviceMustBeNull() {
+    public void noSuchDevice() {
 
         assertNull(stepData.get("Device"));
+    }
+
+    @Then("^I find the device$")
+    public void deviceIsNotNull() {
+
+        assertNotNull(stepData.get("Device"));
     }
 
     @Then("^All device factory functions must return non null values$")
@@ -759,6 +828,143 @@ public class DeviceRegistryServiceSteps extends TestBase {
         assertNotNull(tmpListRes);
     }
 
+    @When("^I validate the device creator$")
+    public void validateExistingDeviceCreator()
+            throws Exception {
+
+        DeviceCreator deviceCreator = (DeviceCreator) stepData.get("DeviceCreator");
+
+        primeException();
+        try {
+            DeviceValidation.validateCreatePreconditions(deviceCreator);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I validate the device for updates$")
+    public void validateExistingDeviceForUpdates()
+            throws Exception {
+
+        Device device = (Device) stepData.get("Device");
+
+        primeException();
+        try {
+            DeviceValidation.validateUpdatePreconditions(device);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^Validating a find operation for scope (.+) and device (.+)$")
+    public void validateDeviceSearch(String scopeId, String deviceId)
+            throws Exception {
+
+        KapuaId scope;
+        KapuaId dev;
+
+        if (scopeId.trim().toLowerCase().equals("null")) {
+            scope = null;
+        } else {
+            scope = getKapuaId(scopeId);
+        }
+
+        if (deviceId.trim().toLowerCase().equals("null")) {
+            dev = null;
+        } else {
+            dev = getKapuaId(deviceId);
+        }
+
+        primeException();
+        try {
+            DeviceValidation.validateFindPreconditions(scope, dev);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^Validating a find operation for scope (.+) and client \"(.*)\"$")
+    public void validateDeviceSearchByClientId(String scopeId, String clientId)
+            throws Exception {
+
+        KapuaId scope;
+        String client;
+
+        if (scopeId.trim().toLowerCase().equals("null")) {
+            scope = null;
+        } else {
+            scope = getKapuaId(scopeId);
+        }
+
+        if (clientId.trim().toLowerCase().equals("null")) {
+            client = null;
+        } else {
+            client = clientId;
+        }
+
+        primeException();
+        try {
+            DeviceValidation.validateFindByClientIdPreconditions(scope, client);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^Validating a delete operation for scope (.+) and device (.+)$")
+    public void validateDeviceDelete(String scopeId, String deviceId)
+            throws Exception {
+
+        KapuaId scope;
+        KapuaId dev;
+
+        if (scopeId.trim().toLowerCase().equals("null")) {
+            scope = null;
+        } else {
+            scope = getKapuaId(scopeId);
+        }
+
+        if (deviceId.trim().toLowerCase().equals("null")) {
+            dev = null;
+        } else {
+            dev = getKapuaId(deviceId);
+        }
+
+        primeException();
+        try {
+            DeviceValidation.validateDeletePreconditions(scope, dev);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I validate a query operation$")
+    public void checkQueryOperation()
+            throws Exception {
+
+        DeviceQuery query = (DeviceQuery) stepData.get("DeviceQuery");
+
+        primeException();
+        try {
+            DeviceValidation.validateQueryPreconditions(query);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
+    @When("^I validate a count operation$")
+    public void checkCountOperation()
+            throws Exception {
+
+        DeviceQuery query = (DeviceQuery) stepData.get("DeviceQuery");
+
+        primeException();
+        try {
+            DeviceValidation.validateCountPreconditions(query);
+        } catch (KapuaException ex) {
+            verifyException(ex);
+        }
+    }
+
     // *******************
     // * Private Helpers *
     // *******************
@@ -768,13 +974,13 @@ public class DeviceRegistryServiceSteps extends TestBase {
 
         DeviceCreator tmpDeviceCreator = deviceFactory.newCreator(accountId, client);
 
-        tmpDeviceCreator.setConnectionId(new KapuaEid(IdGenerator.generate()));
+        tmpDeviceCreator.setConnectionId(getKapuaId());
         tmpDeviceCreator.setDisplayName(TEST_DEVICE_NAME);
         tmpDeviceCreator.setSerialNumber("serialNumber");
         tmpDeviceCreator.setModelId("modelId");
-        tmpDeviceCreator.setImei(String.valueOf(random.nextInt()));
-        tmpDeviceCreator.setImsi(String.valueOf(random.nextInt()));
-        tmpDeviceCreator.setIccid(String.valueOf(random.nextInt()));
+        tmpDeviceCreator.setImei(getRandomString());
+        tmpDeviceCreator.setImsi(getRandomString());
+        tmpDeviceCreator.setIccid(getRandomString());
         tmpDeviceCreator.setBiosVersion("biosVersion");
         tmpDeviceCreator.setFirmwareVersion("firmwareVersion");
         tmpDeviceCreator.setOsVersion("osVersion");
@@ -783,8 +989,6 @@ public class DeviceRegistryServiceSteps extends TestBase {
         tmpDeviceCreator.setApplicationFrameworkVersion("kapuaVersion");
         tmpDeviceCreator.setApplicationIdentifiers("applicationIdentifiers");
         tmpDeviceCreator.setAcceptEncoding("acceptEncoding");
-//        tmpDeviceCreator.setGpsLatitude(45.2);
-//        tmpDeviceCreator.setGpsLongitude(26.3);
         tmpDeviceCreator.setCustomAttribute1("customAttribute1");
         tmpDeviceCreator.setCustomAttribute2("customAttribute2");
         tmpDeviceCreator.setCustomAttribute3("customAttribute3");
@@ -793,5 +997,36 @@ public class DeviceRegistryServiceSteps extends TestBase {
         tmpDeviceCreator.setStatus(DeviceStatus.ENABLED);
 
         return tmpDeviceCreator;
+    }
+
+    // Create a device object. The device is pre-filled with default data.
+    private Device prepareRegularDevice(KapuaId accountId, KapuaId deviceId) {
+
+        Device tmpDevice = deviceFactory.newEntity(accountId);
+
+        tmpDevice.setId(deviceId);
+        tmpDevice.setConnectionId(getKapuaId());
+        tmpDevice.setDisplayName("test_name");
+        tmpDevice.setSerialNumber("serialNumber");
+        tmpDevice.setModelId("modelId");
+        tmpDevice.setImei(getRandomString());
+        tmpDevice.setImsi(getRandomString());
+        tmpDevice.setIccid(getRandomString());
+        tmpDevice.setBiosVersion("biosVersion");
+        tmpDevice.setFirmwareVersion("firmwareVersion");
+        tmpDevice.setOsVersion("osVersion");
+        tmpDevice.setJvmVersion("jvmVersion");
+        tmpDevice.setOsgiFrameworkVersion("osgiFrameworkVersion");
+        tmpDevice.setApplicationFrameworkVersion("kapuaVersion");
+        tmpDevice.setApplicationIdentifiers("applicationIdentifiers");
+        tmpDevice.setAcceptEncoding("acceptEncoding");
+        tmpDevice.setCustomAttribute1("customAttribute1");
+        tmpDevice.setCustomAttribute2("customAttribute2");
+        tmpDevice.setCustomAttribute3("customAttribute3");
+        tmpDevice.setCustomAttribute4("customAttribute4");
+        tmpDevice.setCustomAttribute5("customAttribute5");
+        tmpDevice.setStatus(DeviceStatus.ENABLED);
+
+        return tmpDevice;
     }
 }

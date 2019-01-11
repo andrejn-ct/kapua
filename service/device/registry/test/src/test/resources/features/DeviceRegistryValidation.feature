@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@default
+@unit
+@deviceRegistry
+@deviceRegistryValidation
 Feature: Device Registry Validation Tests
     The Device Registry Validation helper is responsible for validating parameters
     and permissions before any operation is performed on the database.
@@ -19,7 +21,7 @@ Scenario: Validate a regular creator
 
     Given A regular device creator
     When I validate the device creator
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a null creator
     Create a null device creator. The validator should throw an exception.
@@ -27,7 +29,7 @@ Scenario: Validate a null creator
     Given A null device creator
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate the device creator
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device creator with a null scope ID
     Create a regular device creator. Assign a null scope ID. The validator
@@ -37,7 +39,7 @@ Scenario: Validate a device creator with a null scope ID
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I set the creator scope ID to null
     And I validate the device creator
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device creator with a null client ID
     Create a regular device creator. Assign a null client ID. The validator
@@ -47,14 +49,14 @@ Scenario: Validate a device creator with a null client ID
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I set the creator client ID to null
     And I validate the device creator
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device
     Create a regular device object. the update validator should OK it.
 
     Given A regular device
     When I validate the device for updates
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a null device
     Create a null device object. The validator should throw an
@@ -63,14 +65,14 @@ Scenario: Validate a null device
     Given A null device
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate the device for updates
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device search
     Validate the parameters for a device search. Both ScopeID and DeviceID
     are not null. The validator should be OK with it.
 
     When Validating a find operation for scope 15 and device 4321
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a device search with a null device ID
     Validate the parameters for a device search. ScopeID is valid, but the DeviceID
@@ -78,7 +80,7 @@ Scenario: Validate a device search with a null device ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a find operation for scope 15 and device null
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device search with a null scope ID
     Validate the parameters for a device search. DeviceID is valid, but ScopeID
@@ -86,14 +88,14 @@ Scenario: Validate a device search with a null scope ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a find operation for scope null and device 2
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device deletion
     Validate the parameters for deleting a device. Both ScopeID and DeviceID
     are not null. The validator should be OK with it.
 
     When Validating a delete operation for scope 15 and device 4321
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate deleting a device with a null device ID
     Validate the parameters for deleting a device. ScopeID is valid, but the DeviceID
@@ -101,7 +103,7 @@ Scenario: Validate deleting a device with a null device ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a delete operation for scope 15 and device null
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate deleting a device with a null scope ID
     Validate the parameters for deleting a device. DeviceID is valid, but ScopeID
@@ -109,14 +111,14 @@ Scenario: Validate deleting a device with a null scope ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a delete operation for scope null and device 2
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device client search
     Validate the parameters for a client id based search. Both the Scope ID and the
     Client ID are valid. The validator should OK it.
 
     When Validating a find operation for scope 42 and client "test_client"
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a device client search with null scope
     Validate the parameters for a client id based search. The Scope ID is null and the
@@ -124,7 +126,7 @@ Scenario: Validate a device client search with null scope
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a find operation for scope null and client "test_client"
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device client based search with a null client ID
     Validate the parameters for a client id based search. The Scope ID is valid but the
@@ -133,7 +135,7 @@ Scenario: Validate a device client based search with a null client ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a find operation for scope 42 and client "null"
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device client based search with an empty client ID
     Validate the parameters for a client id based search. The Scope ID is valid while the
@@ -141,7 +143,7 @@ Scenario: Validate a device client based search with an empty client ID
 
     Given I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When Validating a find operation for scope 42 and client ""
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device query
     Validate the parameters for a regulat device query. Neither the query nor the query
@@ -149,7 +151,7 @@ Scenario: Validate a regular device query
 
     Given A regular query
     When I validate a query operation
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a null device query
     Validate a null device query. The validator should throw an exception.
@@ -157,7 +159,7 @@ Scenario: Validate a null device query
     Given A null query
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate a query operation
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device query with a null Scope ID
     Validate a faulty device query. The query is not null, but the query Scope ID
@@ -166,7 +168,7 @@ Scenario: Validate a device query with a null Scope ID
     Given A query with a null Scope ID
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate a query operation
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a regular device count
     Validate the parameters for a regulat device count. Neither the query nor the query
@@ -174,7 +176,7 @@ Scenario: Validate a regular device count
 
     Given A regular query
     When I validate a count operation
-    Then There was no exception
+    Then No exception was thrown
 
 Scenario: Validate a null device count
     Validate a device count with a null query. The validator should throw an exception.
@@ -182,7 +184,7 @@ Scenario: Validate a null device count
     Given A null query
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate a count operation
-    Then An exception was raised
+    Then An exception was thrown
 
 Scenario: Validate a device count with a null Scope ID
     Validate a device count with a faulty query. The query is not null, but the query Scope ID is.
@@ -191,4 +193,4 @@ Scenario: Validate a device count with a null Scope ID
     Given A query with a null Scope ID
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     When I validate a count operation
-    Then An exception was raised
+    Then An exception was thrown

@@ -76,12 +76,7 @@ import java.util.Map;
 @ScenarioScoped
 public class DeviceRegistryConnectionSteps extends TestBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceRegistryServiceSteps.class);
-
-    private static final String DEFAULT_PATH = "src/main/sql/H2";
-    private static final String DEFAULT_COMMONS_PATH = "../../../../commons";
-    private static final String CREATE_DEVICE_TABLES = "dvc_*_create.sql";
-    private static final String DROP_DEVICE_TABLES = "dvc_*_drop.sql";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceRegistryConnectionSteps.class);
 
     private static final String CLIENT_NAME = "test_client";
     private static final String CLIENT_IP = "127.1.1.10";

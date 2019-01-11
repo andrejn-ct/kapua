@@ -76,6 +76,12 @@ public class BasicSteps extends TestBase {
         stepData.put("LastUserId", SYS_USER_ID);
     }
 
+    @Given("^A null user")
+    public void setNullUser() {
+
+        stepData.put("LastUserId", null);
+    }
+
     @Given("^I expect the exception \"(.+)\" with the text \"(.+)\"$")
     public void setExpectedExceptionDetails(String name, String text) {
         stepData.put("ExceptionExpected", true);

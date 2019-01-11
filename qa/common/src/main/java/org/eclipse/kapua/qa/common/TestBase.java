@@ -80,11 +80,15 @@ public class TestBase extends Assert {
     }
 
     public KapuaId getKapuaId() {
-        return new KapuaEid(BigInteger.valueOf(random.nextLong()));
+        return new KapuaEid(BigInteger.valueOf(random.nextLong()).abs());
     }
 
-    public KapuaId getKapuaId(int i) {
-        return new KapuaEid(BigInteger.valueOf(i));
+    public KapuaId getKapuaId(int id) {
+        return new KapuaEid(BigInteger.valueOf(id));
+    }
+
+    public KapuaId getKapuaId(String id) {
+        return new KapuaEid(new BigInteger(id));
     }
 
     public KapuaId getCurrentScopeId() {
@@ -185,5 +189,10 @@ public class TestBase extends Assert {
         }
 
         return expDate;
+    }
+
+    public String getRandomString() {
+
+        return String.valueOf(random.nextInt());
     }
 }
