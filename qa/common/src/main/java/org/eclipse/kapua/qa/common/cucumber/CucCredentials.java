@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.user.steps;
+package org.eclipse.kapua.qa.common.cucumber;
 
 import org.eclipse.kapua.service.authentication.credential.CredentialStatus;
 

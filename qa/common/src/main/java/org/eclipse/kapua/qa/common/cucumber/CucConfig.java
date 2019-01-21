@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.qa.common;
+package org.eclipse.kapua.qa.common.cucumber;
 
 import java.util.Map;
 

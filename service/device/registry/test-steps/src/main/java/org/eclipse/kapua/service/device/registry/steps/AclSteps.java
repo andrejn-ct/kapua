@@ -10,7 +10,7 @@
  *     Eurotech
  *     Red Hat Inc
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.service.device.registry.steps;
 
 import cucumber.api.Scenario;
 import cucumber.api.java.Before;

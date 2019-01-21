@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.authorization.steps;
+package org.eclipse.kapua.qa.common.cucumber;
 
 import java.math.BigInteger;
 

@@ -9,14 +9,14 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.job.steps;
+package org.eclipse.kapua.qa.common.cucumber;
 
 /**
  * Data object used in Gherkin to input Job Step properties.
  * The data setters intentionally use only cucumber-friendly data types and
  * generate the resulting Kapua types internally.
  */
-public class CucStepProperty {
+public class CucJobStepProperty {
 
     private String name;
     private String type;

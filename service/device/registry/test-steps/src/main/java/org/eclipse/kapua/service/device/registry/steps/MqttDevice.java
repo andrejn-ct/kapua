@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.service.device.registry.steps;
 
 import org.eclipse.kapua.qa.common.Suppressed;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;

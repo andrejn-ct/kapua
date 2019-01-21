@@ -10,7 +10,7 @@
  *     Eurotech
  *     Red Hat Inc
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.service.device.registry.steps;
 
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.broker.BrokerDomains;

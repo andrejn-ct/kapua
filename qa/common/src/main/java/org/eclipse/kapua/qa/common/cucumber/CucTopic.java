@@ -9,7 +9,7 @@
  * Contributors:
  *     Eurotech
  *******************************************************************************/
-package org.eclipse.kapua.service.datastore.steps;
+package org.eclipse.kapua.qa.common.cucumber;
 
 public class CucTopic {
 
