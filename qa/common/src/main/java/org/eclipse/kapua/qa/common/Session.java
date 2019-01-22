@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.registry.steps;
+package org.eclipse.kapua.qa.common;
 
 import org.eclipse.kapua.commons.util.ThrowingRunnable;
 import org.eclipse.kapua.qa.common.With;

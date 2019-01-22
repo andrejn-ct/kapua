@@ -20,7 +20,7 @@ import java.math.BigInteger;
 /**
  * Data object used for PermissionData configuration.
  */
-public class PermissionData {
+public class AclPermission {
 
     private Domain domain;
 
@@ -28,7 +28,7 @@ public class PermissionData {
 
     private KapuaEid targetScopeId;
 
-    public PermissionData(Domain domain, Actions action, KapuaEid targetScopeId) {
+    public AclPermission(Domain domain, Actions action, KapuaEid targetScopeId) {
         this.domain = domain;
         this.action = action;
         this.targetScopeId = targetScopeId;

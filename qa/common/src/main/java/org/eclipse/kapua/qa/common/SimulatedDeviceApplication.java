@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.registry.steps;
+package org.eclipse.kapua.qa.common;
 
 import java.time.Instant;
 import java.util.Map;
@@ -25,7 +25,7 @@ import org.eclipse.kapua.kura.simulator.topic.Topic;
 import org.eclipse.kura.core.message.protobuf.KuraPayloadProto.KuraPayload;
 import org.eclipse.kura.core.message.protobuf.KuraPayloadProto.KuraPayload.Builder;
 
-public class MockDataApplication implements Application {
+public class SimulatedDeviceApplication implements Application {
 
     private class HandlerImpl implements Handler {
 
@@ -49,7 +49,7 @@ public class MockDataApplication implements Application {
     private final Set<HandlerImpl> handlers = new CopyOnWriteArraySet<>();
     private Descriptor descriptor;
 
-    public MockDataApplication(String applicationId) {
+    public SimulatedDeviceApplication(String applicationId) {
         this.descriptor = new Descriptor(applicationId);
     }
 

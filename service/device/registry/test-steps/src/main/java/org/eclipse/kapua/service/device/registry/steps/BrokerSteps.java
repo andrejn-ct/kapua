@@ -48,7 +48,8 @@ import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionService;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
+
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -190,7 +191,7 @@ public class BrokerSteps extends TestBase {
     @When("^Device birth message is sent$")
     public void deviceBirthMessage() throws Exception {
 
-        kuraDevice.sendMessageFromFile(MQTT_BIRTH, 0, false, "src/test/resources/mqtt/rpione3_MQTT_BIRTH.mqtt");
+        kuraDevice.sendMessageFromFile(MQTT_BIRTH, 0, false, "src/main/resources/mqtt/rpione3_MQTT_BIRTH.mqtt");
     }
 
     @When("^Device is connected$")
@@ -202,7 +203,7 @@ public class BrokerSteps extends TestBase {
     @When("^Device death message is sent$")
     public void deviceDeathMessage() throws Exception {
 
-        kuraDevice.sendMessageFromFile(MQTT_DC, 0, false, "src/test/resources/mqtt/rpione3_MQTT_DC.mqtt");
+        kuraDevice.sendMessageFromFile(MQTT_DC, 0, false, "src/main/resources/mqtt/rpione3_MQTT_DC.mqtt");
     }
 
     @When("^Device is disconnected$")

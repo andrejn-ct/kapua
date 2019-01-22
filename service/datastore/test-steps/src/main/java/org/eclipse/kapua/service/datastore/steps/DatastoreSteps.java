@@ -7,8 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Eurotech - initial API and implementation
- *     Red Hat Inc
+ *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
 package org.eclipse.kapua.service.datastore.steps;
 
@@ -28,14 +27,20 @@ import org.eclipse.kapua.commons.util.KapuaDateUtils;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.message.KapuaMessageFactory;
+import org.eclipse.kapua.message.KapuaPayload;
 import org.eclipse.kapua.message.KapuaPosition;
 import org.eclipse.kapua.message.device.data.KapuaDataChannel;
 import org.eclipse.kapua.message.device.data.KapuaDataMessage;
 import org.eclipse.kapua.message.device.data.KapuaDataMessageFactory;
 import org.eclipse.kapua.message.device.data.KapuaDataPayload;
 import org.eclipse.kapua.model.id.KapuaId;
+import org.eclipse.kapua.qa.common.Session;
+import org.eclipse.kapua.qa.common.SimulatedDevice;
+import org.eclipse.kapua.qa.common.SimulatedDeviceApplication;
 import org.eclipse.kapua.qa.common.StepData;
+import org.eclipse.kapua.qa.common.TestBase;
 import org.eclipse.kapua.qa.common.TestJAXBContextProvider;
+import org.eclipse.kapua.qa.common.With;
 import org.eclipse.kapua.qa.common.cucumber.CucMetric;
 import org.eclipse.kapua.qa.common.cucumber.CucTopic;
 import org.eclipse.kapua.service.account.Account;
@@ -52,6 +57,7 @@ import org.eclipse.kapua.service.datastore.internal.mediator.ChannelInfoField;
 import org.eclipse.kapua.service.datastore.internal.mediator.ClientInfoField;
 import org.eclipse.kapua.service.datastore.internal.mediator.DatastoreChannel;
 import org.eclipse.kapua.service.datastore.internal.mediator.DatastoreMediator;
+import org.eclipse.kapua.service.datastore.internal.mediator.MessageField;
 import org.eclipse.kapua.service.datastore.internal.mediator.MessageStoreConfiguration;
 import org.eclipse.kapua.service.datastore.internal.mediator.MetricInfoField;
 import org.eclipse.kapua.service.datastore.internal.model.DataIndexBy;
@@ -59,6 +65,7 @@ import org.eclipse.kapua.service.datastore.internal.model.MetricsIndexBy;
 import org.eclipse.kapua.service.datastore.internal.model.StorableIdImpl;
 import org.eclipse.kapua.service.datastore.internal.model.query.AndPredicateImpl;
 import org.eclipse.kapua.service.datastore.internal.model.query.ChannelMatchPredicateImpl;
+import org.eclipse.kapua.service.datastore.internal.model.query.MessageQueryImpl;
 import org.eclipse.kapua.service.datastore.internal.model.query.RangePredicateImpl;
 import org.eclipse.kapua.service.datastore.internal.model.query.TermPredicateImpl;
 import org.eclipse.kapua.service.datastore.internal.schema.MessageSchema;
@@ -89,7 +96,7 @@ import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
-import org.eclipse.kapua.test.KapuaTest;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +105,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -111,13 +119,38 @@ import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Steps used in Datastore scenarios.
- */
 @ScenarioScoped
-public class DataStoreServiceSteps extends KapuaTest {
+public class DatastoreSteps extends TestBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataStoreServiceSteps.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatastoreSteps.class);
+
+    // *****************
+    // * Inner Classes *
+    // *****************
+    public static class MetricEntry {
+
+        private final String key;
+        private final String type;
+        private final String value;
+
+        public MetricEntry(final String key, final String type, final String value) {
+            this.key = key;
+            this.type = type;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 
     private AccountService accountService;
 
@@ -138,21 +171,29 @@ public class DataStoreServiceSteps extends KapuaTest {
     private ClientInfoRegistryService clientInfoRegistryService;
     private ClientInfoRegistryServiceProxy clientInfoRegistryServiceProxy;
 
-    private StepData stepData;
+    private KapuaMessageFactory messageFactory;
+    private KapuaDataMessageFactory dataMessageFactory;
 
-    private static final KapuaLocator LOCATOR = KapuaLocator.getInstance();
-
-    private static final KapuaMessageFactory KAPUA_MESSAGE_FACTORY = LOCATOR.getFactory(KapuaMessageFactory.class);
-    private static final KapuaDataMessageFactory KAPUA_DATA_MESSAGE_FACTORY = LOCATOR.getFactory(KapuaDataMessageFactory.class);
+    private SimulatedDevice currentDevice;
+    private Session session;
+    private String currentApplication;
 
     @Inject
-    public DataStoreServiceSteps(StepData stepData) {
+    public DatastoreSteps(SimulatedDevice currentDevice, Session session, StepData stepData) throws KapuaException {
 
+        this.currentDevice = currentDevice;
+        this.session = session;
         this.stepData = stepData;
     }
 
+    // *************************************
+    // Definition of Cucumber scenario steps
+    // *************************************
+
     @Before
     public void beforeScenario(Scenario scenario) {
+
+        this.scenario = scenario;
 
         // Get instance of services used in different scenarios
         KapuaLocator locator = KapuaLocator.getInstance();
@@ -167,22 +208,31 @@ public class DataStoreServiceSteps extends KapuaTest {
         metricInfoRegistryServiceProxy = new MetricInfoRegistryServiceProxy();
         clientInfoRegistryService = locator.getService(ClientInfoRegistryService.class);
         clientInfoRegistryServiceProxy = new ClientInfoRegistryServiceProxy();
+        messageFactory = locator.getFactory(KapuaMessageFactory.class);
+        dataMessageFactory = locator.getFactory(KapuaDataMessageFactory.class);
 
         // JAXB Context
         XmlUtil.setContextProvider(new TestJAXBContextProvider());
     }
 
     @After
-    public void afterScenario() throws Exception {
+    public void afterScenario() {
 
+        // Clean up the database
         try {
+            LOGGER.info("Logging out in cleanup");
             deleteAllIndices();
-            LOG.info("Logging out in cleanup");
             SecurityUtils.getSubject().logout();
             KapuaSecurityUtils.clearSession();
         } catch (Exception e) {
-            LOG.error("Failed to log out in @After", e);
+            LOGGER.error("Failed to log out in @After", e);
         }
+    }
+
+    @Given("I delete indexes \"(.*)\"")
+    public void deleteIndexes(String indexExp) throws Exception {
+        DatastoreMediator.getInstance().deleteIndexes(indexExp);
+        DatastoreMediator.getInstance().refreshAllIndexes();
     }
 
     @Given("^All indices are deleted$")
@@ -191,21 +241,136 @@ public class DataStoreServiceSteps extends KapuaTest {
         deleteAllIndices();
     }
 
-    @Given("^Account for \"(.*)\"$")
-    public void getAccountForName(String accountName) throws KapuaException {
+    @Given("I have a mock data application named \"(.*)\"")
+    public void addMockDataApplication(final String applicationId) {
+        Assert.assertFalse(currentDevice.isStarted());
 
-        Account account = accountService.findByName(accountName);
-        stepData.put("LastAccount", account);
+        final SimulatedDeviceApplication app = new SimulatedDeviceApplication(applicationId);
+        currentDevice.getMockApplications().put(applicationId, app);
     }
 
-    @Given("^The device \"(.*)\"$")
-    public void createDeviceWithName(String clientId) throws KapuaException {
-
-        Account tmpAcc = (Account) stepData.get("LastAccount");
-        DeviceCreator tmpDevCr = deviceFactory.newCreator(tmpAcc.getId(), clientId);
-        Device tmpDev = deviceRegistryService.create(tmpDevCr);
-        stepData.put("LastDevice", tmpDev);
+    @Given("I publish for the application \"(.*)\"")
+    public void selectPublishApplication(final String applicationId) {
+        currentApplication = applicationId;
     }
+
+    @When("I publish on the topic \"(.*)\" timestamped now")
+    public void publishMetric(final String topic, final List<MetricEntry> metrics) {
+
+        final Map<String, Object> data = toData(metrics);
+
+        final SimulatedDeviceApplication app = getMockApplication(currentApplication);
+        app.publishData(topic, Instant.now(), data);
+    }
+
+    @Then("I expect the number of messages for this device to be (\\d+)")
+    public void expectNumberOfMessages(long numberOfMessages) throws Exception {
+        final MessageStoreService service = KapuaLocator.getInstance().getService(MessageStoreService.class);
+        session.withLogin(() -> {
+            With.withUserAccount(currentDevice.getAccountName(), account -> {
+
+                // create new query
+
+                final MessageQueryImpl query = new MessageQueryImpl(account.getId());
+
+                // filter for client only
+
+                query.setPredicate(new TermPredicateImpl(MessageField.CLIENT_ID, currentDevice.getClientId()));
+
+            // set query options
+            query.setAskTotalCount(true);
+            query.setLimit((int)numberOfMessages);
+
+                // perform query
+
+                final MessageListResult result = service.query(query);
+
+                // eval just the size
+
+                Assert.assertEquals(numberOfMessages, result.getSize());
+
+                // eval the total count
+
+                Assert.assertEquals(Long.valueOf(numberOfMessages), result.getTotalCount());
+
+                // different approach -> same result
+
+                Assert.assertEquals(numberOfMessages, service.count(query));
+            });
+        });
+    }
+
+    @Then("I delete the messages for this device")
+    public void deleteMessages() throws Exception {
+        final MessageStoreService service = KapuaLocator.getInstance().getService(MessageStoreService.class);
+        session.withLogin(() -> {
+            With.withUserAccount(currentDevice.getAccountName(), account -> {
+
+                // create new query
+                final MessageQueryImpl query = new MessageQueryImpl(account.getId());
+
+                // filter for client only
+                query.setPredicate(new TermPredicateImpl(MessageField.CLIENT_ID, currentDevice.getClientId()));
+
+                // set query options
+                query.setAskTotalCount(true);
+                query.setLimit(100);
+
+                // perform delete
+                service.delete(query);
+            });
+        });
+    }
+
+    @Then("I expect the latest captured message on channel \"(.*)\" to have the metrics")
+    public void testMessageData(final String topic, final List<MetricEntry> expectedMetrics) throws Exception {
+        final MessageStoreService service = KapuaLocator.getInstance().getService(MessageStoreService.class);
+        session.withLogin(() -> {
+            With.withUserAccount(currentDevice.getAccountName(), account -> {
+
+                // start a new query
+
+                final MessageQueryImpl query = new MessageQueryImpl(account.getId());
+
+                // query for client and channel
+
+                final AndPredicateImpl and = new AndPredicateImpl();
+                and.getPredicates().add(new TermPredicateImpl(MessageField.CLIENT_ID, currentDevice.getClientId()));
+                and.getPredicates().add(new TermPredicateImpl(MessageField.CHANNEL, topic));
+                query.setPredicate(and);
+
+                // sort by captured time
+
+                query.setSortFields(Arrays.asList(SortField.descending(MessageField.CAPTURED_ON.field())));
+
+                // perform the query
+
+                final MessageListResult result = service.query(query);
+
+                Assert.assertEquals(1, result.getSize());
+
+                // get the first item
+
+                final DatastoreMessage message = result.getFirstItem();
+                Assert.assertEquals(currentDevice.getClientId(), message.getClientId());
+
+                // get payload structure
+
+                final KapuaPayload payload = message.getPayload();
+
+                // assert metrics data
+
+                final Map<String, Object> properties = payload.getMetrics();
+                Assert.assertEquals(toData(expectedMetrics), properties);
+            });
+        });
+    }
+
+    @When("^I refresh all indices$")
+    public void refreshIndeces() throws Throwable {
+        DatastoreMediator.getInstance().refreshAllIndexes();
+    }
+
 
     @Given("^I prepare a random message and save it as \"(.*)\"$")
     public void prepareAndRememberARandomMessage(String msgKey) throws Exception {
@@ -264,7 +429,7 @@ public class DataStoreServiceSteps extends KapuaTest {
         List<KapuaDataMessage> tmpMsgLst = (List<KapuaDataMessage>) stepData.get(lstKey);
         KapuaDataMessage tmpMsg = tmpMsgLst.get(idx);
 
-        tmpMsg.setPayload(KAPUA_DATA_MESSAGE_FACTORY.newKapuaDataPayload());
+        tmpMsg.setPayload(dataMessageFactory.newKapuaDataPayload());
 
         for (CucMetric tmpMet : metLst) {
             switch (tmpMet.getType().trim().toLowerCase()) {
@@ -458,12 +623,6 @@ public class DataStoreServiceSteps extends KapuaTest {
     public void clearDatabaseCaches() {
 
         clearAllCaches();
-    }
-
-    @When("^I refresh all database indices$")
-    public void refreshDatabaseIndices() throws Exception {
-
-        refreshAllIndices();
     }
 
     @When("^I delete the datastore message with ID \"(.*)\"$")
@@ -1370,11 +1529,53 @@ public class DataStoreServiceSteps extends KapuaTest {
         messageStoreService.setConfigValues(KapuaId.ONE, null, settings);
     }
 
-    // Private helper functions
+    // *******************
+    // * Private Helpers *
+    // *******************
+
+    private static Map<String, Object> toData(List<MetricEntry> metrics) {
+        final Map<String, Object> data = new HashMap<>();
+
+        for (final MetricEntry entry : metrics) {
+
+            final String key = entry.getKey();
+            final String stringValue = entry.getValue();
+            final String type = entry.getType();
+
+            switch (type.toUpperCase()) {
+                case "STRING":
+                    data.put(key, stringValue);
+                    break;
+                case "INT32":
+                    data.put(key, Integer.valueOf(stringValue));
+                    break;
+                case "INT64":
+                    data.put(key, Long.valueOf(stringValue));
+                    break;
+                case "DOUBLE":
+                    data.put(key, Double.parseDouble(stringValue));
+                    break;
+                case "BOOLEAN":
+                    data.put(key, Boolean.valueOf(stringValue));
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("Unknown type: %s", type));
+            }
+        }
+        return data;
+    }
+
+    private SimulatedDeviceApplication getMockApplication(final String applicationId) {
+        final SimulatedDeviceApplication app = currentDevice.getMockApplications().get(applicationId);
+        if (app == null) {
+            throw new IllegalStateException(String.format("Application '%s' not found in current setup", applicationId));
+        }
+        return app;
+    }
 
     private KapuaDataPayload createRandomTestPayload() throws Exception {
 
-        KapuaDataPayload tmpTestPayload = KAPUA_DATA_MESSAGE_FACTORY.newKapuaDataPayload();
+        KapuaDataPayload tmpTestPayload = dataMessageFactory.newKapuaDataPayload();
 
         byte[] randomPayload = new byte[128];
         random.nextBytes(randomPayload);
@@ -1415,7 +1616,7 @@ public class DataStoreServiceSteps extends KapuaTest {
 
     private KapuaPosition createRandomTestPosition(Date timeStamp) {
 
-        KapuaPosition tmpPosition = KAPUA_MESSAGE_FACTORY.newPosition();
+        KapuaPosition tmpPosition = messageFactory.newPosition();
 
         tmpPosition.setAltitude(20000.0 * random.nextDouble()); // 0 .. 20000
         tmpPosition.setHeading(360.0 * random.nextDouble()); // 0 .. 360
@@ -1435,7 +1636,7 @@ public class DataStoreServiceSteps extends KapuaTest {
 
         String tmpTopic = (topic != null) ? topic : "default/test/topic";
         String tmpClientId = (clientId != null) ? clientId : ((Device) stepData.get("LastDevice")).getClientId();
-        KapuaDataMessage tmpMessage = KAPUA_DATA_MESSAGE_FACTORY.newKapuaDataMessage();
+        KapuaDataMessage tmpMessage = dataMessageFactory.newKapuaDataMessage();
 
         Date tmpRecDate = new Date();
         Calendar tmpCal = Calendar.getInstance();
@@ -1454,7 +1655,7 @@ public class DataStoreServiceSteps extends KapuaTest {
         tmpMessage.setDeviceId(deviceId);
         tmpMessage.setScopeId(scopeId);
 
-        KapuaDataChannel tmpChannel = KAPUA_DATA_MESSAGE_FACTORY.newKapuaDataChannel();
+        KapuaDataChannel tmpChannel = dataMessageFactory.newKapuaDataChannel();
         tmpChannel.setSemanticParts(new ArrayList<>(Arrays.asList(tmpTopic.split("/"))));
         tmpMessage.setChannel(tmpChannel);
 

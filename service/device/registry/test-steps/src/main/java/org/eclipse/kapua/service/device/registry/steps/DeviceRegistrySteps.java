@@ -423,6 +423,15 @@ public class DeviceRegistrySteps extends TestBase {
         }
     }
 
+    @Given("^The device \"(.*)\"$")
+    public void createDeviceWithName(String clientId) throws KapuaException {
+
+        Account tmpAcc = (Account) stepData.get("LastAccount");
+        DeviceCreator tmpDevCr = deviceFactory.newCreator(tmpAcc.getId(), clientId);
+        Device tmpDev = deviceRegistryService.create(tmpDevCr);
+        stepData.put("LastDevice", tmpDev);
+    }
+
     @Given("^A null device$")
     public void createANullDevice() {
 

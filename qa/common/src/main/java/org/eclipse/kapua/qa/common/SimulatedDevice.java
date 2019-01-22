@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.registry.steps;
+package org.eclipse.kapua.qa.common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,13 +17,13 @@ import java.util.Map;
 import cucumber.runtime.java.guice.ScenarioScoped;
 
 @ScenarioScoped
-public class SimulatorDevice {
+public class SimulatedDevice {
 
     private String accountName;
 
     private String clientId;
 
-    private Map<String, MockDataApplication> mockApplications = new HashMap<>();
+    private Map<String, SimulatedDeviceApplication> mockApplications = new HashMap<>();
 
     private boolean started;
 
@@ -43,11 +43,11 @@ public class SimulatorDevice {
         this.clientId = clientId;
     }
 
-    public Map<String, MockDataApplication> getMockApplications() {
+    public Map<String, SimulatedDeviceApplication> getMockApplications() {
         return mockApplications;
     }
 
-    public void setMockApplications(Map<String, MockDataApplication> mockApplications) {
+    public void setMockApplications(Map<String, SimulatedDeviceApplication> mockApplications) {
         this.mockApplications = mockApplications;
     }
 
