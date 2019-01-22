@@ -9,9 +9,10 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.service.device.registry.steps;
 
 import org.eclipse.kapua.commons.util.ThrowingRunnable;
+import org.eclipse.kapua.qa.common.With;
 import org.eclipse.kapua.service.authentication.LoginCredentials;
 
 import cucumber.runtime.java.guice.ScenarioScoped;

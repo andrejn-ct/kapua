@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.service.device.registry.steps;
 
 import java.net.URI;
 import java.time.Duration;
@@ -38,6 +38,7 @@ import org.eclipse.kapua.kura.simulator.app.command.SimpleCommandApplication;
 import org.eclipse.kapua.kura.simulator.app.deploy.SimpleDeployApplication;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.qa.common.DBHelper;
+import org.eclipse.kapua.qa.common.With;
 import org.eclipse.kapua.qa.common.utils.EmbeddedBroker;
 import org.eclipse.kapua.qa.common.Starting;
 import org.eclipse.kapua.qa.common.Suppressed;

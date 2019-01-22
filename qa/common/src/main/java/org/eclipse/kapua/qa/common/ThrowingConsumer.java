@@ -9,7 +9,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.device.steps;
+package org.eclipse.kapua.qa.common;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T> {

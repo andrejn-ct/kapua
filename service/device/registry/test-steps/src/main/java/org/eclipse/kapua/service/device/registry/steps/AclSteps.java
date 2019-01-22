@@ -27,9 +27,9 @@ import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountFactory;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.authentication.AuthenticationService;
+import org.eclipse.kapua.service.authentication.CredentialsFactory;
 import org.eclipse.kapua.service.authentication.LoginCredentials;
 import org.eclipse.kapua.service.authentication.credential.CredentialService;
-import org.eclipse.kapua.service.authentication.shiro.UsernamePasswordCredentialsImpl;
 import org.eclipse.kapua.service.authorization.access.AccessInfoService;
 import org.eclipse.kapua.service.user.User;
 import org.eclipse.kapua.service.user.UserService;
@@ -73,6 +73,11 @@ public class AclSteps extends TestBase {
     private static AuthenticationService authenticationService;
 
     /**
+     * Credentials factory.
+     */
+    private static CredentialsFactory credentialsFactory;
+
+    /**
      * Account service.
      */
     private static AccountService accountService;
@@ -113,6 +118,7 @@ public class AclSteps extends TestBase {
 
         KapuaLocator locator = KapuaLocator.getInstance();
         authenticationService = locator.getService(AuthenticationService.class);
+        credentialsFactory = locator.getFactory(CredentialsFactory.class);
         accountService = locator.getService(AccountService.class);
         accountFactory = locator.getFactory(AccountFactory.class);
         userService = locator.getService(UserService.class);
@@ -142,7 +148,7 @@ public class AclSteps extends TestBase {
         waitInMillis(BROKER_START_WAIT_MILLIS);
         // Login with system user
         String passwd = SYS_PASSWORD;
-        LoginCredentials credentials = new UsernamePasswordCredentialsImpl(SYS_USERNAME, passwd);
+        LoginCredentials credentials = credentialsFactory.newUsernamePasswordCredentials(SYS_USERNAME, passwd);
         authenticationService.login(credentials);
     }
 
