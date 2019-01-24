@@ -12,23 +12,23 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.device.registry.steps;
 
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
+import cucumber.api.Scenario;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import cucumber.runtime.java.guice.ScenarioScoped;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.broker.core.setting.BrokerSetting;
-import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.xml.JAXBContextProvider;
 import org.eclipse.kapua.commons.util.xml.XmlUtil;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.qa.common.DBHelper;
-import org.eclipse.kapua.qa.common.TestBase;
-import org.eclipse.kapua.qa.common.utils.EmbeddedBroker;
 import org.eclipse.kapua.qa.common.StepData;
+import org.eclipse.kapua.qa.common.TestBase;
 import org.eclipse.kapua.qa.common.TestJAXBContextProvider;
+import org.eclipse.kapua.qa.common.utils.EmbeddedBroker;
 import org.eclipse.kapua.service.device.management.bundle.DeviceBundle;
 import org.eclipse.kapua.service.device.management.bundle.DeviceBundleManagementService;
 import org.eclipse.kapua.service.device.management.bundle.DeviceBundles;
@@ -47,20 +47,16 @@ import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionService;
-
-import javax.inject.Inject;
-
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import cucumber.runtime.java.guice.ScenarioScoped;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.Assert;
+
+import javax.inject.Inject;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Steps used in integration scenarios with running MQTT broker and process of
@@ -149,7 +145,7 @@ public class BrokerSteps extends TestBase {
     }
 
     @Before
-    public void beforeScenario(Scenario scenario) throws Exception {
+    public void beforeScenario(Scenario scenario) {
 
         this.scenario = scenario;
 
@@ -191,7 +187,7 @@ public class BrokerSteps extends TestBase {
     @When("^Device birth message is sent$")
     public void deviceBirthMessage() throws Exception {
 
-        kuraDevice.sendMessageFromFile(MQTT_BIRTH, 0, false, "src/main/resources/mqtt/rpione3_MQTT_BIRTH.mqtt");
+        kuraDevice.sendMessageFromFile(MQTT_BIRTH, 0, false, "/mqtt/rpione3_MQTT_BIRTH.mqtt");
     }
 
     @When("^Device is connected$")
@@ -203,7 +199,7 @@ public class BrokerSteps extends TestBase {
     @When("^Device death message is sent$")
     public void deviceDeathMessage() throws Exception {
 
-        kuraDevice.sendMessageFromFile(MQTT_DC, 0, false, "src/main/resources/mqtt/rpione3_MQTT_DC.mqtt");
+        kuraDevice.sendMessageFromFile(MQTT_DC, 0, false, "/mqtt/rpione3_MQTT_DC.mqtt");
     }
 
     @When("^Device is disconnected$")
@@ -215,7 +211,7 @@ public class BrokerSteps extends TestBase {
     @When("^Packages are requested$")
     public void requestPackages() throws Exception {
 
-        Device device = deviceRegistryService.findByClientId(new KapuaEid(BigInteger.valueOf(1l)), "rpione3");
+        Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, "rpione3");
         if (device != null) {
             DevicePackages deploymentPackages = devicePackageManagementService.getInstalled(device.getScopeId(),
                     device.getId(), null);
@@ -237,7 +233,7 @@ public class BrokerSteps extends TestBase {
     @When("^Bundles are requested$")
     public void requestBundles() throws Exception {
 
-        Device device = deviceRegistryService.findByClientId(new KapuaEid(BigInteger.valueOf(1l)), "rpione3");
+        Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, "rpione3");
         Assert.assertNotNull(device);
         DeviceBundles deviceBundles = deviceBundleManagementService.get(device.getScopeId(), device.getId(), null);
         List<DeviceBundle> bundles = deviceBundles.getBundles();
@@ -254,9 +250,9 @@ public class BrokerSteps extends TestBase {
     @When("^Configuration is requested$")
     public void requestConfiguration() throws Exception {
 
-        Device device = deviceRegistryService.findByClientId(new KapuaEid(BigInteger.valueOf(1l)), "rpione3");
-        DeviceConfiguration deviceConfiguration = deviceConfiguratiomManagementService.get(device.getScopeId(),
-                device.getId(), null, null, null);
+        Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, "rpione3");
+        Assert.assertNotNull(device);
+        DeviceConfiguration deviceConfiguration = deviceConfiguratiomManagementService.get(device.getScopeId(), device.getId(), null, null, null);
         List<DeviceComponentConfiguration> configurations = deviceConfiguration.getComponentConfigurations();
         stepData.put("configurations", configurations);
     }
@@ -271,7 +267,7 @@ public class BrokerSteps extends TestBase {
     @When("^Command (.*) is executed$")
     public void executeCommand(String command) throws Exception {
 
-        Device device = deviceRegistryService.findByClientId(new KapuaEid(BigInteger.valueOf(1l)), "rpione3");
+        Device device = deviceRegistryService.findByClientId(SYS_SCOPE_ID, "rpione3");
         DeviceCommandInput commandInput = deviceCommandFactory.newCommandInput();
         commandInput.setCommand(command);
         commandInput.setRunAsynch(false);
@@ -295,7 +291,7 @@ public class BrokerSteps extends TestBase {
         DeviceConnection deviceConn = null;
         stepData.put("ExceptionCaught", false);
         try {
-            deviceConn = deviceConnectionService.findByClientId(new KapuaEid(BigInteger.valueOf(1l)), "rpione3");
+            deviceConn = deviceConnectionService.findByClientId(SYS_SCOPE_ID, "rpione3");
         } catch (KapuaException ex) {
             stepData.put("ExceptionCaught", true);
             return;
@@ -332,7 +328,7 @@ public class BrokerSteps extends TestBase {
     @When("^topic \"(.*)\" content \"(.*)\" is published by client named \"(.*)\"$")
     public void publishMessageByClient(String topic, String content, String clientName) throws Exception {
         MqttClient mqttClient = (MqttClient) stepData.get(clientName);
-        byte[] payload = Files.readAllBytes(Paths.get(content));
+        byte[] payload = Files.readAllBytes(Paths.get(getClass().getResource(content).toURI()));
 
         if (mqttClient == null) {
             throw new Exception("Mqtt test client not found");
