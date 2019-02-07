@@ -302,7 +302,7 @@ public class DeviceRegistrySteps extends TestBase {
         tagService = locator.getService(TagService.class);
         tagFactory = locator.getFactory(TagFactory.class);
 
-        aclCreator = new AclCreator(accountService, accountFactory, userService, accessInfoService, credentialService);
+        aclCreator = new AclCreator();
 
         if (isUnitTest()) {
             // Create KapuaSession using KapuaSecurtiyUtils and kapua-sys user as logged in user.
