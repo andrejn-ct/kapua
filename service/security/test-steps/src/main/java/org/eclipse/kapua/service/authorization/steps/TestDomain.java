@@ -32,6 +32,12 @@ public class TestDomain extends AbstractKapuaEntity implements Domain, org.eclip
     private Set<Actions> actions = new HashSet<>(Lists.newArrayList(Actions.read, Actions.delete, Actions.write));
     private boolean groupable;
 
+    public TestDomain() {}
+
+    public TestDomain(String name) {
+        this.name = name;
+    }
+
     @Override
     public void setName(String name) {
         this.name = name;

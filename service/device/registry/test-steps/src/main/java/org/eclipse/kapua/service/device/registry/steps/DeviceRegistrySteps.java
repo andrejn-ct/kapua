@@ -103,7 +103,6 @@ import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionQuer
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionService;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionStatus;
 import org.eclipse.kapua.service.device.registry.connection.internal.DeviceConnectionFactoryImpl;
-import org.eclipse.kapua.service.device.registry.connection.internal.DeviceConnectionListResultImpl;
 import org.eclipse.kapua.service.device.registry.connection.internal.DeviceConnectionServiceImpl;
 import org.eclipse.kapua.service.device.registry.event.DeviceEvent;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventCreator;
@@ -2163,7 +2162,7 @@ public class DeviceRegistrySteps extends TestBase {
         KapuaSecurityUtils.doPrivileged(() -> {
             Account tmpAcc;
             DeviceConnection tmpConn;
-            DeviceConnectionListResult tmpConnLst = new DeviceConnectionListResultImpl();
+            DeviceConnectionListResult tmpConnLst = deviceConnectionFactory.newListResult();
 
             tmpAcc = accountService.findByName(account);
             Assert.assertNotNull(tmpAcc);
