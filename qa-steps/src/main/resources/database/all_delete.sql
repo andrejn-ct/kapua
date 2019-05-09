@@ -58,6 +58,10 @@ DELETE FROM job_job_step_definition;
 
 DELETE FROM job_job_step_definition_properties;
 
+DELETE FROM job_job_execution;
+
+DELETE FROM job_job_execution_target;
+
 DELETE FROM job_job_target;
 
 DELETE FROM endp_endpoint_info;

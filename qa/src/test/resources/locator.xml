@@ -43,11 +43,12 @@
         <api>org.eclipse.kapua.service.user.UserFactory</api>
         <api>org.eclipse.kapua.service.user.UserService</api>
 
-
         <api>org.eclipse.kapua.service.job.JobService</api>
         <api>org.eclipse.kapua.service.job.JobFactory</api>
         <api>org.eclipse.kapua.service.job.step.JobStepService</api>
         <api>org.eclipse.kapua.service.job.step.JobStepFactory</api>
+        <api>org.eclipse.kapua.service.job.execution.JobExecutionService</api>
+        <api>org.eclipse.kapua.service.job.execution.JobExecutionFactory</api>
         <api>org.eclipse.kapua.service.job.targets.JobTargetService</api>
         <api>org.eclipse.kapua.service.job.targets.JobTargetFactory</api>
         <api>org.eclipse.kapua.service.job.step.definition.JobStepDefinitionService</api>

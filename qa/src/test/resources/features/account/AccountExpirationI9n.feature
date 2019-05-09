@@ -9,10 +9,15 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
-@user
+@account
+@integration
 Feature: Account expiration features
     Accounts have an expiration date. From this date onward the accounts are considered disabled
     and cannot be logged into anymore.
+
+  Scenario: Start event broker for all scenarios
+
+    Given Start Event Broker
 
   Scenario: Account with future expiration date
     Set the expiration date of an account in the future. It must be possible to log into such
@@ -506,3 +511,7 @@ Feature: Account expiration features
     When I change the current account expiration date to "null"
     Then An exception was thrown
     And I logout
+
+  Scenario: Stop event broker for all scenarios
+
+    Given Stop Event Broker

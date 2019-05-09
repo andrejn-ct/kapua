@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
+@user
 @rest
+@integration
 Feature: REST API tests for User
   REST API test of Kapua User API.
 

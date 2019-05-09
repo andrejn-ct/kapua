@@ -9,7 +9,10 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
+@user
+@integration
 @serviceevents
+@userevents
 Feature: Tenant service with Service Events
     Basic workflow of Account and User creation and deletion, where Service Events are
     being triggered on create, update and delete action on Account and User service.
@@ -592,25 +595,6 @@ Feature: Tenant service with Service Events
         And I wait 1 second
         Then I don't find user credentials
         And I logout
-
-    Scenario: Job is deleted, the job schedules must be deleted too
-
-        Given I select account "account-a"
-        And A job named "test-job-a-1" in the current scope
-        And A job named "test-job-a-2" in the current scope
-        When I create the schedule "test-trigger-1" for the job "test-job-a-1" in the current account
-        When I create the schedule "test-trigger-2" for the job "test-job-a-1" in the current account
-        When I create the schedule "test-trigger-3" for the job "test-job-a-2" in the current account
-        And I search for the schedule "test-trigger-1" in the current account
-        Then There is such a schedule
-        When I count the schedules in the current account
-        Then There are exactly 3 schedules
-        When I delete the job "test-job-a-1" in the current account
-        And I wait 5 seconds
-        When I search for the schedule "test-trigger-1" in the current account
-        Then There is no such schedule
-        When I count the schedules in the current account
-        Then There is exactly 1 schedule
 
     Scenario: Stop event broker for all scenarios
         Given Stop Event Broker

@@ -105,6 +105,7 @@ public class JobServiceSteps extends BaseQATests {
             logger.info("Logging out in cleanup");
             SecurityUtils.getSubject().logout();
             KapuaSecurityUtils.clearSession();
+            database.unconditionalDeleteAll();
         } catch (Exception e) {
             logger.error("Failed to log out in @After", e);
         }
@@ -487,8 +488,8 @@ public class JobServiceSteps extends BaseQATests {
 
         Calendar tmpCalStart = Calendar.getInstance();
         tmpCalStart.add(Calendar.HOUR, 5);
-        Calendar tmpCalEnd = tmpCalStart;
-        tmpCalEnd.add(Calendar.HOUR, 5);
+        Calendar tmpCalEnd = Calendar.getInstance();
+        tmpCalEnd.add(Calendar.HOUR, 10);
 
         tmpCreator.setStartsOn(tmpCalStart.getTime());
         tmpCreator.setEndsOn(tmpCalEnd.getTime());

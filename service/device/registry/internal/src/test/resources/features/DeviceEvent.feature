@@ -14,21 +14,18 @@ Feature: Device Event CRUD tests
     The Device Event service is responsible for handling the incoming device
     events.
 
-Background:
-    Given Scope 12
-    And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
-    And A "first" device
-    And A "second" device
-
 Scenario: Create a regular event
     Create a regular event. The event should not be null and should
     have a regular entity ID. Also the event entity shoould match the event
     creator parameters.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And A "CREATE" event from device "first"
     Then There was no exception
@@ -38,6 +35,13 @@ Scenario: Create an event with a null scope ID
     It should be impossible to create an event with a null scope ID. Such attempt
     must raise an exception.
 
+    Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     Given Null scope ID
     And I expect the exception "KapuaIllegalNullArgumentException" with the text "An illegal null value was provided"
     And User 5
@@ -49,6 +53,12 @@ Scenario: Create an event with a null action
     In such cases an exception must be thrown.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type device with id/name"
     And User 5
     And An event creator with null action
@@ -59,6 +69,12 @@ Scenario: Find an event by its ID
     It must be possible to find an event entity based on the event ID.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And A "CREATE" event from device "first"
     When I search for an event with the remembered ID
@@ -69,6 +85,12 @@ Scenario: Find a non existing event
     exception must be thrown.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And A "CREATE" event from device "first"
     When I search for an event with a random ID
@@ -78,6 +100,12 @@ Scenario: Delete an existing event
     It must be possible to delete an existing event entity from the database.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And A "CREATE" event from device "first"
     When I search for an event with the remembered ID
@@ -91,6 +119,12 @@ Scenario: Delete a non existent event
     exception to be thrown.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And I expect the exception "KapuaEntityNotFoundException" with the text "The entity of type deviceEvent with id/name"
     And User 5
     And A "CREATE" event from device "first"
@@ -102,6 +136,12 @@ Scenario: Count events in scope
     scope should counted, all other events must be ignored.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And I have 15 "CREATE" events from device "first"
 
@@ -120,6 +160,12 @@ Scenario: Count events in empty scope
     exception must be thrown.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And I have 15 "CREATE" events from device "first"
     When I count events for scope 42
@@ -129,6 +175,12 @@ Scenario: Basic Device Event queries
     It must be possible to perform basic event entity queries.
 
     Given Scope 12
+    And I configure the device service
+        | type    | name                   | value |
+        | boolean | infiniteChildEntities  | true  |
+        | integer | maxNumberChildEntities |  10   |
+    And A "first" device
+    And A "second" device
     And User 5
     And I have 10 "WRITE" events from device "first"
     And I have 15 "CREATE" events from device "first"

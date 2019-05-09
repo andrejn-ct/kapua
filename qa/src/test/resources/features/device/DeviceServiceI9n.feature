@@ -313,7 +313,8 @@ Scenario: Creating new device, tagging it with specific Tag and then deleting th
     When I search for device with tag "KuraDevice2"
     Then I find device "device_1"
     And I untag device with "KuraDevice2" tag
-    And I verify that tag "KuraDevice2" is deleted
+    When I search for device with tag "KuraDevice2"
+    Then I find no device
     And I logout
 
   Scenario: Stop broker after all scenarios
