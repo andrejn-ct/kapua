@@ -10,6 +10,8 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @security
+@groups
+@unit
 Feature: Group Service CRUD tests
 
   Scenario: Count groups in a blank database

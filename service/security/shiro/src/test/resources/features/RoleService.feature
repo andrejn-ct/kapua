@@ -10,6 +10,8 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @security
+@role
+@unit
 Feature: Role Service CRUD tests
 
 Scenario: Regular role creation

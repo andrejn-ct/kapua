@@ -10,6 +10,7 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @security
+@unit
 Feature: Misc Authorization functionality CRUD tests
 
 Scenario: Permission factory sanity checks
