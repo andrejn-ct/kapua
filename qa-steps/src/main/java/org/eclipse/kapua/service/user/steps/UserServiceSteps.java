@@ -174,7 +174,7 @@ public class UserServiceSteps extends BaseQATests {
 
     @Given("^Full permissions$")
     public void givenFullPermissions() throws Exception {
-        createPermissions(null, (ComparableUser) stepData.get("LastUser"), (Account) stepData.get("LastAccount"));
+        createPermissions(null, new ComparableUser((User) stepData.get("LastUser")), (Account) stepData.get("LastAccount"));
     }
 
     @Given("^User A$")
