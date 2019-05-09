@@ -10,6 +10,8 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @security
+@domain
+@unit
 Feature: Domain Service CRUD tests
 
   Scenario: Count domains in a blank database

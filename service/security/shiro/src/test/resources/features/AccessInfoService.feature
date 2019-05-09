@@ -10,6 +10,8 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @security
+@accessinfo
+@unit
 Feature: Access Info Service CRUD tests
 
   Scenario: Simple create

@@ -10,6 +10,8 @@
 #     Eurotech - initial API and implementation
 ###############################################################################
 @jobs
+@jobtargets
+@unit
 Feature: Job Target service CRUD tests
     The Job service is responsible for maintaining a list of job targets.
 
