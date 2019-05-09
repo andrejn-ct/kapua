@@ -9,6 +9,7 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
+@broker
 @brokerAcl
 @integration
 Feature: Broker ACL tests

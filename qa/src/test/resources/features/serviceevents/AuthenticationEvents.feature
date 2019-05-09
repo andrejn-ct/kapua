@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech
 ###############################################################################
+@integration
 @serviceevents
+@authtevents
 Feature: Authentication Service
 
     Scenario: Start event broker for all scenarios

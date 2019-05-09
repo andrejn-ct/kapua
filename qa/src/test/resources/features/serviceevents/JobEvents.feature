@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
+@integration
 @serviceevents
+@jobevents
 Feature: Job service with Service Events
     Basic workflow of Job creation and deletion, where Service Events are triggered on
     delete action on Job service.

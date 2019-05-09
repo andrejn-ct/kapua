@@ -9,78 +9,10 @@
 # Contributors:
 #     Eurotech
 ###############################################################################
+@integration
 @serviceevents
+@authzevents
 Feature: Authorization Service
-
-    Background:
-        Given I login as user with name "kapua-sys" and password "kapua-password"
-        And I configure the account service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And I configure the user service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        Given Account
-            | name      | scopeId |
-            | account-a | 1       |
-        And I configure the account service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And I configure the user service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And I configure the role service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 5     |
-        And I configure the group service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 5     |
-        And I configure the device service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And User A
-            | name    | displayName  | email             | phoneNumber     | status  | userType |
-            | kapua-a | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
-        And Credentials
-            | name    | password          | enabled |
-            | kapua-a | ToManySecrets123# | true    |
-        Given Account
-            | name      | scopeId |
-            | account-b | 1       |
-        And I configure the account service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And I configure the user service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And I configure the role service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 5     |
-        And I configure the group service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 5     |
-        And I configure the device service
-            | type    | name                   | value |
-            | boolean | infiniteChildEntities  | true  |
-            | integer | maxNumberChildEntities | 0     |
-        And User B
-            | name    | displayName  | email             | phoneNumber     | status  | userType |
-            | kapua-b | Kapua User B | kapua_b@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
-        And Credentials
-            | name    | password          | enabled |
-            | kapua-b | ToManySecrets123# | true    |
-        And I wait for 5 seconds
 
     Scenario: Start event broker for all scenarios
 

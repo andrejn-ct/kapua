@@ -9,7 +9,9 @@
 # Contributors:
 #     Eurotech - initial API and implementation
 ###############################################################################
+@integration
 @serviceevents
+@endpointevents
 Feature: EndpointInfo service with Service Events
     Basic workflow of Endpoint Info creation and deletion, where Service Events are triggered on
     account deletion.

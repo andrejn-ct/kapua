@@ -16,13 +16,6 @@ Feature: Tag Service
   used to attach tags to Devices, but could be used to tag eny kapua entity, like
   User for example.
 
-  Background:
-    Given I login as user with name "kapua-sys" and password "kapua-password"
-      And I configure the tag service
-        | type    | name                       | value |
-        | boolean | infiniteChildEntities      | true  |
-        | integer | maxNumberChildEntities     | 5     |
-
   Scenario: Start datastore for all scenarios
 
     Given Start Datastore
@@ -39,6 +32,12 @@ Feature: Tag Service
     Create a tag entry, with specified name. Name is only tag specific attribute.
     Once created search for it and is should been created.
 
+    Given I login as user with name "kapua-sys" and password "kapua-password"
+    And I configure the tag service
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
+
     Given Tag with name "tagName"
     When Tag with name "tagName" is searched
     Then Tag with name "tagName" is found
@@ -47,6 +46,12 @@ Feature: Tag Service
   Scenario: Deleting tag
     Create a tag entry, with specified name. Name is only tag specific attribute.
     Once created search and find it, then delete it.
+
+    Given I login as user with name "kapua-sys" and password "kapua-password"
+    And I configure the tag service
+      | type    | name                       | value |
+      | boolean | infiniteChildEntities      | true  |
+      | integer | maxNumberChildEntities     | 5     |
 
     Given Tag with name "tagName2"
     When Tag with name "tagName2" is searched
