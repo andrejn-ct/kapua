@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.endpoint.internal;
 
-import org.eclipse.kapua.KapuaEntityNotFoundException;
+// import org.eclipse.kapua.KapuaEntityNotFoundException;
 import org.eclipse.kapua.KapuaEntityUniquenessException;
 import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.configuration.AbstractKapuaConfigurableResourceLimitedService;
@@ -201,7 +201,8 @@ public class EndpointInfoServiceImpl
                     Account account = KapuaSecurityUtils.doPrivileged(() -> accountService.find(query.getScopeId()));
 
                     if (account == null) {
-                        throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
+                        // throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
+                        return endpointInfoListResult;
                     }
 
                     query.setScopeId(account.getScopeId());
@@ -244,7 +245,8 @@ public class EndpointInfoServiceImpl
                     Account account = KapuaSecurityUtils.doPrivileged(() -> accountService.find(query.getScopeId()));
 
                     if (account == null) {
-                        throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
+                        // throw new KapuaEntityNotFoundException(Account.TYPE, query.getScopeId());
+                        return 0L;
                     }
 
                     query.setScopeId(account.getScopeId());
